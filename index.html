@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<title>Bask — Tan by the numbers</title>
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Bask" />
+<meta name="theme-color" content="#efe3d4" id="themeColorMeta" />
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cdefs%3E%3CradialGradient id='g' cx='35%25' cy='30%25'%3E%3Cstop offset='0' stop-color='%23f0c79a'/%3E%3Cstop offset='.6' stop-color='%23c9824e'/%3E%3Cstop offset='1' stop-color='%238c5028'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='42' fill='%23efe3d4'/%3E%3Ccircle cx='90' cy='90' r='54' fill='url(%23g)'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  /* ---------- THEME TOKENS ---------- */
+  html[data-theme="light"]{
+    --bg:#efe3d4;
+    --bg-grad:linear-gradient(180deg,#f3e8da 0%,#ecdcc9 55%,#e7d0b8 100%);
+    --frame-glow:radial-gradient(120% 50% at 80% -5%,rgba(230,177,95,.4),transparent 55%),radial-gradient(90% 40% at 10% 8%,rgba(223,157,118,.3),transparent 55%);
+    --text:#3b2a1e; --heading:#3b2a1e; --muted:#6e5443; --muted2:#80604c;
+    --card:rgba(255,255,255,.62); --card-line:rgba(255,255,255,.85); --card-shadow:0 6px 22px rgba(94,60,33,.16);
+    --accent:#b3702f; --accent-grad:linear-gradient(120deg,#b3702f,#df9d76);
+    --curve-a:#df9d76; --curve-b:#b3702f; --curve-c:#e6b15f; --curve-fill:rgba(179,112,47,.26); --night:rgba(120,80,40,.14);
+    --ring-track:rgba(120,80,40,.12); --ring-grad:#ringL;
+    --pill:rgba(179,112,47,.16); --pill-text:#b3702f;
+    --chip:rgba(255,255,255,.55); --chip-line:rgba(255,255,255,.8); --chip-on:#3b2a1e;
+    --gem-glow:0 22px 46px rgba(124,70,36,.4);
+    --nav:rgba(243,232,218,.8); --sheet:#f3e8da; --input:rgba(255,255,255,.6); --input-line:rgba(120,80,40,.18);
+    --good:#4f9d6b; --warn:#cf7a3a; --danger:#d9534f;
+    --themecolor:#efe3d4;
+  }
+  *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;overscroll-behavior-y:none;font-variant-numeric:tabular-nums;transition:background .4s,color .4s;}
+  .app{max-width:460px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;position:relative;background:var(--frame-glow),var(--bg-grad);transition:background .4s;}
+  .fraunces{font-family:'Fraunces',Georgia,serif;}
+  .lbl{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);font-weight:600;}
+
+  header{padding:calc(env(safe-area-inset-top,0px) + 14px) 20px 4px;display:flex;justify-content:space-between;align-items:center;}
+  header .greet{font-family:'Fraunces',serif;font-weight:500;font-size:24px;letter-spacing:-.01em;line-height:1;color:var(--heading);}
+  header .loc{font-size:12.5px;color:var(--muted);margin-top:5px;display:flex;align-items:center;gap:5px;}
+  header .loc svg{width:13px;height:13px;color:var(--accent);}
+  .hbtns{display:flex;gap:8px;}
+  .icon-btn{width:40px;height:40px;border-radius:14px;border:1px solid var(--card-line);background:var(--card);color:var(--text);display:grid;place-items:center;cursor:pointer;backdrop-filter:blur(10px);transition:.15s;}
+  .icon-btn:active{transform:scale(.93);}
+
+  .screen{flex:1;padding:6px 16px 0;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  .screen.hidden{display:none;}
+  .pad{height:calc(108px + env(safe-area-inset-bottom,0px));}
+
+  .status{display:flex;align-items:center;gap:9px;margin:8px 4px 6px;font-size:12px;color:var(--muted2);cursor:pointer;}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex:none;transition:.3s;}
+  .dot.live{background:var(--good);box-shadow:0 0 9px var(--good);}
+  .dot.warn{background:var(--warn);} .dot.err{background:var(--danger);}
+  .dot.load{background:var(--accent);animation:blink 1s infinite;} @keyframes blink{50%{opacity:.3;}}
+  .status .rf{margin-left:auto;color:var(--accent);background:none;border:none;font:inherit;font-size:14px;cursor:pointer;padding:2px 6px;}
+
+  .card{background:var(--card);border:1px solid var(--card-line);border-radius:24px;backdrop-filter:blur(16px);box-shadow:var(--card-shadow);}
+  .reveal{animation:rise .5s cubic-bezier(.2,.7,.2,1) both;}
+  .reveal.d1{animation-delay:.05s;}.reveal.d2{animation-delay:.1s;}.reveal.d3{animation-delay:.15s;}
+  @keyframes rise{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
+
+  /* UV ribbon */
+  .ribbon{padding:16px 18px 10px;margin-top:2px;}
+  .ribbon .top{display:flex;justify-content:space-between;align-items:baseline;}
+  .ribbon .top .t{font-family:'Fraunces',serif;font-weight:600;font-size:17px;color:var(--heading);}
+  .ribbon .top .now{font-family:'Fraunces',serif;font-weight:600;font-size:22px;color:var(--heading);}
+  .ribbon .top .now i{font-style:normal;font-size:12px;color:var(--muted);font-family:'Inter';font-weight:500;}
+  svg.wave{width:100%;height:78px;display:block;margin-top:8px;}
+  .ribbon .times{display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);margin-top:2px;}
+  .window{margin-top:8px;display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted2);padding-top:8px;border-top:1px solid var(--card-line);}
+  .window b{color:var(--text);font-weight:600;}
+
+  /* stat trio */
+  .trio{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;}
+  .trio .s{padding:14px 10px;text-align:center;}
+  .trio .s .v{font-family:'Fraunces',serif;font-weight:600;font-size:25px;line-height:1;color:var(--heading);}
+  .trio .s .v u{font-size:12px;text-decoration:none;color:var(--muted);}
+  .trio .s .k{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-top:6px;}
+
+  /* dial */
+  .dialcard{margin-top:14px;padding:22px 22px 20px;text-align:center;}
+  .dial{position:relative;width:206px;height:206px;margin:2px auto 16px;cursor:pointer;}
+  .dial svg{transform:rotate(-90deg);}
+  .dial .glow{position:absolute;inset:26px;border-radius:50%;background:radial-gradient(circle,rgba(201,130,79,.16),transparent 70%);filter:blur(8px);opacity:var(--dialglow,0);}
+  .dial .c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;}
+  .dial .c .n{font-family:'Fraunces',serif;font-weight:600;font-size:52px;letter-spacing:-.02em;line-height:1;color:var(--heading);}
+  .dial .c .n.t{font-size:46px;}
+  .dial .c .l{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:8px;}
+  .dial .c .tap{font-size:11px;color:var(--accent);margin-top:8px;}
+  .btn{width:100%;border:none;border-radius:20px;padding:17px;font-family:'Fraunces',serif;font-weight:600;font-size:17px;cursor:pointer;transition:.12s;color:#fff;}
+  .btn:active{transform:scale(.985);}
+  .btn-go{background:var(--accent-grad);box-shadow:0 8px 24px rgba(179,112,47,.34);}
+  .btn-stop{background:linear-gradient(120deg,#d9534f,#df7d76);box-shadow:0 8px 24px rgba(217,83,79,.34);}
+  .btn-ghost{background:var(--card);color:var(--text);border:1px solid var(--card-line);}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+  /* tan gem card */
+  .tancard{margin-top:14px;padding:18px;display:flex;align-items:center;gap:18px;}
+  .gem{width:108px;height:108px;flex:none;border-radius:50%;position:relative;
+    background:radial-gradient(circle at 35% 28%,var(--gem1,#e9b98c) 0%,var(--gem2,#c9824e) 42%,var(--gem3,#7c4624) 78%);
+    box-shadow:var(--gem-glow),inset 0 -6px 18px rgba(80,40,20,.45),inset 0 5px 14px rgba(255,224,196,.5);}
+  .gem::after{content:"";position:absolute;top:15%;left:22%;width:40%;height:30%;border-radius:50%;background:radial-gradient(circle at 40% 40%,rgba(255,255,255,.7),transparent 70%);filter:blur(2px);}
+  .gem .gp{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Fraunces',serif;font-weight:600;font-size:26px;text-shadow:0 1px 5px rgba(70,35,15,.55);}
+  .tan-info{flex:1;min-width:0;}
+  .tan-info .badge{display:inline-block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;padding:3px 10px;border-radius:99px;background:var(--pill);color:var(--pill-text);margin-bottom:6px;}
+  .tan-info .badge.up{background:var(--pill);color:var(--pill-text);}
+  .tan-info .badge.hold{background:rgba(79,157,107,.16);color:var(--good);}
+  .tan-info .badge.fade{background:rgba(217,83,79,.14);color:var(--danger);}
+  .tan-info h3{font-family:'Fraunces',serif;font-weight:600;font-size:20px;color:var(--heading);letter-spacing:-.01em;}
+  .tan-info p{font-size:12.5px;color:var(--muted);margin-top:2px;}
+  .goalbar{height:6px;border-radius:99px;background:var(--ring-track);margin-top:9px;overflow:hidden;}
+  .goalbar i{display:block;height:100%;border-radius:99px;background:var(--accent-grad);width:0;transition:width .5s;}
+
+  /* sections / chips */
+  .sec-head{display:flex;justify-content:space-between;align-items:center;margin:18px 4px 9px;}
+  .sec-head .lbl{margin:0;} .sec-head button{background:none;border:none;color:var(--accent);font:inherit;font-size:11px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;font-weight:600;}
+  .chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+  .chips::-webkit-scrollbar{display:none;}
+  .chip{flex:none;padding:11px 15px;border-radius:15px;border:1px solid var(--chip-line);background:var(--chip);color:var(--muted2);font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;backdrop-filter:blur(8px);transition:.15s;display:flex;flex-direction:column;gap:1px;}
+  .chip .t{font-size:11px;color:var(--muted);font-weight:400;}
+  .chip[aria-pressed=true]{border-color:var(--accent);color:var(--chip-on);box-shadow:0 0 0 1px var(--accent) inset;}
+  .chip.add{border-style:dashed;color:var(--accent);justify-content:center;align-items:center;}
+
+  .uv-input{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--card-line);border-radius:20px;padding:14px 18px;backdrop-filter:blur(10px);}
+  .uv-input .num{font-family:'Fraunces',serif;font-weight:600;font-size:26px;min-width:40px;text-align:center;color:var(--accent);}
+  input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:8px;border-radius:99px;background:linear-gradient(90deg,var(--curve-a),var(--curve-b),var(--curve-c));outline:none;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;border:3px solid var(--bg);box-shadow:0 2px 8px rgba(0,0,0,.4);cursor:pointer;}
+  input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--bg);cursor:pointer;}
+  .hint{font-size:12px;color:var(--muted);margin:8px 4px 0;line-height:1.5;}
+  .foot{margin:18px 8px 0;font-size:11px;color:var(--muted);text-align:center;line-height:1.6;opacity:.85;}
+
+  /* sessions */
+  .tan-chart-card{padding:16px 16px 8px;margin-top:2px;}
+  .tan-chart-card .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;}
+  .tan-chart-card .top h3{font-family:'Fraunces',serif;font-weight:600;font-size:17px;color:var(--heading);}
+  .tan-chart-card .top .pct{font-family:'Fraunces',serif;font-weight:600;font-size:22px;color:var(--accent);}
+  svg.tanchart{width:100%;height:100px;display:block;}
+  .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;}
+  .mini{padding:14px 10px;text-align:center;}
+  .mini .v{font-family:'Fraunces',serif;font-weight:600;font-size:25px;line-height:1;color:var(--heading);}
+  .mini .k{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:5px;}
+  .log-item{display:flex;align-items:center;gap:13px;padding:13px 15px;margin-bottom:9px;}
+  .log-uv{width:44px;height:44px;flex:none;border-radius:14px;display:grid;place-items:center;font-family:'Fraunces',serif;font-weight:600;font-size:17px;color:#3b1e00;}
+  .log-body{flex:1;min-width:0;}
+  .log-body .d{font-weight:600;font-size:15px;color:var(--text);}
+  .log-body .m{font-size:12.5px;color:var(--muted);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .log-min{font-family:'Fraunces',serif;font-weight:600;font-size:16px;color:var(--accent);}
+  .del{margin-left:4px;color:var(--muted);background:none;border:none;font-size:20px;cursor:pointer;padding:4px;line-height:1;}
+  .empty{text-align:center;color:var(--muted);padding:46px 20px;}
+  .empty .ico{font-size:36px;margin-bottom:8px;opacity:.7;}
+
+  /* nav */
+  nav{position:fixed;left:0;right:0;bottom:0;z-index:30;max-width:460px;margin:0 auto;background:var(--nav);backdrop-filter:blur(20px);border-top:1px solid var(--card-line);display:flex;padding:8px 18px calc(8px + env(safe-area-inset-bottom,0px));}
+  .tab{flex:1;background:none;border:none;color:var(--muted);font:inherit;font-size:11px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px;cursor:pointer;}
+  .tab svg{width:23px;height:23px;}
+  .tab[aria-current=true]{color:var(--accent);}
+  .fab{flex:none;width:56px;height:56px;border-radius:50%;border:none;margin:-20px 8px 0;cursor:pointer;background:var(--accent-grad);color:#fff;box-shadow:0 8px 22px rgba(179,112,47,.45);display:grid;place-items:center;transition:.12s;}
+  .fab svg{width:25px;height:25px;} .fab:active{transform:scale(.92);}
+
+  /* sheets + onboarding */
+  .scrim{position:fixed;inset:0;background:rgba(20,10,4,.5);z-index:40;opacity:0;pointer-events:none;transition:.22s;backdrop-filter:blur(3px);}
+  .scrim.open{opacity:1;pointer-events:auto;}
+  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:50;max-width:460px;margin:0 auto;background:var(--sheet);border-top-left-radius:28px;border-top-right-radius:28px;border-top:1px solid var(--card-line);padding:6px 22px calc(26px + env(safe-area-inset-bottom,0px));transform:translateY(110%);transition:transform .3s cubic-bezier(.2,.85,.25,1);max-height:92vh;overflow-y:auto;}
+  .sheet.open{transform:none;}
+  .grab{width:38px;height:5px;border-radius:99px;background:var(--card-line);margin:8px auto 16px;}
+  .sheet h2{font-family:'Fraunces',serif;font-weight:600;font-size:23px;color:var(--heading);margin-bottom:4px;}
+  .sheet .sub{color:var(--muted);font-size:13px;margin-bottom:18px;}
+  .field{margin-bottom:16px;}
+  .field>label{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:8px;}
+  input[type=text],input[type=number],input[type=datetime-local],input[type=password],textarea{width:100%;background:var(--input);border:1px solid var(--input-line);border-radius:14px;color:var(--text);font:inherit;font-size:16px;padding:13px 15px;}
+  textarea{resize:none;min-height:58px;}
+  input:focus,textarea:focus{outline:none;border-color:var(--accent);}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .seg{display:flex;gap:8px;}
+  .seg button{flex:1;padding:12px 8px;border-radius:14px;border:1px solid var(--input-line);background:var(--input);color:var(--muted2);font:inherit;font-weight:600;font-size:14px;cursor:pointer;}
+  .seg button[aria-pressed=true]{border-color:var(--accent);color:var(--text);background:var(--card);}
+  .prod-row{display:flex;align-items:center;gap:12px;background:var(--input);border:1px solid var(--input-line);border-radius:14px;padding:12px 14px;margin-bottom:9px;}
+  .prod-row .pi{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;flex:none;font-size:17px;}
+  .prod-row .pb{flex:1;min-width:0;} .prod-row .pb .n{font-weight:600;font-size:15px;color:var(--text);} .prod-row .pb .s{font-size:12px;color:var(--muted);}
+  .sci p{font-size:13px;color:var(--muted2);line-height:1.6;margin-bottom:11px;} .sci code{background:var(--input);padding:2px 6px;border-radius:6px;color:var(--accent);font-size:12px;} .sci b{color:var(--text);}
+  .disclaimer{font-size:11px;color:var(--muted);line-height:1.55;text-align:center;padding:14px 8px 0;}
+
+  /* onboarding overlay */
+  .onb{position:fixed;inset:0;z-index:80;background:var(--frame-glow),var(--bg-grad);display:none;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 8px) 24px calc(24px + env(safe-area-inset-bottom,0px));overflow-y:auto;max-width:460px;margin:0 auto;}
+  .onb.show{display:flex;}
+  .onb .center{margin:auto 0;text-align:center;width:100%;}
+  .onb .orb{width:120px;height:120px;border-radius:50%;margin:8px auto 22px;background:radial-gradient(circle at 35% 30%,#f0c79a,#c9824e 60%,#8c5028);box-shadow:var(--gem-glow);}
+  .onb h2{font-family:'Fraunces',serif;font-weight:500;font-size:34px;line-height:1.05;letter-spacing:-.01em;color:var(--heading);}
+  .onb h2 em{font-style:italic;color:var(--accent);}
+  .onb .lede{font-size:14.5px;color:var(--muted2);line-height:1.55;margin:12px auto 0;max-width:30ch;}
+  .onb .label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:30px 0 12px;text-align:left;font-weight:600;}
+  .skins{display:flex;gap:9px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none;}
+  .skins::-webkit-scrollbar{display:none;}
+  .sk{flex:none;text-align:center;cursor:pointer;}
+  .sk .d{width:50px;height:50px;border-radius:50%;border:3px solid transparent;box-shadow:var(--card-shadow);transition:.15s;}
+  .sk.sel .d{border-color:var(--accent);}
+  .sk .n{font-family:'Fraunces',serif;font-size:13px;margin-top:6px;color:var(--text);}
+  .onb .loc{width:100%;border:1px solid var(--card-line);background:var(--card);color:var(--text);font-weight:600;font-size:15px;padding:15px;border-radius:18px;cursor:pointer;margin-top:18px;backdrop-filter:blur(10px);}
+  .onb .go{width:100%;border:none;background:var(--accent-grad);color:#fff;font-family:'Fraunces',serif;font-weight:600;font-size:17px;padding:17px;border-radius:18px;cursor:pointer;margin-top:12px;}
+  .onb .skip{background:none;border:none;color:var(--muted);font:inherit;font-size:13px;margin:14px auto 0;cursor:pointer;display:block;}
+  /* wizard */
+  .onb-progress{display:flex;gap:7px;justify-content:center;padding:6px 0 4px;}
+  .onb-progress .pd{width:8px;height:8px;border-radius:50%;background:var(--card-line);transition:.25s;}
+  .onb-progress .pd.on{background:var(--accent);width:22px;border-radius:99px;}
+  .step{display:none;animation:rise .35s ease both;}
+  .step.on{display:block;}
+  .step .eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:600;text-align:center;}
+  .step h2{text-align:center;margin-top:8px;}
+  .step .lede{text-align:center;}
+  .qlist{margin-top:18px;}
+  .q{margin-bottom:18px;}
+  .q .qt{font-family:'Fraunces',serif;font-weight:500;font-size:17px;color:var(--heading);margin-bottom:9px;}
+  .opts{display:flex;flex-direction:column;gap:7px;}
+  .opt{text-align:left;width:100%;border:1px solid var(--input-line);background:var(--input);color:var(--text);border-radius:13px;padding:12px 14px;font:inherit;font-size:14px;cursor:pointer;transition:.12s;display:flex;align-items:center;gap:10px;}
+  .opt:active{transform:scale(.99);}
+  .opt[aria-pressed=true]{border-color:var(--accent);background:var(--card);box-shadow:0 0 0 1px var(--accent) inset;}
+  .opt .rad{width:16px;height:16px;border-radius:50%;border:2px solid var(--input-line);flex:none;}
+  .opt[aria-pressed=true] .rad{border-color:var(--accent);background:radial-gradient(circle,var(--accent) 0 4px,transparent 5px);}
+  .opt .qsw{width:24px;height:24px;border-radius:7px;flex:none;border:1px solid rgba(0,0,0,.16);box-shadow:inset 0 1px 2px rgba(255,255,255,.25);}
+  .opt .qunsure{display:flex;align-items:center;justify-content:center;background:var(--input);color:var(--muted);font-weight:700;font-size:14px;border-style:dashed;box-shadow:none;}
+  .opt .otx{flex:1;}
+  .result-card{text-align:center;padding:8px 0 4px;}
+  .result-card .rgem{width:120px;height:120px;border-radius:50%;margin:0 auto 14px;position:relative;box-shadow:var(--gem-glow),inset 0 -6px 18px rgba(80,40,20,.4),inset 0 5px 14px rgba(255,224,196,.5);}
+  .result-card .rtype{font-family:'Fraunces',serif;font-weight:600;font-size:30px;color:var(--heading);}
+  .result-card .rdesc{font-size:13.5px;color:var(--muted2);margin-top:4px;}
+  .result-adjust{font-size:12px;color:var(--muted);text-align:center;margin:18px 0 10px;}
+  .mode-card{border:1px solid var(--input-line);background:var(--input);border-radius:18px;padding:15px 16px;margin-bottom:11px;cursor:pointer;transition:.12s;display:flex;gap:13px;align-items:flex-start;}
+  .mode-card:active{transform:scale(.99);}
+  .mode-card[aria-pressed=true]{border-color:var(--accent);background:var(--card);box-shadow:0 0 0 1px var(--accent) inset;}
+  .mode-card .mi{font-size:24px;flex:none;line-height:1;margin-top:1px;}
+  .mode-card .mb{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;text-align:left;}
+  .mode-card .mb .mn{font-family:'Fraunces',serif;font-weight:600;font-size:18px;color:var(--heading);}
+  .mode-card .mb .md{font-size:13px;color:var(--muted2);margin-top:3px;line-height:1.45;}
+  .mode-card .mb .mt{font-size:11.5px;color:var(--muted);margin-top:5px;font-style:italic;}
+  .onb-nav{display:flex;gap:10px;margin-top:8px;}
+  .onb-nav .back{flex:none;width:54px;border:1px solid var(--card-line);background:var(--card);color:var(--text);border-radius:18px;font-size:20px;cursor:pointer;}
+  .onb-nav .next{flex:1;border:none;background:var(--accent-grad);color:#fff;font-family:'Fraunces',serif;font-weight:600;font-size:17px;padding:16px;border-radius:18px;cursor:pointer;}
+  /* Today mode selector */
+  .modeseg{display:flex;gap:6px;background:var(--input);border:1px solid var(--input-line);border-radius:16px;padding:5px;margin-bottom:16px;}
+  .modeseg button{flex:1;border:none;background:transparent;color:var(--muted2);font:inherit;font-weight:600;font-size:13px;padding:9px 4px;border-radius:12px;cursor:pointer;transition:.15s;display:flex;flex-direction:column;align-items:center;gap:2px;}
+  .modeseg button .mm{font-size:14px;line-height:1;}
+  .modeseg button[aria-pressed=true]{background:var(--card);color:var(--text);box-shadow:0 1px 6px rgba(0,0,0,.12);}
+  .modeseg-settings{display:flex;flex-direction:column;gap:8px;}
+
+  .toast{position:fixed;left:50%;bottom:calc(120px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);z-index:90;background:var(--heading);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:99px;opacity:0;pointer-events:none;transition:.25s;max-width:90%;text-align:center;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <div class="greet" id="greet">Welcome back</div>
+      <div class="loc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span id="locName">—</span><span id="clock"></span></div>
+    </div>
+    <div class="hbtns">
+      <button class="icon-btn" id="openSettings" aria-label="Settings"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+    </div>
+  </header>
+
+  <!-- TODAY -->
+  <main class="screen" id="screen-today">
+    <div class="status" id="statusPill"><span class="dot load" id="statusDot"></span><span id="statusText">Checking UV…</span><button class="rf" id="refreshBtn">↻</button></div>
+
+    <div class="card ribbon reveal">
+      <div class="top"><span class="t">UV today</span><span class="now" id="uvNowBig">—<i id="uvSub"></i></span></div>
+      <svg class="wave" id="wave" viewBox="0 0 360 78" preserveAspectRatio="none"></svg>
+      <div class="times" id="sunTimes"><span>☀ —</span><span>—</span><span>— ☾</span></div>
+      <div class="window">☀ <span id="windowTxt">Best tan window —</span></div>
+    </div>
+
+    <div class="trio reveal d1">
+      <div class="card s"><div class="v" id="safeMin">—<u>m</u></div><div class="k">Tan time</div></div>
+      <div class="card s"><div class="v" id="burnMin">—<u>m</u></div><div class="k">Burns at</div></div>
+      <div class="card s"><div class="v" id="vitD">—</div><div class="k">Vit D ≈ IU</div></div>
+    </div>
+
+    <div class="card dialcard reveal d2">
+      <div class="modeseg" id="modeSeg"></div>
+      <div class="dial" id="dial">
+        <div class="glow"></div>
+        <svg width="206" height="206" viewBox="0 0 206 206">
+          <circle cx="103" cy="103" r="90" fill="none" stroke="var(--ring-track)" stroke-width="13"/>
+          <circle id="ring" cx="103" cy="103" r="90" fill="none" stroke="url(#ringL)" stroke-width="13" stroke-linecap="round" stroke-dasharray="565.5" stroke-dashoffset="0"/>
+          <defs>
+            <linearGradient id="ringL" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#df9d76"/><stop offset="1" stop-color="#b3702f"/></linearGradient>
+            <linearGradient id="ringD" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbbf24"/><stop offset="1" stop-color="#f97316"/></linearGradient>
+          </defs>
+        </svg>
+        <div class="c"><div class="n" id="dialBig">—</div><div class="l" id="dialLab">min to tan</div><div class="tap" id="dialTap">tap to start</div></div>
+      </div>
+      <button class="btn btn-go" id="timerBtn">Start session</button>
+    </div>
+
+    <div class="card tancard reveal d3">
+      <div class="gem" id="gem"><span class="gp" id="gemPct">0%</span></div>
+      <div class="tan-info">
+        <span class="badge" id="tanBadge">No tan</span>
+        <h3 id="tanShade">Untanned</h3>
+        <p id="tanNote">Log a session to start your glow.</p>
+        <div class="goalbar" id="goalWrap" style="display:none;"><i id="goalFill"></i></div>
+      </div>
+    </div>
+
+    <div class="sec-head"><span class="lbl">What you're wearing</span><button id="manageProducts">Manage</button></div>
+    <div class="chips" id="productChips"></div>
+
+    <div id="manualBlock" style="display:none;">
+      <div class="sec-head"><span class="lbl">Set today's peak UV</span></div>
+      <div class="uv-input"><span class="num" id="uvNum">5</span><input type="range" id="uvSlider" min="0" max="13" step="1" value="5" /></div>
+      <p class="hint">Live UV is off. Tap the status above to enable location, or read today's UV from your Weather app.</p>
+    </div>
+
+    <p class="foot">Erythema-dose model · estimates only, not medical advice.<br>No tan is risk-free.</p>
+    <div class="pad"></div>
+  </main>
+
+  <!-- SESSIONS -->
+  <main class="screen hidden" id="screen-log">
+    <div class="card tan-chart-card reveal">
+      <div class="top"><h3>Your glow over time</h3><span class="pct" id="chartPct">0%</span></div>
+      <svg class="tanchart" id="tanchart" viewBox="0 0 320 100" preserveAspectRatio="none"></svg>
+    </div>
+    <div class="stats-grid reveal d1">
+      <div class="card mini"><div class="v" id="sTotal">0</div><div class="k">Sessions</div></div>
+      <div class="card mini"><div class="v" id="sStreak">0</div><div class="k">Day streak</div></div>
+      <div class="card mini"><div class="v" id="sMins">0</div><div class="k">Total min</div></div>
+    </div>
+    <div class="sec-head"><span class="lbl">History</span></div>
+    <div id="logList"></div>
+    <div class="pad"></div>
+  </main>
+
+  <nav>
+    <button class="tab" data-tab="today" aria-current="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>Today</button>
+    <button class="fab" id="quickAdd" aria-label="Log a past session"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+    <button class="tab" data-tab="log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg>Sessions</button>
+  </nav>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<div class="toast" id="toast"></div>
+
+<!-- SETTINGS -->
+<div class="sheet" id="settingsSheet">
+  <div class="grab"></div><h2>Settings</h2><p class="sub">Tune Bask to you.</p>
+  <div class="field"><label>Your skin type (Fitzpatrick)</label><div class="chips" id="skinChips"></div><button class="btn btn-ghost" id="retakeQuiz" style="margin-top:10px;font-size:14px;padding:12px;">Retake skin-type quiz</button></div>
+  <div class="field"><label>Tan mode</label><div class="modeseg-settings" id="modeSegSettings"></div></div>
+  <div class="field"><label>Glow goal</label><div class="seg" id="goalSeg"></div></div>
+  <div class="field"><label>Location</label><button class="btn btn-ghost" id="useLocation" style="margin-bottom:8px;">Use my location</button><div class="hint" id="locSetting">Not set yet.</div></div>
+  <div class="field"><label>UV data source</label><div class="seg" id="sourceSeg"><button data-src="openmeteo" aria-pressed="true">Open-Meteo<br><span style="font-size:11px;color:var(--muted);">free · no key</span></button><button data-src="openuv" aria-pressed="false">OpenUV<br><span style="font-size:11px;color:var(--muted);">needs key</span></button></div></div>
+  <div class="field" id="keyField" style="display:none;"><label>OpenUV API key</label><input type="password" id="openuvKey" placeholder="x-access-token from openuv.io" /><div class="hint">Free key, 50 lookups/day. Stored only on this device.</div></div>
+  <div class="field"><label>Your data</label><div class="row2"><button class="btn btn-ghost" id="exportBtn">Export</button><button class="btn btn-ghost" id="importBtn">Import</button></div><input type="file" id="importFile" accept="application/json" style="display:none;" /></div>
+  <button class="btn btn-go" id="openSciBtn" style="margin-bottom:10px;">How Bask calculates</button>
+  <button class="btn btn-ghost" id="closeSettings">Done</button>
+  <p class="disclaimer">Estimates only, not medical advice. UV exposure carries skin-damage and skin-cancer risk; these numbers help avoid burning, not make tanning safe.</p>
+</div>
+
+<!-- PRODUCTS -->
+<div class="sheet" id="productsSheet">
+  <div class="grab"></div><h2>Your products</h2><p class="sub">Add the sunscreens and tanning oils you own. Pick one before each session.</p>
+  <div id="productList"></div>
+  <div class="field"><label>Add a product</label><input type="text" id="pName" placeholder="e.g. Hawaiian Tropic oil" style="margin-bottom:8px;" /><div class="seg" id="pKindSeg" style="margin-bottom:8px;"><button data-kind="oil" aria-pressed="true">🟠 Tanning oil</button><button data-kind="sunscreen" aria-pressed="false">🟢 Sunscreen</button></div><input type="number" id="pSpf" min="0" max="100" placeholder="SPF on the bottle (0 if none)" /></div>
+  <button class="btn btn-go" id="addProduct">Add product</button><div style="height:8px"></div><button class="btn btn-ghost" id="closeProducts">Done</button><div style="height:8px"></div>
+</div>
+
+<!-- SCIENCE -->
+<div class="sheet" id="sciSheet">
+  <div class="grab"></div><h2>How Bask calculates</h2>
+  <div class="sci">
+    <p><b>Live UV.</b> Real hourly forecasts from Open-Meteo (major weather models) for your coordinates, or OpenUV with a key. The curve is the real forecast, with night shaded between sunset and sunrise.</p>
+    <p><b>Burn time.</b> UV Index means erythemal irradiance = <code>UVI × 0.025 W/m²</code> (CIE/WHO). Time to redness ≈ <code>MED ÷ (1.5 × UVI)</code> min, where MED is your skin's minimal erythemal dose.</p>
+    <p><b>MED (J/m², approx):</b> I 200 · II 250 · III 350 · IV 450 · V 600 · VI 1000.</p>
+    <p><b>Sunscreen / oil.</b> Your product's SPF multiplies burn time, applied conservatively (~half label, since real coverage is thin) so the safe number errs short.</p>
+    <p><b>Glow.</b> Each session adds UV dose <code>(UVI × min × 0.015 SED)</code> to a melanin stimulus that saturates toward your type's ceiling and fades on an ~18-day half-life.</p>
+    <p><b>Vitamin D</b> is a rough estimate from UVB dose and skin type — lighter skin synthesises faster; skin self-limits, so it's capped.</p>
+  </div>
+  <button class="btn btn-go" id="closeSci">Got it</button>
+  <p class="disclaimer">Models are estimates; individual skin varies. Not medical advice.</p>
+</div>
+
+<!-- ADD SESSION -->
+<div class="sheet" id="addSheet">
+  <div class="grab"></div><h2>Log a session</h2><p class="sub">Add a tan you've already done.</p>
+  <div class="field"><label>When</label><input type="datetime-local" id="aWhen" /></div>
+  <div class="field"><label>Minutes</label><input type="number" id="aMin" min="1" max="600" placeholder="e.g. 25" /></div>
+  <div class="field"><label>Peak UV</label><input type="number" id="aUV" min="0" max="14" placeholder="e.g. 6" /></div>
+  <div class="field"><label>Note (optional)</label><textarea id="aNote" placeholder="Front + back, coconut oil, slight pink…"></textarea></div>
+  <div class="row2"><button class="btn btn-ghost" id="addCancel">Cancel</button><button class="btn btn-go" id="addSave">Save</button></div><div style="height:8px"></div>
+</div>
+
+<!-- ONBOARDING -->
+<div class="onb" id="onb">
+  <div class="center">
+    <div class="onb-progress" id="onbProgress"></div>
+
+    <!-- Step 1: welcome -->
+    <div class="step on" id="step0">
+      <div class="orb" style="margin-top:18px;"></div>
+      <h2>Your <em>golden</em><br>hour, measured.</h2>
+      <p class="lede">Bask reads the real UV where you stand, tunes it to your skin, and tracks every shade you earn. Let's set you up — takes a minute.</p>
+      <div class="onb-nav" style="margin-top:30px;"><button class="next" id="go0">Get started</button></div>
+      <button class="skip" id="onbSkip">Skip setup</button>
+    </div>
+
+    <!-- Step 2: quiz -->
+    <div class="step" id="step1">
+      <div class="eyebrow">Step 1 · your skin</div>
+      <h2>Find your skin type</h2>
+      <p class="lede">Answer honestly about your natural, unexposed skin — no makeup or existing tan.</p>
+      <div class="qlist" id="quiz"></div>
+      <div class="onb-nav"><button class="back" id="back1">‹</button><button class="next" id="go1">See my result</button></div>
+    </div>
+
+    <!-- Step 3: result -->
+    <div class="step" id="step2">
+      <div class="eyebrow">Your result</div>
+      <div class="result-card">
+        <div class="rgem" id="resultGem"></div>
+        <div class="rtype" id="resultType">Type III</div>
+        <div class="rdesc" id="resultDesc"></div>
+      </div>
+      <div class="result-adjust">Not quite right? Tap to adjust:</div>
+      <div class="skins" id="onbSkins" style="justify-content:center;"></div>
+      <div class="onb-nav"><button class="back" id="back2">‹</button><button class="next" id="go2">Looks right</button></div>
+    </div>
+
+    <!-- Step 4: mode -->
+    <div class="step" id="step3">
+      <div class="eyebrow">Step 2 · your goal</div>
+      <h2>Pick your tan mode</h2>
+      <p class="lede">How hard do you want to push? You can change this any time.</p>
+      <div id="modeCards" style="margin-top:18px;"></div>
+      <div class="onb-nav"><button class="back" id="back3">‹</button><button class="next" id="go3">Continue</button></div>
+    </div>
+
+    <!-- Step 5: location -->
+    <div class="step" id="step4">
+      <div class="orb" style="margin-top:18px;"></div>
+      <div class="eyebrow">Step 3 · your sky</div>
+      <h2>Turn on live UV</h2>
+      <p class="lede">Bask uses your location to pull the real UV forecast. It stays on your device — no account, no tracking.</p>
+      <button class="loc" id="onbLoc">📍 Use my location</button>
+      <div class="onb-nav" style="margin-top:12px;"><button class="back" id="back4">‹</button><button class="next" id="onbGo">Start glowing</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var mem={};
+  var Store={read:function(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return (k in mem)?mem[k]:d;}},
+             write:function(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){mem[k]=v;}}};
+
+  var SKIN=[{id:1,label:"I",tip:"Always burns",med:200,cap:30,vd:15},{id:2,label:"II",tip:"Burns easily",med:250,cap:48,vd:13},
+            {id:3,label:"III",tip:"Sometimes",med:350,cap:65,vd:11},{id:4,label:"IV",tip:"Rarely",med:450,cap:80,vd:8},
+            {id:5,label:"V",tip:"Very rarely",med:600,cap:90,vd:6},{id:6,label:"VI",tip:"Almost never",med:1000,cap:96,vd:4}];
+  var TONE={1:["#f4ddc8","#e7b58c"],2:["#f0d2b4","#d99c66"],3:["#e7b690","#c8824f"],4:["#cf9b6e","#a9663b"],5:["#a9744a","#80492a"],6:["#7a4b2c","#5a3420"]};
+  var DEFAULT_PRODUCTS=[{id:"bare",name:"Bare skin",kind:"oil",spf:0,fixed:true}];
+
+  var state={
+    skin:Store.read("bask.skin",3), products:Store.read("bask.products",DEFAULT_PRODUCTS),
+    activeProduct:Store.read("bask.activeProduct","bare"), manualUV:Store.read("bask.manualUV",5),
+    source:Store.read("bask.source","openmeteo"), openuvKey:Store.read("bask.openuvKey",""),
+    loc:Store.read("bask.loc",null), live:Store.read("bask.live",null),
+    sessions:Store.read("bask.sessions",[]),
+    goal:Store.read("bask.goal",0), onboarded:Store.read("bask.onboarded",false),
+    mode:Store.read("bask.mode","build")
+  };
+  var MODES=[
+    {id:"cautious",name:"No Burn",icon:"🛡️",factor:0.45,desc:"Cautious. Stops well short of redness.",trade:"Slowest tan, safest skin."},
+    {id:"build",name:"Build",icon:"☀️",factor:0.65,desc:"Balanced. Builds a steady tan below the burn line.",trade:"The recommended default."},
+    {id:"max",name:"Max Tan",icon:"🔥",factor:0.92,desc:"Pushes right up to the burn threshold for the most melanin per session.",trade:"Fastest tan — riskier. Burning peels and undoes progress, so it stays just under the line."}
+  ];
+  function curMode(){return MODES.find(function(m){return m.id===state.mode;})||MODES[1];}
+
+  function $(id){return document.getElementById(id);}
+  function skin(){return SKIN.find(function(s){return s.id===state.skin;})||SKIN[2];}
+  function activeProd(){return state.products.find(function(p){return p.id===state.activeProduct;})||state.products[0];}
+  function effSPF(){var s=activeProd().spf||0;return s<=1?1:1+(s-1)*0.5;}
+  function burnMin(uv){if(uv<=0.2)return Infinity;return skin().med/(1.5*uv)*effSPF();}
+  function safeMin(uv){var b=burnMin(uv);if(!isFinite(b))return 0;return Math.max(0,Math.round(Math.min(b*curMode().factor,180)));}
+  function vitDIU(uv,min){if(uv<=0||min<=0)return 0;return Math.min(10000,Math.round(uv*min*skin().vd));}
+  function nowHour(){var d=new Date();return d.getHours()+d.getMinutes()/60;}
+  function lerpHex(a,b,t){function h(x){return parseInt(x,16);}function c(x){x=Math.max(0,Math.min(255,Math.round(x))).toString(16);return x.length<2?"0"+x:x;}return "#"+c(h(a.slice(1,3))+(h(b.slice(1,3))-h(a.slice(1,3)))*t)+c(h(a.slice(3,5))+(h(b.slice(3,5))-h(a.slice(3,5)))*t)+c(h(a.slice(5,7))+(h(b.slice(5,7))-h(a.slice(5,7)))*t);}
+
+  function tanAt(ms){var cap=skin().cap,Ss=8,dd=Math.pow(0.5,1/18);var ss=state.sessions.filter(function(s){return s.when<=ms;}).sort(function(a,b){return a.when-b.when;});if(!ss.length)return 0;var S=0,last=ss[0].when;for(var i=0;i<ss.length;i++){var d=(ss[i].when-last)/864e5;if(d>0)S*=Math.pow(dd,d);S+=(ss[i].uv||2)*ss[i].min*0.015;last=ss[i].when;}var d2=(ms-last)/864e5;if(d2>0)S*=Math.pow(dd,d2);return Math.max(0,Math.min(cap,cap*(1-Math.exp(-S/Ss))));}
+  function lastSessionMs(){if(!state.sessions.length)return null;return Math.max.apply(null,state.sessions.map(function(s){return s.when;}));}
+  function shadeName(p){var c=skin().cap,r=p/c;if(p<2)return"Untanned";if(r<0.25)return"Faint glow";if(r<0.5)return"Light tan";if(r<0.75)return"Golden";if(r<0.95)return"Bronzed";return"Deep bronze";}
+  function streak(){if(!state.sessions.length)return 0;var days={};state.sessions.forEach(function(s){days[new Date(s.when).toDateString()]=1;});var n=0,d=new Date();d.setHours(12,0,0,0);if(!days[d.toDateString()]){d.setDate(d.getDate()-1);if(!days[d.toDateString()])return 0;}while(days[d.toDateString()]){n++;d.setDate(d.getDate()-1);}return n;}
+
+  function liveCurrent(){if(!state.live)return null;var h=state.live.hourly;if(h&&h.length){var t=nowHour(),lo=null,hi=null;for(var i=0;i<h.length;i++){if(h[i].h<=t)lo=h[i];if(h[i].h>=t&&hi===null)hi=h[i];}if(lo&&hi&&hi.h!==lo.h){var f=(t-lo.h)/(hi.h-lo.h);return Math.max(0,lo.uv+(hi.uv-lo.uv)*f);}if(lo)return Math.max(0,lo.uv);if(hi)return Math.max(0,hi.uv);}return (typeof state.live.current==="number")?state.live.current:null;}
+  function currentUV(){var c=liveCurrent();return (c==null)?state.manualUV:c;}
+  function peakUV(){if(state.live&&state.live.hourly&&state.live.hourly.length)return Math.max.apply(null,state.live.hourly.map(function(p){return p.uv;}));if(state.live&&typeof state.live.max==="number")return state.live.max;return state.manualUV;}
+  function uvColor(uv){if(uv<3)return"#7ad19a";if(uv<6)return"#ffce4a";if(uv<8)return"#ff9d3c";if(uv<11)return"#ff5d73";return"#c2417f";}
+  function fmtClock(sec){var m=Math.floor(sec/60),s=Math.floor(sec%60);return (m<10?"0":"")+m+":"+(s<10?"0":"")+s;}
+  function fmtH(h){var hh=Math.floor(h),mm=Math.round((h-hh)*60);if(mm===60){hh++;mm=0;}return hh+":"+(mm<10?"0":"")+mm;}
+
+  function sunTime(lat,lng,date,tz,rising){var D2R=Math.PI/180,R2D=180/Math.PI,Z=90.833;var start=Date.UTC(date.getUTCFullYear(),0,0);var N=Math.floor((Date.UTC(date.getUTCFullYear(),date.getUTCMonth(),date.getUTCDate())-start)/864e5);var lngHour=lng/15,t=N+(((rising?6:18)-lngHour)/24),M=0.9856*t-3.289;var L=M+1.916*Math.sin(M*D2R)+0.020*Math.sin(2*M*D2R)+282.634;L=(L%360+360)%360;var RA=R2D*Math.atan(0.91764*Math.tan(L*D2R));RA=(RA%360+360)%360;var Lq=Math.floor(L/90)*90,RAq=Math.floor(RA/90)*90;RA=(RA+(Lq-RAq))/15;var sinDec=0.39782*Math.sin(L*D2R),cosDec=Math.cos(Math.asin(sinDec));var cosH=(Math.cos(Z*D2R)-sinDec*Math.sin(lat*D2R))/(cosDec*Math.cos(lat*D2R));if(cosH>1||cosH<-1)return rising?5:21;var Hh=rising?360-R2D*Math.acos(cosH):R2D*Math.acos(cosH);Hh/=15;var T=Hh+RA-0.06571*t-6.622,UT=((T-lngHour)%24+24)%24,loc=((UT+tz)%24+24)%24;return loc;}
+  function sunWindow(){if(state.live&&state.live.sunrise!=null&&state.live.sunset!=null)return{sr:state.live.sunrise,ss:state.live.sunset};if(state.loc){var tz=-new Date().getTimezoneOffset()/60;return{sr:sunTime(state.loc.lat,state.loc.lng,new Date(),tz,true),ss:sunTime(state.loc.lat,state.loc.lng,new Date(),tz,false)};}return{sr:6.5,ss:20};}
+  function bestWindow(){var data=curveData();var lo=null,hi=null;data.forEach(function(p){if(p.uv>=3){if(lo===null)lo=p.h;hi=p.h;}});if(lo===null)return null;return{lo:lo,hi:hi};}
+
+  function themeColors(){return {a:"#df9d76",b:"#b3702f",c:"#e6b15f",fill:"rgba(179,112,47,.26)",night:"rgba(120,80,40,.14)",dot:"#b3702f"};}
+
+  // ---- curve ----
+  var W=360,H=78,firstDraw=true;
+  function syntheticHourly(){var peak=state.manualUV,arr=[];for(var i=5;i<=21;i+=0.5){var f=1-Math.pow((i-13)/6.8,2);arr.push({h:i,uv:Math.max(0,peak*f)});}return arr;}
+  function curveData(){if(state.live&&state.live.hourly&&state.live.hourly.length)return state.live.hourly.filter(function(p){return p.h>=5&&p.h<=21;});return syntheticHourly();}
+  function drawWave(){
+    var svg=$("wave");svg.innerHTML="";var ns="http://www.w3.org/2000/svg",tc=themeColors();
+    var defs=document.createElementNS(ns,'defs');defs.innerHTML="<linearGradient id='wv' x1='0' y1='0' x2='1' y2='0'><stop offset='0' stop-color='"+tc.a+"'/><stop offset='.55' stop-color='"+tc.b+"'/><stop offset='1' stop-color='"+tc.c+"'/></linearGradient><linearGradient id='wvf' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='"+tc.fill+"'/><stop offset='1' stop-color='rgba(0,0,0,0)'/></linearGradient>";svg.appendChild(defs);
+    var pts=curveData();if(!pts.length)return;var mx=Math.max(3,Math.max.apply(null,pts.map(function(p){return p.uv;})));
+    function X(h){return (h-5)/16*W;}function Y(uv){return H-8-uv/mx*(H-18);}
+    var sw=sunWindow();
+    function nr(x1,x2){if(x2<=x1)return;var r=document.createElementNS(ns,'rect');r.setAttribute('x',x1);r.setAttribute('y',0);r.setAttribute('width',x2-x1);r.setAttribute('height',H-8);r.setAttribute('fill',tc.night);svg.appendChild(r);}
+    nr(X(5),X(Math.max(5,Math.min(21,sw.sr))));nr(X(Math.max(5,Math.min(21,sw.ss))),X(21));
+    var line="";pts.forEach(function(p,i){line+=(i===0?"M":"L")+X(p.h).toFixed(1)+" "+Y(p.uv).toFixed(1)+" ";});
+    var a=document.createElementNS(ns,'path');a.setAttribute('d',line+"L"+X(pts[pts.length-1].h)+" "+(H-8)+" L"+X(pts[0].h)+" "+(H-8)+" Z");a.setAttribute('fill','url(#wvf)');svg.appendChild(a);
+    var l=document.createElementNS(ns,'path');l.setAttribute('d',line);l.setAttribute('fill','none');l.setAttribute('stroke','url(#wv)');l.setAttribute('stroke-width','2.5');l.setAttribute('stroke-linecap','round');svg.appendChild(l);
+    if(firstDraw&&!matchMedia("(prefers-reduced-motion:reduce)").matches){try{var len=l.getTotalLength();l.style.strokeDasharray=len;l.style.strokeDashoffset=len;l.getBoundingClientRect();l.style.transition="stroke-dashoffset .9s ease";l.style.strokeDashoffset="0";}catch(e){}firstDraw=false;}
+    var nh=nowHour();if(nh>=5&&nh<=21){var cu=Math.min(currentUV(),mx),nx=X(nh),ny=Y(cu);var c=document.createElementNS(ns,'circle');c.setAttribute('cx',nx);c.setAttribute('cy',ny);c.setAttribute('r','5');c.setAttribute('fill','#fff');c.setAttribute('stroke',tc.b);c.setAttribute('stroke-width','2.5');svg.appendChild(c);}
+  }
+
+  // ---- chips ----
+  function buildChips(host,items,getA,onPick,fmt,extra){host.innerHTML="";items.forEach(function(it){var b=document.createElement("button");b.className="chip";b.type="button";b.setAttribute("aria-pressed",getA()===it.id?"true":"false");b.innerHTML=fmt(it);b.onclick=function(){onPick(it.id);renderAll();};host.appendChild(b);});if(extra){var e=document.createElement("button");e.className="chip add";e.type="button";e.innerHTML=extra.label;e.onclick=extra.onClick;host.appendChild(e);}}
+  function renderSkinChips(){buildChips($("skinChips"),SKIN,function(){return state.skin;},function(v){state.skin=v;Store.write("bask.skin",v);},function(it){return "<span>Type "+it.label+"</span><span class='t'>"+it.tip+"</span>";});}
+  function renderProductChips(){buildChips($("productChips"),state.products,function(){return state.activeProduct;},function(v){state.activeProduct=v;Store.write("bask.activeProduct",v);},function(p){return "<span>"+(p.kind==="oil"?"🟠 ":"🟢 ")+p.name+"</span><span class='t'>"+(p.spf?("SPF "+p.spf):"no SPF")+"</span>";},{label:"+ Add",onClick:function(){openSheet($("productsSheet"));}});}
+
+  // ---- today ----
+  var RING=2*Math.PI*90;
+  function greetWord(){var h=new Date().getHours();return h<12?"Good morning":h<18?"Good afternoon":"Good evening";}
+  function renderToday(){
+    $("greet").textContent=greetWord();
+    var cu=currentUV(),pk=peakUV();
+    $("uvNowBig").innerHTML=cu.toFixed(1)+"<i id='uvSub'> now · peak "+(pk?pk.toFixed(1):"—")+"</i>";
+    $("safeMin").innerHTML=safeMin(cu)+"<u>m</u>";
+    var b=burnMin(cu);$("burnMin").innerHTML=(isFinite(b)?Math.round(b):"∞")+"<u>m</u>";
+    $("vitD").textContent=vitDIU(cu,safeMin(cu)).toLocaleString();
+    var sw=sunWindow();$("sunTimes").innerHTML="<span>☀ "+fmtH(sw.sr)+"</span><span>golden "+fmtH(Math.max(sw.sr,sw.ss-1.5))+"</span><span>"+fmtH(sw.ss)+" ☾</span>";
+    var bw=bestWindow();$("windowTxt").innerHTML=bw?("Best tan window <b>"+fmtH(bw.lo)+"–"+fmtH(bw.hi)+"</b>"):"UV stays low today";
+    drawWave();renderDial();renderTan();
+    $("manualBlock").style.display=state.live?"none":"block";
+    if(!state.live){$("uvNum").textContent=state.manualUV;$("uvSlider").value=state.manualUV;}
+  }
+  function renderDial(){
+    var big=$("dialBig"),lab=$("dialLab"),tap=$("dialTap"),ring=$("ring");
+    ring.setAttribute("stroke","url(#ringL)");
+    if(timer.running){var sec=(Date.now()-timer.start)/1000,cu=currentUV(),tgt=safeMin(cu)*60||1800;big.textContent=fmtClock(sec);big.className="n t";var left=Math.ceil((tgt-sec)/60);lab.textContent=left>0?(left+" min left"):"over limit";var dose=Math.round(sec/60/Math.max(burnMin(cu),0.1)*100);tap.textContent=dose+"% to redness";var frac=Math.min(sec/tgt,1);ring.setAttribute("stroke-dashoffset",(RING*frac).toFixed(1));if(frac>=1)ring.setAttribute("stroke","#d9534f");document.querySelector(".dial .glow").style.setProperty("--dialglow",frac>0.5?1:0);
+      if(!timer.alerted&&sec>=tgt){timer.alerted=true;burnAlert();}
+    }else{var s=safeMin(currentUV());big.textContent=s>0?s:"0";big.className="n";lab.textContent="min · "+curMode().name;tap.textContent="tap to start";ring.setAttribute("stroke-dashoffset","0");document.querySelector(".dial .glow").style.setProperty("--dialglow",0);}
+  }
+  function renderTan(){
+    var p=tanAt(Date.now()),cap=skin().cap;
+    var shade=lerpHex(TONE[state.skin][0],TONE[state.skin][1],Math.min(1,p/cap));
+    var gem=$("gem");gem.style.setProperty("--gem1",lerpHex(shade,"#ffffff",.32));gem.style.setProperty("--gem2",shade);gem.style.setProperty("--gem3",lerpHex(shade,"#000000",.34));
+    $("gemPct").textContent=Math.round(p)+"%";
+    $("tanShade").textContent=shadeName(p);
+    var last=lastSessionMs(),badge=$("tanBadge"),note=$("tanNote"),gw=$("goalWrap");
+    gw.style.display="none";
+    if(p<2){badge.className="badge";badge.textContent="No tan";note.textContent="Log a session to start your glow.";$("tanShade").textContent="Untanned";}
+    else{var days=last?Math.floor((Date.now()-last)/864e5):0;
+      if(days<=2){badge.className="badge up";badge.textContent="Building";note.textContent=days===0?"Tanned today — beautifully on track.":days+" day"+(days>1?"s":"")+" since last session.";}
+      else if(days<=6){badge.className="badge hold";badge.textContent="Holding";note.textContent=days+" days since last — tan again to keep it.";}
+      else{badge.className="badge fade";badge.textContent="Fading";note.textContent=days+" days off — your glow is fading.";}
+    }
+    if(state.goal>0){gw.style.display="block";$("goalFill").style.width=Math.min(100,Math.round(p/state.goal*100))+"%";if(p>=state.goal&&p>=2){note.textContent="🎉 Goal reached — "+Math.round(p)+"% glow.";}else if(p>=2){note.textContent+=" Goal "+state.goal+"%.";}}
+  }
+
+  // ---- timer + alert ----
+  var timer={running:false,start:0,raf:null,alerted:false};
+  function tick(){if(!timer.running)return;renderDial();timer.raf=requestAnimationFrame(tick);}
+  function startTimer(){timer.running=true;timer.start=Date.now();timer.alerted=false;var btn=$("timerBtn");btn.textContent="Stop & log";btn.className="btn btn-stop";tick();}
+  function stopTimer(){timer.running=false;cancelAnimationFrame(timer.raf);var sec=(Date.now()-timer.start)/1000;var mins=Math.max(1,Math.round(sec/60));var cu=Math.round(currentUV()*10)/10;var prod=activeProd();addSession({when:Date.now(),min:mins,uv:cu,note:(prod.id==="bare"?"Bare skin":prod.name)+(prod.spf?(" · SPF "+prod.spf):"")});var btn=$("timerBtn");btn.textContent="Start session";btn.className="btn btn-go";toast("Logged "+mins+" min · "+vitDIU(cu,mins).toLocaleString()+" IU vit D");renderToday();}
+  function toggleTimer(){timer.running?stopTimer():startTimer();}
+  function burnAlert(){try{if(navigator.vibrate)navigator.vibrate([200,80,200]);}catch(e){}try{var ac=new (window.AudioContext||window.webkitAudioContext)();var o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);o.frequency.value=660;g.gain.setValueAtTime(.0001,ac.currentTime);g.gain.exponentialRampToValueAtTime(.25,ac.currentTime+.02);g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+.6);o.start();o.stop(ac.currentTime+.62);}catch(e){}toast("⚠ Safe tan limit reached — time to cover up");}
+  $("timerBtn").onclick=toggleTimer;$("dial").onclick=toggleTimer;
+
+  // ---- sessions ----
+  function addSession(s){s.id=Date.now()+"-"+Math.random().toString(36).slice(2,6);state.sessions.unshift(s);Store.write("bask.sessions",state.sessions);renderLog();renderTan();}
+  function delSession(id){state.sessions=state.sessions.filter(function(s){return s.id!==id;});Store.write("bask.sessions",state.sessions);renderLog();renderTan();}
+  function renderLog(){var list=$("logList"),n=state.sessions.length,mins=0;state.sessions.forEach(function(s){mins+=s.min;});$("sTotal").textContent=n;$("sMins").textContent=mins;$("sStreak").textContent=streak();drawTanChart();
+    if(n===0){list.innerHTML="<div class='empty'><div class='ico'>☀️</div><p>No sessions yet.</p><p>Start the timer or tap + to log one.</p></div>";return;}
+    list.innerHTML="";state.sessions.forEach(function(s){var d=new Date(s.when),date=d.toLocaleDateString([],{weekday:"short",month:"short",day:"numeric"}),time=d.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});var el=document.createElement("div");el.className="card log-item";el.innerHTML="<div class='log-uv' style='background:"+uvColor(s.uv)+"'>"+(s.uv!=null?s.uv:"–")+"</div><div class='log-body'><div class='d'>"+date+" · "+time+"</div><div class='m'>"+(s.note||"Tanning session")+"</div></div><div class='log-min'>"+s.min+"m</div><button class='del' aria-label='Delete'>×</button>";el.querySelector(".del").onclick=function(){delSession(s.id);};list.appendChild(el);});}
+  function drawTanChart(){var svg=$("tanchart");svg.innerHTML="";var ns="http://www.w3.org/2000/svg",cw=320,ch=100,pad=6,now=Date.now(),days=30,cap=skin().cap,tc=themeColors();var pts=[];for(var i=days;i>=0;i--)pts.push({x:(days-i)/days,y:tanAt(now-i*864e5)});$("chartPct").textContent=Math.round(tanAt(now))+"%";var t0=TONE[state.skin][0],t1=TONE[state.skin][1];var defs=document.createElementNS(ns,'defs');defs.innerHTML="<linearGradient id='tg' x1='0' y1='0' x2='1' y2='0'><stop offset='0' stop-color='"+t0+"'/><stop offset='1' stop-color='"+t1+"'/></linearGradient><linearGradient id='tgf' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='"+t1+"' stop-opacity='.35'/><stop offset='1' stop-color='"+t1+"' stop-opacity='0'/></linearGradient>";svg.appendChild(defs);function X(x){return pad+x*(cw-2*pad);}function Y(y){return (ch-pad)-(y/Math.max(cap,1))*(ch-2*pad);}var line="";pts.forEach(function(p,i){line+=(i===0?"M":"L")+X(p.x).toFixed(1)+" "+Y(p.y).toFixed(1)+" ";});var ar=document.createElementNS(ns,'path');ar.setAttribute('d',line+"L"+X(1)+" "+(ch-pad)+" L"+X(0)+" "+(ch-pad)+" Z");ar.setAttribute('fill','url(#tgf)');svg.appendChild(ar);var ln=document.createElementNS(ns,'path');ln.setAttribute('d',line);ln.setAttribute('fill','none');ln.setAttribute('stroke','url(#tg)');ln.setAttribute('stroke-width','2.5');ln.setAttribute('stroke-linecap','round');svg.appendChild(ln);var lp=pts[pts.length-1],c=document.createElementNS(ns,'circle');c.setAttribute('cx',X(lp.x));c.setAttribute('cy',Y(lp.y));c.setAttribute('r','4');c.setAttribute('fill',t1);svg.appendChild(c);}
+
+  // ---- products ----
+  function renderProductList(){var host=$("productList");host.innerHTML="";state.products.forEach(function(p){var row=document.createElement("div");row.className="prod-row";row.innerHTML="<div class='pi' style='background:"+(p.kind==="oil"?"rgba(255,157,60,.18)":"rgba(122,209,154,.18)")+"'>"+(p.kind==="oil"?"🟠":"🟢")+"</div><div class='pb'><div class='n'>"+p.name+"</div><div class='s'>"+(p.kind==="oil"?"Tanning oil":"Sunscreen")+" · "+(p.spf?("SPF "+p.spf):"no SPF")+"</div></div>";if(!p.fixed){var del=document.createElement("button");del.className="del";del.textContent="×";del.onclick=function(){state.products=state.products.filter(function(x){return x.id!==p.id;});if(state.activeProduct===p.id){state.activeProduct="bare";Store.write("bask.activeProduct","bare");}Store.write("bask.products",state.products);renderProductList();renderProductChips();renderToday();};row.appendChild(del);}host.appendChild(row);});}
+  var pKind="oil";document.querySelectorAll("#pKindSeg button").forEach(function(btn){btn.onclick=function(){document.querySelectorAll("#pKindSeg button").forEach(function(b){b.setAttribute("aria-pressed","false");});btn.setAttribute("aria-pressed","true");pKind=btn.dataset.kind;};});
+  $("addProduct").onclick=function(){var name=$("pName").value.trim();if(!name){$("pName").focus();return;}var spf=parseInt($("pSpf").value,10);if(isNaN(spf)||spf<0)spf=0;state.products.push({id:"p"+Date.now(),name:name,kind:pKind,spf:spf});Store.write("bask.products",state.products);$("pName").value="";$("pSpf").value="";renderProductList();renderProductChips();toast("Added "+name);};
+
+  // ---- goal ----
+  function renderGoalSeg(){var seg=$("goalSeg");seg.innerHTML="";[{v:0,l:"Off"},{v:40,l:"Light"},{v:65,l:"Golden"},{v:90,l:"Deep"}].forEach(function(o){var b=document.createElement("button");b.textContent=o.l;b.setAttribute("aria-pressed",state.goal===o.v?"true":"false");b.onclick=function(){state.goal=o.v;Store.write("bask.goal",o.v);renderGoalSeg();renderTan();};seg.appendChild(b);});}
+
+  // ---- location & fetch ----
+  function setStatus(k,t){$("statusDot").className="dot "+k;$("statusText").textContent=t;}
+  function liveAge(){if(!state.live)return"";var m=Math.round((Date.now()-state.live.updatedAt)/60000);if(m<1)return"just now";if(m<60)return m+"m ago";return Math.round(m/60)+"h ago";}
+  function getLocation(){return new Promise(function(res,rej){if(!navigator.geolocation){rej("no geolocation");return;}navigator.geolocation.getCurrentPosition(function(p){res({lat:p.coords.latitude,lng:p.coords.longitude});},function(e){rej(e&&e.message||"denied");},{enableHighAccuracy:false,timeout:9000,maximumAge:600000});});}
+  function reverseGeocode(lat,lng){return fetch("https://api.bigdatacloud.net/data/reverse-geocode-client?latitude="+lat+"&longitude="+lng+"&localityLanguage=en").then(function(r){return r.json();}).then(function(j){return j.city||j.locality||j.principalSubdivision||"";}).catch(function(){return"";});}
+  function parseHM(s){return parseInt(s.substr(11,2),10)+parseInt(s.substr(14,2),10)/60;}
+  function fetchOpenMeteo(lat,lng){var url="https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lng+"&hourly=uv_index&daily=uv_index_max,sunrise,sunset&current=uv_index&timezone=auto&forecast_days=1";return fetch(url).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();}).then(function(j){var hourly=[];if(j.hourly&&j.hourly.time)for(var i=0;i<j.hourly.time.length;i++){var hh=parseInt(j.hourly.time[i].substr(11,2),10),uv=j.hourly.uv_index[i];if(typeof uv==="number")hourly.push({h:hh,uv:uv});}var sr=null,ss=null;if(j.daily&&j.daily.sunrise){sr=parseHM(j.daily.sunrise[0]);ss=parseHM(j.daily.sunset[0]);}return{current:(j.current&&typeof j.current.uv_index==="number")?j.current.uv_index:null,max:(j.daily&&j.daily.uv_index_max)?j.daily.uv_index_max[0]:null,hourly:hourly,sunrise:sr,sunset:ss,updatedAt:Date.now(),source:"openmeteo"};});}
+  function fetchOpenUV(lat,lng){if(!state.openuvKey)return Promise.reject("no key");return fetch("https://api.openuv.io/api/v1/uv?lat="+lat+"&lng="+lng,{headers:{"x-access-token":state.openuvKey}}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();}).then(function(j){var cur=j.result?j.result.uv:null,mx=j.result?j.result.uv_max:null,hourly=[];if(typeof mx==="number")for(var i=5;i<=21;i+=0.5){var f=1-Math.pow((i-13)/6.8,2);hourly.push({h:i,uv:Math.max(0,mx*f)});}var sr=null,ss=null;try{var st=j.result.sun_info.sun_times;sr=new Date(st.sunrise).getHours()+new Date(st.sunrise).getMinutes()/60;ss=new Date(st.sunset).getHours()+new Date(st.sunset).getMinutes()/60;}catch(e){}return{current:cur,max:mx,hourly:hourly,sunrise:sr,sunset:ss,updatedAt:Date.now(),source:"openuv"};});}
+  function refreshUV(){setStatus("load","Locating…");firstDraw=true;var locP=state.loc?Promise.resolve(state.loc):getLocation().then(function(c){state.loc=c;Store.write("bask.loc",c);reverseGeocode(c.lat,c.lng).then(function(name){if(name){state.loc.place=name;Store.write("bask.loc",state.loc);updateLocLabels();}});return c;});locP.then(function(c){setStatus("load","Fetching UV…");return (state.source==="openuv"?fetchOpenUV:fetchOpenMeteo)(c.lat,c.lng);}).then(function(live){state.live=live;Store.write("bask.live",live);updateLocLabels();setStatus("live","Live · "+liveAge());renderToday();}).catch(function(err){if(state.live)setStatus("warn","Saved UV ("+liveAge()+") · tap ↻");else setStatus("err","Tap to enable live UV");renderToday();});}
+  function updateLocLabels(){var name=(state.loc&&state.loc.place)?state.loc.place:(state.loc?"Your location":"Set location");$("locName").textContent=name;$("locSetting").textContent=state.loc?(name+" ("+state.loc.lat.toFixed(2)+", "+state.loc.lng.toFixed(2)+")"):"Not set yet.";}
+
+  // ---- export / import ----
+  $("exportBtn").onclick=function(){var data={app:"Bask",version:1,exported:new Date().toISOString(),skin:state.skin,goal:state.goal,products:state.products,sessions:state.sessions};var blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="bask-data-"+new Date().toISOString().slice(0,10)+".json";a.click();toast("Exported your data");};
+  $("importBtn").onclick=function(){$("importFile").click();};
+  $("importFile").onchange=function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(d.sessions)state.sessions=d.sessions;if(d.products)state.products=d.products;if(typeof d.skin==="number")state.skin=d.skin;if(typeof d.goal==="number")state.goal=d.goal;Store.write("bask.sessions",state.sessions);Store.write("bask.products",state.products);Store.write("bask.skin",state.skin);Store.write("bask.goal",state.goal);renderAll();renderGoalSeg();toast("Imported "+(d.sessions?d.sessions.length:0)+" sessions");}catch(err){toast("Couldn't read that file");}};r.readAsText(f);e.target.value="";};
+
+  // ---- toast ----
+  var toastT;function toast(msg){var t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove("show");},2600);}
+
+  // ---- nav & sheets ----
+  var tabs=document.querySelectorAll(".tab");tabs.forEach(function(t){t.onclick=function(){tabs.forEach(function(x){x.setAttribute("aria-current","false");});t.setAttribute("aria-current","true");var w=t.dataset.tab;$("screen-today").classList.toggle("hidden",w!=="today");$("screen-log").classList.toggle("hidden",w!=="log");if(w==="log")drawTanChart();};});
+  var scrim=$("scrim"),sheets=["settingsSheet","addSheet","productsSheet","sciSheet"].map($);
+  function openSheet(s){scrim.classList.add("open");s.classList.add("open");}
+  function closeSheets(){scrim.classList.remove("open");sheets.forEach(function(s){s.classList.remove("open");});}
+  scrim.onclick=closeSheets;
+  $("openSettings").onclick=function(){updateLocLabels();openSheet($("settingsSheet"));};
+  $("closeSettings").onclick=closeSheets;
+  $("openSciBtn").onclick=function(){closeSheets();setTimeout(function(){openSheet($("sciSheet"));},120);};
+  $("closeSci").onclick=closeSheets;
+  $("manageProducts").onclick=function(){openSheet($("productsSheet"));};
+  $("closeProducts").onclick=closeSheets;
+  document.querySelectorAll("#sourceSeg button").forEach(function(btn){btn.onclick=function(){document.querySelectorAll("#sourceSeg button").forEach(function(b){b.setAttribute("aria-pressed","false");});btn.setAttribute("aria-pressed","true");state.source=btn.dataset.src;Store.write("bask.source",state.source);$("keyField").style.display=state.source==="openuv"?"block":"none";};});
+  $("openuvKey").addEventListener("input",function(e){state.openuvKey=e.target.value.trim();Store.write("bask.openuvKey",state.openuvKey);});
+  $("useLocation").onclick=function(){state.loc=null;state.live=null;Store.write("bask.loc",null);refreshUV();};
+  $("refreshBtn").onclick=function(e){e.stopPropagation();state.live=null;refreshUV();};
+  $("statusPill").onclick=function(){if(!state.loc)refreshUV();};
+  $("uvSlider").addEventListener("input",function(e){state.manualUV=parseInt(e.target.value,10);Store.write("bask.manualUV",state.manualUV);$("uvNum").textContent=state.manualUV;firstDraw=true;renderToday();});
+  $("quickAdd").onclick=function(){var now=new Date();now.setMinutes(now.getMinutes()-now.getTimezoneOffset());$("aWhen").value=now.toISOString().slice(0,16);$("aMin").value="";$("aUV").value=Math.round(currentUV());$("aNote").value="";openSheet($("addSheet"));};
+  $("addCancel").onclick=closeSheets;
+  $("addSave").onclick=function(){var min=parseInt($("aMin").value,10);if(!min||min<1){$("aMin").focus();return;}var wv=$("aWhen").value,when=wv?new Date(wv).getTime():Date.now();var uv=$("aUV").value;uv=uv===""?null:parseFloat(uv);addSession({when:when,min:min,uv:uv,note:$("aNote").value.trim()});closeSheets();document.querySelector('.tab[data-tab="log"]').click();toast("Session logged");};
+
+  // ---- tan mode selectors ----
+  function renderModeSeg(){
+    var seg=$("modeSeg");if(seg){seg.innerHTML="";MODES.forEach(function(m){var b=document.createElement("button");b.type="button";b.setAttribute("aria-pressed",state.mode===m.id?"true":"false");b.innerHTML="<span class='mm'>"+m.icon+"</span>"+m.name;b.onclick=function(){setMode(m.id);};seg.appendChild(b);});}
+    var s2=$("modeSegSettings");if(s2){s2.innerHTML="";MODES.forEach(function(m){var c=document.createElement("button");c.type="button";c.className="mode-card";c.setAttribute("aria-pressed",state.mode===m.id?"true":"false");c.innerHTML="<span class='mi'>"+m.icon+"</span><span class='mb'><span class='mn'>"+m.name+"</span><span class='md'>"+m.desc+"</span><span class='mt'>"+m.trade+"</span></span>";c.onclick=function(){setMode(m.id);};s2.appendChild(c);});}
+  }
+  function setMode(id){state.mode=id;Store.write("bask.mode",id);renderModeSeg();renderToday();if(id==="max")toast("🔥 Max Tan — watch the burn line");}
+
+  // ---- skin-type quiz (Fitzpatrick) ----
+  var QUIZ=[
+    {q:"Your natural eye colour",a:[["Light blue, grey or green",0,"#bcd6e0"],["Blue, grey or green",1,"#88a99e"],["Hazel or light brown",2,"#9a7a4a"],["Dark brown",3,"#5a3a22"],["Brownish black",4,"#2c1d13"],["Not sure",2,"?"]]},
+    {q:"Your natural hair colour",a:[["Red or light blond",0,"#d98f4e"],["Blond",1,"#e7c878"],["Dark blond / light brown",2,"#a87a48"],["Dark brown",3,"#5e3e26"],["Black",4,"#221a14"],["Not sure",2,"?"]]},
+    {q:"Your skin colour (unexposed areas)",a:[["Reddish, very pale",0,"#f3d8cd"],["Pale, fair",1,"#f0d6bb"],["Fair to beige",2,"#e8c39a"],["Light brown / olive",3,"#c79a6b"],["Dark brown",4,"#8a5a36"],["Not sure",2,"?"]]},
+    {q:"Freckles on unexposed skin",a:[["Many",0,"freckle:9"],["Several",1,"freckle:5"],["A few",2,"freckle:2"],["Very few",3,"freckle:1"],["None",4,"freckle:0"],["Not sure",2,"?"]]},
+    {q:"After a lot of sun, your skin…",a:[["Painful redness, blisters, peeling",0],["Blisters, then peels",1],["Burns, sometimes peels",2],["Rarely burns",3],["Never burns",4],["Not sure",2,"?"]]},
+    {q:"How deeply do you tan?",a:[["Hardly or not at all",0],["A light tan",1],["A reasonable tan",2],["Tan easily",3],["Very dark, very quickly",4],["Not sure",2,"?"]]},
+    {q:"After hours in the sun, you go brown…",a:[["Never",0],["Seldom",1],["Sometimes",2],["Often",3],["Always",4],["Not sure",2,"?"]]},
+    {q:"Your face's sensitivity to sun",a:[["Very sensitive",0],["Sensitive",1],["Normal",2],["Resistant",3],["Never a problem",4],["Not sure",2,"?"]]}
+  ];
+  var quizAns={};
+  function scoreToType(s){if(s<=7)return 1;if(s<=14)return 2;if(s<=20)return 3;if(s<=25)return 4;if(s<=29)return 5;return 6;}
+  var FRECKLE_POS=[[6,7],[14,6],[9,13],[16,14],[5,15],[12,9],[17,9],[8,17],[15,18]];
+  function buildSwatch(spec){
+    if(!spec)return "";
+    if(spec==="?")return "<span class='qsw qunsure'>?</span>";
+    if(spec.indexOf("freckle:")===0){var n=parseInt(spec.split(":")[1],10),dots="";for(var i=0;i<n&&i<FRECKLE_POS.length;i++)dots+="<circle cx='"+FRECKLE_POS[i][0]+"' cy='"+FRECKLE_POS[i][1]+"' r='1.5' fill='#8a5a36'/>";return "<svg class='qsw' viewBox='0 0 24 24'><rect width='24' height='24' rx='7' fill='#e8c39a'/>"+dots+"</svg>";}
+    return "<span class='qsw' style='background:"+spec+"'></span>";
+  }
+  function buildQuiz(){var h=$("quiz");h.innerHTML="";QUIZ.forEach(function(item,qi){var q=document.createElement("div");q.className="q";var t=document.createElement("div");t.className="qt";t.textContent=(qi+1)+". "+item.q;q.appendChild(t);var ol=document.createElement("div");ol.className="opts";item.a.forEach(function(opt,oi){var b=document.createElement("button");b.type="button";b.className="opt";b.setAttribute("aria-pressed",quizAns[qi]===oi?"true":"false");b.innerHTML="<span class='rad'></span>"+buildSwatch(opt[2])+"<span class='otx'>"+opt[0]+"</span>";b.onclick=function(){quizAns[qi]=oi;ol.querySelectorAll(".opt").forEach(function(x){x.setAttribute("aria-pressed","false");});b.setAttribute("aria-pressed","true");};ol.appendChild(b);});q.appendChild(ol);h.appendChild(q);});}
+  function quizComplete(){return Object.keys(quizAns).length>=QUIZ.length;}
+  function computeQuiz(){var s=0;for(var k in quizAns)s+=QUIZ[k].a[quizAns[k]][1];return scoreToType(s);}
+
+  // ---- onboarding wizard ----
+  var onbSkin=state.skin,onbStep=0,TOTAL=5;
+  function buildProgress(){var p=$("onbProgress");p.innerHTML="";for(var i=0;i<TOTAL;i++){var d=document.createElement("div");d.className="pd"+(i===onbStep?" on":"");p.appendChild(d);}}
+  function gotoStep(n){onbStep=Math.max(0,Math.min(TOTAL-1,n));for(var i=0;i<TOTAL;i++)$("step"+i).classList.toggle("on",i===onbStep);buildProgress();$("onb").scrollTop=0;}
+  function buildOnbSkins(){var h=$("onbSkins");h.innerHTML="";SKIN.forEach(function(t){var d=document.createElement("div");d.className="sk"+(t.id===onbSkin?" sel":"");d.innerHTML="<div class='d' style='background:"+TONE[t.id][0]+"'></div><div class='n'>"+t.label+"</div>";d.onclick=function(){onbSkin=t.id;buildOnbSkins();showResult();};h.appendChild(d);});}
+  function showResult(){var sk=SKIN.find(function(x){return x.id===onbSkin;});var g=$("resultGem");g.style.background="radial-gradient(circle at 35% 28%,"+lerpHex(TONE[onbSkin][0],"#ffffff",.3)+","+TONE[onbSkin][0]+" 55%,"+lerpHex(TONE[onbSkin][0],"#000000",.25)+")";$("resultType").textContent="Type "+sk.label;$("resultDesc").textContent=sk.tip+" in the sun · burns near "+Math.round(sk.med/9)+" min at UV 6.";}
+  function buildModeCards(){var h=$("modeCards");h.innerHTML="";MODES.forEach(function(m){var c=document.createElement("div");c.className="mode-card";c.setAttribute("aria-pressed",state.mode===m.id?"true":"false");c.innerHTML="<span class='mi'>"+m.icon+"</span><span class='mb'><span class='mn'>"+m.name+"</span><span class='md'>"+m.desc+"</span><span class='mt'>"+m.trade+"</span></span>";c.onclick=function(){state.mode=m.id;Store.write("bask.mode",m.id);buildModeCards();};h.appendChild(c);});}
+  function finishOnb(){state.skin=onbSkin;state.onboarded=true;Store.write("bask.skin",state.skin);Store.write("bask.onboarded",true);$("onb").classList.remove("show");renderAll();renderGoalSeg();renderModeSeg();if(!state.live)refreshUV();}
+  function startOnb(retake){onbSkin=state.skin;quizAns={};onbStep=0;buildProgress();buildQuiz();buildOnbSkins();buildModeCards();showResult();gotoStep(retake?1:0);$("onb").classList.add("show");}
+
+  $("go0").onclick=function(){gotoStep(1);};
+  $("back1").onclick=function(){gotoStep(0);};
+  $("go1").onclick=function(){if(!quizComplete()){toast("Answer all questions, or pick manually next");}onbSkin=quizComplete()?computeQuiz():onbSkin;buildOnbSkins();showResult();gotoStep(2);};
+  $("back2").onclick=function(){gotoStep(1);};
+  $("go2").onclick=function(){buildModeCards();gotoStep(3);};
+  $("back3").onclick=function(){gotoStep(2);};
+  $("go3").onclick=function(){gotoStep(4);};
+  $("back4").onclick=function(){gotoStep(3);};
+  $("onbLoc").onclick=function(){state.loc=null;state.live=null;Store.write("bask.loc",null);refreshUV();$("onbLoc").textContent="📍 Location enabled ✓";};
+  $("onbGo").onclick=finishOnb;
+  $("onbSkip").onclick=finishOnb;
+  $("retakeQuiz").onclick=function(){closeSheets();setTimeout(function(){startOnb(true);},150);};
+
+  // ---- init ----
+  function initSettingsUI(){document.querySelectorAll("#sourceSeg button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.src===state.source?"true":"false");});$("keyField").style.display=state.source==="openuv"?"block":"none";$("openuvKey").value=state.openuvKey||"";updateLocLabels();}
+  function renderAll(){renderSkinChips();renderProductChips();renderProductList();renderModeSeg();renderToday();renderLog();}
+  function clock(){var d=new Date();$("clock").textContent=" · "+d.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});}
+
+  initSettingsUI();renderGoalSeg();renderAll();clock();
+  if(state.live)setStatus("warn","Saved UV ("+liveAge()+")");else setStatus("warn","Tap to enable live UV");
+  if(!state.onboarded){startOnb(false);}else{refreshUV();}
+  setInterval(function(){clock();if(!timer.running)renderToday();},60000);
+
+  try{var mani={name:"Bask",short_name:"Bask",display:"standalone",background_color:"#efe3d4",theme_color:"#efe3d4",start_url:".",icons:[{src:document.querySelector("link[rel='apple-touch-icon']").href,sizes:"180x180",type:"image/svg+xml",purpose:"any"}]};var blob=new Blob([JSON.stringify(mani)],{type:"application/json"});var l=document.createElement("link");l.rel="manifest";l.href=URL.createObjectURL(blob);document.head.appendChild(l);}catch(e){}
+})();
+</script>
+</body>
+</html>
