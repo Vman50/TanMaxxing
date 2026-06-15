@@ -893,46 +893,47 @@
       sideInd.textContent = timer.currentSide;
 
       var runningElapsed = timer.running ? (Date.now() - timer.start) / 1000 : 0;
-      // total time on the current side: previously committed + current paused segment + live running time
       var currentSideSec = currentSideCommitted() + timer.accumulatedSec + runningElapsed;
 
       var currentUvIndex=currentUV();
       var tgtSideMins = safeMin(currentUvIndex);
       var totalTgtSec = tgtSideMins * 60 || 1800;
+      var pastSuggestion = currentSideSec >= totalTgtSec;
 
       big.textContent=fmtClock(currentSideSec);
       big.className="n t";
 
-      var left = Math.ceil((totalTgtSec - currentSideSec) / 60);
-      lab.textContent=left>0?(left+" min to flip"):"side limit reached";
+      lab.textContent = tgtSideMins>0 ? ("~"+tgtSideMins+"m suggested") : "stopwatch";
 
-      var dose=Math.round(currentSideSec/60/Math.max(burnMin(currentUvIndex),0.1)*100);
-      tap.textContent=dose+"% to redness";
+      // show running total across all sides in tap area
+      var allSidesSec = timerSumSides() + timer.accumulatedSec + runningElapsed;
+      var activeSideCount = activeSides().length;
+      tap.textContent = activeSideCount > 1 ? ("total: "+fmtClock(allSidesSec)) : (pastSuggestion ? "suggestion reached" : "");
 
       var frac=Math.min(currentSideSec/totalTgtSec,1);
       ring.setAttribute("stroke-dashoffset",(RING*frac).toFixed(1));
-      if(frac >= 1) ring.setAttribute("stroke","#d9534f");
+      if(pastSuggestion) ring.setAttribute("stroke","#d9534f");
       document.querySelector(".dial .glow").style.setProperty("--dialglow",frac>0.5?1:0);
       dialContainer.setAttribute("aria-valuenow", Math.floor(frac * 100));
 
       if(!timer.warned2min && !timer.alerted && currentSideSec<totalTgtSec && (totalTgtSec-currentSideSec)<=120){
         timer.warned2min=true;
         try{if(navigator.vibrate)navigator.vibrate([100]);}catch(e){}
-        toast("2 min left on "+timer.currentSide);
-        fireNotify("2 minutes left","Your "+timer.currentSide+" side is almost done — get ready to flip.");
+        toast("2 min to suggestion on "+timer.currentSide);
+        fireNotify("Almost at suggestion","Your "+timer.currentSide+" side is 2 min from the suggestion.");
       }
-      if(!timer.alerted && currentSideSec>=totalTgtSec){
+      if(!timer.alerted && pastSuggestion){
         timer.alerted=true;
         burnAlert();
       }
     }else{
       sideInd.style.display = "none";
       var s = safeMin(currentUV());
-      big.textContent=s>0?s:"0";
+      big.textContent=s>0?s:"–";
       big.className="n";
-      lab.textContent="min per side";
+      lab.textContent="min suggested";
       var nSides=activeSides().length;
-      tap.textContent=s>0?("≈ "+(s*nSides)+" min total · set a phone timer"):"tap to start";
+      tap.textContent=s>0?("≈ "+(s*nSides)+"m total suggestion"):"tap to start";
       ring.setAttribute("stroke-dashoffset","0");
       document.querySelector(".dial .glow").style.setProperty("--dialglow",0);
       dialContainer.setAttribute("aria-valuenow", "0");
@@ -1255,7 +1256,7 @@
   }
 
   // Soft in-app reminder only (no alarm) — the live timer is a glance reference, not something to rely on in the background. Use a phone Clock timer for the real alert.
-  function burnAlert(){try{if(navigator.vibrate)navigator.vibrate([200,80,200]);}catch(e){}toast("⚠ "+timer.currentSide+" side hit its safe limit — flip or wrap up.");fireNotify("Side limit reached","Your "+timer.currentSide+" side hit its safe limit. Flip sides or wrap up to avoid burning.");}
+  function burnAlert(){try{if(navigator.vibrate)navigator.vibrate([100,50,100]);}catch(e){}toast(timer.currentSide+" suggestion reached — flip when ready.");fireNotify("Suggestion reached","Your "+timer.currentSide+" side hit the suggested time. Flip or keep going — your call.");}
 
   function resetTimer(){
     timer.running=false;
