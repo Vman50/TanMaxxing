@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="TanMaxxing" />
 <meta name="theme-color" content="#efe3d4" id="themeColorMeta" />
-<script>try{var _t=JSON.parse(localStorage.getItem("bask.theme")||'"auto"');var _d=_t==="dark"||(_t!=="light"&&matchMedia("(prefers-color-scheme:dark)").matches);document.documentElement.setAttribute("data-theme",_d?"dark":"light");var _m=document.getElementById("themeColorMeta");if(_m)_m.setAttribute("content",_d?"#15100c":"#efe3d4");}catch(e){}</script>
+<script>try{var _t=JSON.parse(localStorage.getItem("tanmax.theme")||localStorage.getItem("tanmax.theme")||'"auto"');var _d=_t==="dark"||(_t!=="light"&&matchMedia("(prefers-color-scheme:dark)").matches);document.documentElement.setAttribute("data-theme",_d?"dark":"light");var _m=document.getElementById("themeColorMeta");if(_m)_m.setAttribute("content",_d?"#15100c":"#efe3d4");}catch(e){}</script>
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cdefs%3E%3CradialGradient id='g' cx='35%25' cy='30%25'%3E%3Cstop offset='0' stop-color='%23f0c79a'/%3E%3Cstop offset='.6' stop-color='%23c9824e'/%3E%3Cstop offset='1' stop-color='%238c5028'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='42' fill='%23efe3d4'/%3E%3Ccircle cx='90' cy='90' r='54' fill='url(%23g)'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -671,6 +671,9 @@
   var Store={read:function(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return (k in mem)?mem[k]:d;}},
              write:function(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){mem[k]=v;}}};
 
+  // one-time migration: copy bask.* keys to tanmax.* and remove old keys
+  (function(){try{var keys=["skin","products","activeProduct","manualUV","source","openuvKey","loc","live","sessions","goal","onboarded","mode","sides","env","recoveryUntil","productAppliedAt","weekOpen","theme","timer"];keys.forEach(function(k){var old=localStorage.getItem("tanmax."+k);if(old!=null&&localStorage.getItem("tanmax."+k)==null){localStorage.setItem("tanmax."+k,old);}localStorage.removeItem("tanmax."+k);});}catch(e){}})();
+
   var SKIN=[{id:1,label:"I",tip:"Always burns",med:200,cap:30,vd:15},{id:2,label:"II",tip:"Burns easily",med:250,cap:48,vd:13},
             {id:3,label:"III",tip:"Sometimes",med:350,cap:65,vd:11},{id:4,label:"IV",tip:"Rarely",med:450,cap:80,vd:8},
             {id:5,label:"V",tip:"Very rarely",med:600,cap:90,vd:6},{id:6,label:"VI",tip:"Almost never",med:1000,cap:96,vd:4}];
@@ -678,20 +681,20 @@
   var DEFAULT_PRODUCTS=[{id:"bare",name:"Bare skin",kind:"oil",spf:0,fixed:true}];
 
   var state={
-    skin:Store.read("bask.skin",3), products:Store.read("bask.products",DEFAULT_PRODUCTS),
-    activeProduct:Store.read("bask.activeProduct","bare"), manualUV:Store.read("bask.manualUV",5),
-    source:Store.read("bask.source","openmeteo"),
-    openuvKey: (function(){ try { var k=Store.read("bask.openuvKey",""); return k ? atob(k) : ""; } catch(e) { return ""; } })(),
-    loc:Store.read("bask.loc",null), live:Store.read("bask.live",null),
-    sessions:Store.read("bask.sessions",[]),
-    goal:Store.read("bask.goal",0), onboarded:Store.read("bask.onboarded",false),
-    mode:Store.read("bask.mode","build"),
-    sides:Store.read("bask.sides",["Front","Back"]),
-    env:Store.read("bask.env",{}),
-    recoveryUntil:Store.read("bask.recoveryUntil",0),
-    productAppliedAt:Store.read("bask.productAppliedAt",0),
-    weekOpen:Store.read("bask.weekOpen",false),
-    theme:Store.read("bask.theme","auto")
+    skin:Store.read("tanmax.skin",3), products:Store.read("tanmax.products",DEFAULT_PRODUCTS),
+    activeProduct:Store.read("tanmax.activeProduct","bare"), manualUV:Store.read("tanmax.manualUV",5),
+    source:Store.read("tanmax.source","openmeteo"),
+    openuvKey: (function(){ try { var k=Store.read("tanmax.openuvKey",""); return k ? atob(k) : ""; } catch(e) { return ""; } })(),
+    loc:Store.read("tanmax.loc",null), live:Store.read("tanmax.live",null),
+    sessions:Store.read("tanmax.sessions",[]),
+    goal:Store.read("tanmax.goal",0), onboarded:Store.read("tanmax.onboarded",false),
+    mode:Store.read("tanmax.mode","build"),
+    sides:Store.read("tanmax.sides",["Front","Back"]),
+    env:Store.read("tanmax.env",{}),
+    recoveryUntil:Store.read("tanmax.recoveryUntil",0),
+    productAppliedAt:Store.read("tanmax.productAppliedAt",0),
+    weekOpen:Store.read("tanmax.weekOpen",false),
+    theme:Store.read("tanmax.theme","auto")
   };
   var ALL_SIDES=["Front","Back","Left","Right"];
   var ENV=[{id:"beach",label:"Beach sand",mult:0.25,icon:"🏖️"},{id:"snow",label:"Snow",mult:0.80,icon:"❄️"},
@@ -787,8 +790,8 @@
 
   // ---- chips ----
   function buildChips(host,items,getA,onPick,fmt,extra){host.innerHTML="";items.forEach(function(it){var b=document.createElement("button");b.className="chip";b.type="button";b.setAttribute("aria-pressed",getA()===it.id?"true":"false");b.innerHTML=fmt(it);b.onclick=function(){haptic(8);onPick(it.id);renderAll();};host.appendChild(b);});if(extra){var e=document.createElement("button");e.className="chip add";e.type="button";e.innerHTML=extra.label;e.onclick=extra.onClick;host.appendChild(e);}}
-  function renderSkinChips(){buildChips($("skinChips"),SKIN,function(){return state.skin;},function(v){state.skin=v;Store.write("bask.skin",v);},function(it){return "<span>Type "+it.label+"</span><span class='t'>"+it.tip+"</span>";});}
-  function renderProductChips(){buildChips($("productChips"),state.products,function(){return state.activeProduct;},function(v){state.activeProduct=v;Store.write("bask.activeProduct",v);var p=state.products.find(function(x){return x.id===v;});if(p&&p.id!=="bare"&&(p.kind==="sunscreen"||p.spf>0)){state.productAppliedAt=Date.now();}else{state.productAppliedAt=0;}Store.write("bask.productAppliedAt",state.productAppliedAt);},function(p){return "<span>"+(p.kind==="oil"?"🟠 ":"🟢 ")+(p.id==="bare"?"Bare skin":(p.kind==="oil"?"Tanning Oil":"Sunscreen"))+"</span><span class='t'>"+(p.spf?("SPF "+p.spf):"no SPF")+"</span>";},{label:"+ Add",onClick:function(){openSheet($("productsSheet"));}});}
+  function renderSkinChips(){buildChips($("skinChips"),SKIN,function(){return state.skin;},function(v){state.skin=v;Store.write("tanmax.skin",v);},function(it){return "<span>Type "+it.label+"</span><span class='t'>"+it.tip+"</span>";});}
+  function renderProductChips(){buildChips($("productChips"),state.products,function(){return state.activeProduct;},function(v){state.activeProduct=v;Store.write("tanmax.activeProduct",v);var p=state.products.find(function(x){return x.id===v;});if(p&&p.id!=="bare"&&(p.kind==="sunscreen"||p.spf>0)){state.productAppliedAt=Date.now();}else{state.productAppliedAt=0;}Store.write("tanmax.productAppliedAt",state.productAppliedAt);},function(p){return "<span>"+(p.kind==="oil"?"🟠 ":"🟢 ")+(p.id==="bare"?"Bare skin":(p.kind==="oil"?"Tanning Oil":"Sunscreen"))+"</span><span class='t'>"+(p.spf?("SPF "+p.spf):"no SPF")+"</span>";},{label:"+ Add",onClick:function(){openSheet($("productsSheet"));}});}
 
   // ---- Smart Science SPF Advisor logic ----
   function updateSpfAdvisor(uv) {
@@ -853,8 +856,8 @@
   
   // ---- tracking system state & engine update ----
   var timer={running:false,paused:false,start:0,accumulatedSec:0,completedSidesSec:0,currentSide:"Front",sidesDone:[],alerted:false,warned2min:false};
-  function saveTimer(){Store.write("bask.timer",{running:timer.running,paused:timer.paused,start:timer.start,accumulatedSec:timer.accumulatedSec,completedSidesSec:timer.completedSidesSec,currentSide:timer.currentSide,sidesDone:timer.sidesDone,alerted:timer.alerted,warned2min:timer.warned2min});}
-  function clearTimer(){Store.write("bask.timer",null);}
+  function saveTimer(){Store.write("tanmax.timer",{running:timer.running,paused:timer.paused,start:timer.start,accumulatedSec:timer.accumulatedSec,completedSidesSec:timer.completedSidesSec,currentSide:timer.currentSide,sidesDone:timer.sidesDone,alerted:timer.alerted,warned2min:timer.warned2min});}
+  function clearTimer(){Store.write("tanmax.timer",null);}
 
   function renderDial(){
     var big=$("dialBig"),lab=$("dialLab"),tap=$("dialTap"),ring=$("ring"), sideInd=$("dialSide");
@@ -1099,7 +1102,7 @@
       timer.sidesDone=[];
       timer.alerted=false;
       timer.warned2min=false;
-      if(reapplyEligible()&&!state.productAppliedAt){state.productAppliedAt=Date.now();Store.write("bask.productAppliedAt",state.productAppliedAt);}
+      if(reapplyEligible()&&!state.productAppliedAt){state.productAppliedAt=Date.now();Store.write("tanmax.productAppliedAt",state.productAppliedAt);}
       saveTimer();
       setupActionButtonUI();
       startReliableTimer();
@@ -1217,15 +1220,15 @@
 
   // ---- sessions ----
   var editingId=null,addBurn=0,confirmBurn=0,undoT;
-  function applyBurn(when){state.recoveryUntil=when+BURN_LOCKOUT_DAYS*864e5;Store.write("bask.recoveryUntil",state.recoveryUntil);}
-  function addSession(s){s.id=Date.now()+"-"+Math.random().toString(36).slice(2,6);state.sessions.unshift(s);Store.write("bask.sessions",state.sessions);renderLog();renderTan();}
+  function applyBurn(when){state.recoveryUntil=when+BURN_LOCKOUT_DAYS*864e5;Store.write("tanmax.recoveryUntil",state.recoveryUntil);}
+  function addSession(s){s.id=Date.now()+"-"+Math.random().toString(36).slice(2,6);state.sessions.unshift(s);Store.write("tanmax.sessions",state.sessions);renderLog();renderTan();}
   function showUndo(msg,fn){var t=$("toast");t.innerHTML="";var sp=document.createElement("span");sp.textContent=msg;var b=document.createElement("button");b.className="ub";b.textContent="Undo";b.onclick=function(){fn();t.classList.remove("show");t.innerHTML="";clearTimeout(undoT);};t.appendChild(sp);t.appendChild(b);t.classList.add("show");clearTimeout(undoT);clearTimeout(toastT);undoT=setTimeout(function(){t.classList.remove("show");t.innerHTML="";},5000);}
   function delSession(id){
     var idx=-1;state.sessions.forEach(function(s,i){if(s.id===id)idx=i;});
     if(idx<0)return;
     var removed=state.sessions[idx];
-    state.sessions.splice(idx,1);Store.write("bask.sessions",state.sessions);renderLog();renderTan();
-    showUndo("Session deleted",function(){state.sessions.splice(idx,0,removed);Store.write("bask.sessions",state.sessions);renderLog();renderTan();});
+    state.sessions.splice(idx,1);Store.write("tanmax.sessions",state.sessions);renderLog();renderTan();
+    showUndo("Session deleted",function(){state.sessions.splice(idx,0,removed);Store.write("tanmax.sessions",state.sessions);renderLog();renderTan();});
   }
   function setAddBurn(v){addBurn=v;document.querySelectorAll("#aBurnSeg button").forEach(function(b){b.setAttribute("aria-pressed",parseInt(b.dataset.burn,10)===v?"true":"false");});}
   function setConfirmBurn(v){confirmBurn=v;document.querySelectorAll("#cBurnSeg button").forEach(function(b){b.setAttribute("aria-pressed",parseInt(b.dataset.burn,10)===v?"true":"false");});}
@@ -1243,17 +1246,17 @@
   function drawTanChart(){var svg=$("tanchart");svg.innerHTML="";var ns="http://www.w3.org/2000/svg",cw=320,ch=100,pad=6,now=Date.now(),days=30,cap=skin().cap,tc=themeColors();var pts=[];for(var i=days;i>=0;i--)pts.push({x:(days-i)/days,y:tanAt(now-i*864e5)});animateCount($("chartPct"),tanAt(now));var t0=TONE[state.skin][0],t1=TONE[state.skin][1];var defs=document.createElementNS(ns,'defs');defs.innerHTML="<linearGradient id='tg' x1='0' y1='0' x2='1' y2='0'><stop offset='0' stop-color='"+t0+"'/><stop offset='1' stop-color='"+t1+"'/></linearGradient><linearGradient id='tgf' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='"+t1+"' stop-opacity='.35'/><stop offset='1' stop-color='"+t1+"' stop-opacity='0'/></linearGradient>";svg.appendChild(defs);function X(x){return pad+x*(cw-2*pad);}function Y(y){return (ch-pad)-(y/Math.max(cap,1))*(ch-2*pad);}var line="";pts.forEach(function(p,i){line+=(i===0?"M":"L")+X(p.x).toFixed(1)+" "+Y(p.y).toFixed(1)+" ";});var ar=document.createElementNS(ns,'path');ar.setAttribute('d',line+"L"+X(1)+" "+(ch-pad)+" L"+X(0)+" "+(ch-pad)+" Z");ar.setAttribute('fill','url(#tgf)');svg.appendChild(ar);var ln=document.createElementNS(ns,'path');ln.setAttribute('d',line);ln.setAttribute('fill','none');ln.setAttribute('stroke','url(#tg)');ln.setAttribute('stroke-width','2.5');ln.setAttribute('stroke-linecap','round');svg.appendChild(ln);var lp=pts[pts.length-1],c=document.createElementNS(ns,'circle');c.setAttribute('cx',X(lp.x));c.setAttribute('cy',Y(lp.y));c.setAttribute('r','4');c.setAttribute('fill',t1);svg.appendChild(c);}
 
   // ---- products ----
-  function renderProductList(){var host=$("productList");host.innerHTML="";state.products.forEach(function(p){var row=document.createElement("div");row.className="prod-row";row.innerHTML="<div class='pi' style='background:"+(p.kind==="oil"?"rgba(255,157,60,.18)":"rgba(122,209,154,.18)")+"'>"+(p.kind==="oil"?"🟠":"🟢")+"</div><div class='pb'><div class='n'>"+(p.id==="bare"?"Bare skin":(p.kind==="oil"?"Tanning Oil":"Sunscreen"))+"</div><div class='s'>"+(p.spf?("SPF "+p.spf):"no SPF")+"</div></div>";if(!p.fixed){var del=document.createElement("button");del.className="del";del.textContent="×";del.onclick=function(){state.products=state.products.filter(function(x){return x.id!==p.id;});if(state.activeProduct===p.id){state.activeProduct="bare";Store.write("bask.activeProduct","bare");}Store.write("bask.products",state.products);renderProductList();renderProductChips();renderToday();};row.appendChild(del);}host.appendChild(row);});}
+  function renderProductList(){var host=$("productList");host.innerHTML="";state.products.forEach(function(p){var row=document.createElement("div");row.className="prod-row";row.innerHTML="<div class='pi' style='background:"+(p.kind==="oil"?"rgba(255,157,60,.18)":"rgba(122,209,154,.18)")+"'>"+(p.kind==="oil"?"🟠":"🟢")+"</div><div class='pb'><div class='n'>"+(p.id==="bare"?"Bare skin":(p.kind==="oil"?"Tanning Oil":"Sunscreen"))+"</div><div class='s'>"+(p.spf?("SPF "+p.spf):"no SPF")+"</div></div>";if(!p.fixed){var del=document.createElement("button");del.className="del";del.textContent="×";del.onclick=function(){state.products=state.products.filter(function(x){return x.id!==p.id;});if(state.activeProduct===p.id){state.activeProduct="bare";Store.write("tanmax.activeProduct","bare");}Store.write("tanmax.products",state.products);renderProductList();renderProductChips();renderToday();};row.appendChild(del);}host.appendChild(row);});}
   var pKind="oil";document.querySelectorAll("#pKindSeg button").forEach(function(btn){btn.onclick=function(){document.querySelectorAll("#pKindSeg button").forEach(function(b){b.setAttribute("aria-pressed","false");});btn.setAttribute("aria-pressed","true");pKind=btn.dataset.kind;};});
-  $("addProduct").onclick=function(){var spf=parseInt($("pSpf").value,10);if(isNaN(spf)||spf<0)spf=0;if(spf>100)spf=100;var dup=state.products.find(function(p){return !p.fixed&&p.kind===pKind&&(p.spf||0)===spf;});var prod=dup||{id:"p"+Date.now(),kind:pKind,spf:spf};if(!dup){prod.name=prodLabel(prod);state.products.push(prod);Store.write("bask.products",state.products);}$("pSpf").value="";renderProductList();renderProductChips();toast((dup?"Already added · ":"Added ")+prodLabel(prod));};
+  $("addProduct").onclick=function(){var spf=parseInt($("pSpf").value,10);if(isNaN(spf)||spf<0)spf=0;if(spf>100)spf=100;var dup=state.products.find(function(p){return !p.fixed&&p.kind===pKind&&(p.spf||0)===spf;});var prod=dup||{id:"p"+Date.now(),kind:pKind,spf:spf};if(!dup){prod.name=prodLabel(prod);state.products.push(prod);Store.write("tanmax.products",state.products);}$("pSpf").value="";renderProductList();renderProductChips();toast((dup?"Already added · ":"Added ")+prodLabel(prod));};
 
   // ---- goal ----
-  function renderGoalSeg(){var seg=$("goalSeg");seg.innerHTML="";[{v:0,l:"Off"},{v:40,l:"Light"},{v:65,l:"Golden"},{v:90,l:"Deep"}].forEach(function(o){var b=document.createElement("button");b.textContent=o.l;b.setAttribute("aria-pressed",state.goal===o.v?"true":"false");b.onclick=function(){state.goal=o.v;Store.write("bask.goal",o.v);renderGoalSeg();renderTan();};seg.appendChild(b);});}
-  function renderThemeSeg(){var seg=$("themeSeg");if(!seg)return;seg.innerHTML="";[{v:"auto",l:"Auto"},{v:"light",l:"Light"},{v:"dark",l:"Dark"}].forEach(function(o){var b=document.createElement("button");b.type="button";b.textContent=o.l;b.setAttribute("aria-pressed",state.theme===o.v?"true":"false");b.onclick=function(){state.theme=o.v;Store.write("bask.theme",o.v);applyTheme();renderThemeSeg();renderToday();drawTanChart();};seg.appendChild(b);});}
+  function renderGoalSeg(){var seg=$("goalSeg");seg.innerHTML="";[{v:0,l:"Off"},{v:40,l:"Light"},{v:65,l:"Golden"},{v:90,l:"Deep"}].forEach(function(o){var b=document.createElement("button");b.textContent=o.l;b.setAttribute("aria-pressed",state.goal===o.v?"true":"false");b.onclick=function(){state.goal=o.v;Store.write("tanmax.goal",o.v);renderGoalSeg();renderTan();};seg.appendChild(b);});}
+  function renderThemeSeg(){var seg=$("themeSeg");if(!seg)return;seg.innerHTML="";[{v:"auto",l:"Auto"},{v:"light",l:"Light"},{v:"dark",l:"Dark"}].forEach(function(o){var b=document.createElement("button");b.type="button";b.textContent=o.l;b.setAttribute("aria-pressed",state.theme===o.v?"true":"false");b.onclick=function(){state.theme=o.v;Store.write("tanmax.theme",o.v);applyTheme();renderThemeSeg();renderToday();drawTanChart();};seg.appendChild(b);});}
 
   // ---- environment multiplier & body sides (settings) ----
-  function renderEnvChips(){var host=$("envChips");if(!host)return;host.innerHTML="";ENV.forEach(function(e){var b=document.createElement("button");b.type="button";b.className="envchip";b.setAttribute("aria-pressed",state.env[e.id]?"true":"false");b.innerHTML="<span>"+e.icon+"</span>"+e.label+" +"+Math.round(e.mult*100)+"%";b.onclick=function(){state.env[e.id]=!state.env[e.id];Store.write("bask.env",state.env);b.setAttribute("aria-pressed",state.env[e.id]?"true":"false");renderToday();};host.appendChild(b);});}
-  function renderSidesChips(){var host=$("sidesChips");if(!host)return;host.innerHTML="";ALL_SIDES.forEach(function(name){var on=activeSides().indexOf(name)>=0;var b=document.createElement("button");b.type="button";b.className="envchip";b.setAttribute("aria-pressed",on?"true":"false");b.textContent=name;b.onclick=function(){var cur=activeSides(),has=cur.indexOf(name)>=0,next=ALL_SIDES.filter(function(n){return n===name?!has:cur.indexOf(n)>=0;});if(!next.length){toast("Keep at least one side");return;}state.sides=next;Store.write("bask.sides",next);renderSidesChips();};host.appendChild(b);});}
+  function renderEnvChips(){var host=$("envChips");if(!host)return;host.innerHTML="";ENV.forEach(function(e){var b=document.createElement("button");b.type="button";b.className="envchip";b.setAttribute("aria-pressed",state.env[e.id]?"true":"false");b.innerHTML="<span>"+e.icon+"</span>"+e.label+" +"+Math.round(e.mult*100)+"%";b.onclick=function(){state.env[e.id]=!state.env[e.id];Store.write("tanmax.env",state.env);b.setAttribute("aria-pressed",state.env[e.id]?"true":"false");renderToday();};host.appendChild(b);});}
+  function renderSidesChips(){var host=$("sidesChips");if(!host)return;host.innerHTML="";ALL_SIDES.forEach(function(name){var on=activeSides().indexOf(name)>=0;var b=document.createElement("button");b.type="button";b.className="envchip";b.setAttribute("aria-pressed",on?"true":"false");b.textContent=name;b.onclick=function(){var cur=activeSides(),has=cur.indexOf(name)>=0,next=ALL_SIDES.filter(function(n){return n===name?!has:cur.indexOf(n)>=0;});if(!next.length){toast("Keep at least one side");return;}state.sides=next;Store.write("tanmax.sides",next);renderSidesChips();};host.appendChild(b);});}
 
   // ---- location & fetch ----
   function setStatus(k,t){$("statusDot").className="dot "+k;$("statusText").textContent=t;var rf=$("refreshBtn"),ptr=$("ptr");if(rf)rf.classList.toggle("busy",k==="load");if(ptr&&k!=="load")ptr.classList.remove("spin");}
@@ -1271,7 +1274,7 @@
   // Resolve a typed place into state.loc and refresh UV. onName runs with the resolved loc.
   function setManualLocation(query,onName){
     setStatus("load","Finding place…");
-    return geocodePlace(query).then(function(loc){state.loc=loc;state.live=null;Store.write("bask.loc",loc);updateLocLabels();if(onName)onName(loc);refreshUV();toast("Location set to "+loc.place);return loc;}).catch(function(){toast("Couldn't find that place — try a city name or \"lat, lng\"");setStatus("warn","Tap to enable live UV");});
+    return geocodePlace(query).then(function(loc){state.loc=loc;state.live=null;Store.write("tanmax.loc",loc);updateLocLabels();if(onName)onName(loc);refreshUV();toast("Location set to "+loc.place);return loc;}).catch(function(){toast("Couldn't find that place — try a city name or \"lat, lng\"");setStatus("warn","Tap to enable live UV");});
   }
   function parseHM(s){return parseInt(s.substr(11,2),10)+parseInt(s.substr(14,2),10)/60;}
   function fetchOpenMeteo(lat,lng){var url="https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lng+"&hourly=uv_index&daily=uv_index_max,sunrise,sunset&current=uv_index&timezone=auto&forecast_days=7";return fetch(url).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();}).then(function(j){
@@ -1282,13 +1285,13 @@
     var today=daily[0]||{};
     return{current:(j.current&&typeof j.current.uv_index==="number")?j.current.uv_index:null,max:(today.max!=null?today.max:null),hourly:today.hourly||[],sunrise:today.sunrise,sunset:today.sunset,daily:daily,updatedAt:Date.now(),source:"openmeteo"};});}
   function fetchOpenUV(lat,lng){if(!state.openuvKey)return Promise.reject("no key");return fetch("https://api.openuv.io/api/v1/uv?lat="+lat+"&lng="+lng,{headers:{"x-access-token":state.openuvKey}}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();}).then(function(j){var cur=j.result?j.result.uv:null,mx=j.result?j.result.uv_max:null,hourly=[];if(typeof mx==="number")for(var i=5;i<=21;i+=0.5){var f=1-Math.pow((i-13)/6.8,2);hourly.push({h:i,uv:Math.max(0,mx*f)});}var sr=null,ss=null;try{var st=j.result.sun_info.sun_times;sr=new Date(st.sunrise).getHours()+new Date(st.sunrise).getMinutes()/60;ss=new Date(st.sunset).getHours()+new Date(st.sunset).getMinutes()/60;}catch(e){}return{current:cur,max:mx,hourly:hourly,sunrise:sr,sunset:ss,updatedAt:Date.now(),source:"openuv"};});}
-  function refreshUV(){setStatus("load","Locating…");firstDraw=true;var locP=state.loc?Promise.resolve(state.loc):getLocation().then(function(c){state.loc=c;Store.write("bask.loc",c);reverseGeocode(c.lat,c.lng).then(function(name){if(name){state.loc.place=name;Store.write("bask.loc",state.loc);updateLocLabels();}});return c;});locP.then(function(c){setStatus("load","Fetching UV…");return (state.source==="openuv"?fetchOpenUV:fetchOpenMeteo)(c.lat,c.lng);}).then(function(live){state.live=live;Store.write("bask.live",live);updateLocLabels();setStatus("live","Live · "+liveAge());renderToday();}).catch(function(err){if(state.live)setStatus("warn","Saved UV ("+liveAge()+") · tap ↻");else setStatus("err","Tap to enable live UV");renderToday();});}
+  function refreshUV(){setStatus("load","Locating…");firstDraw=true;var locP=state.loc?Promise.resolve(state.loc):getLocation().then(function(c){state.loc=c;Store.write("tanmax.loc",c);reverseGeocode(c.lat,c.lng).then(function(name){if(name){state.loc.place=name;Store.write("tanmax.loc",state.loc);updateLocLabels();}});return c;});locP.then(function(c){setStatus("load","Fetching UV…");return (state.source==="openuv"?fetchOpenUV:fetchOpenMeteo)(c.lat,c.lng);}).then(function(live){state.live=live;Store.write("tanmax.live",live);updateLocLabels();setStatus("live","Live · "+liveAge());renderToday();}).catch(function(err){if(state.live)setStatus("warn","Saved UV ("+liveAge()+") · tap ↻");else setStatus("err","Tap to enable live UV");renderToday();});}
   function updateLocLabels(){var name=(state.loc&&state.loc.place)?state.loc.place:(state.loc?"Your location":"Set location");$("locName").textContent=name;$("locSetting").textContent=state.loc?(name+" ("+state.loc.lat.toFixed(2)+", "+state.loc.lng.toFixed(2)+")"):"Not set yet.";}
 
   // ---- export / import ----
   $("exportBtn").onclick=function(){var data={app:"TanMaxxing",version:1,exported:new Date().toISOString(),skin:state.skin,goal:state.goal,products:state.products,sessions:state.sessions};var blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="tanmaxxing-data-"+new Date().toISOString().slice(0,10)+".json";a.click();toast("Exported your data");};
   $("importBtn").onclick=function(){$("importFile").click();};
-  $("importFile").onchange=function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(d.sessions)state.sessions=d.sessions;if(d.products)state.products=d.products;if(typeof d.skin==="number")state.skin=d.skin;if(typeof d.goal==="number")state.goal=d.goal;Store.write("bask.sessions",state.sessions);Store.write("bask.products",state.products);Store.write("bask.skin",state.skin);Store.write("bask.goal",state.goal);renderAll();renderGoalSeg();toast("Imported "+(d.sessions?d.sessions.length:0)+" sessions");}catch(err){toast("Couldn't read that file");}};r.readAsText(f);e.target.value="";};
+  $("importFile").onchange=function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(d.sessions)state.sessions=d.sessions;if(d.products)state.products=d.products;if(typeof d.skin==="number")state.skin=d.skin;if(typeof d.goal==="number")state.goal=d.goal;Store.write("tanmax.sessions",state.sessions);Store.write("tanmax.products",state.products);Store.write("tanmax.skin",state.skin);Store.write("tanmax.goal",state.goal);renderAll();renderGoalSeg();toast("Imported "+(d.sessions?d.sessions.length:0)+" sessions");}catch(err){toast("Couldn't read that file");}};r.readAsText(f);e.target.value="";};
 
   // ---- toast ----
   var toastT;function toast(msg){var t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove("show");},2600);}
@@ -1359,14 +1362,14 @@
   $("closeSci").onclick=closeSheets;
   $("manageProducts").onclick=function(){openSheet($("productsSheet"));};
   $("closeProducts").onclick=closeSheets;
-  document.querySelectorAll("#sourceSeg button").forEach(function(btn){btn.onclick=function(){document.querySelectorAll("#sourceSeg button").forEach(function(b){b.setAttribute("aria-pressed","false");});btn.setAttribute("aria-pressed","true");state.source=btn.dataset.src;Store.write("bask.source",state.source);$("keyField").style.display=state.source==="openuv"?"block":"none";};});
-  $("openuvKey").addEventListener("input",function(e){state.openuvKey=e.target.value.trim();Store.write("bask.openuvKey",btoa(state.openuvKey));});
-  $("useLocation").onclick=function(){state.loc=null;state.live=null;Store.write("bask.loc",null);refreshUV();};
+  document.querySelectorAll("#sourceSeg button").forEach(function(btn){btn.onclick=function(){document.querySelectorAll("#sourceSeg button").forEach(function(b){b.setAttribute("aria-pressed","false");});btn.setAttribute("aria-pressed","true");state.source=btn.dataset.src;Store.write("tanmax.source",state.source);$("keyField").style.display=state.source==="openuv"?"block":"none";};});
+  $("openuvKey").addEventListener("input",function(e){state.openuvKey=e.target.value.trim();Store.write("tanmax.openuvKey",btoa(state.openuvKey));});
+  $("useLocation").onclick=function(){state.loc=null;state.live=null;Store.write("tanmax.loc",null);refreshUV();};
   $("locManualBtn").onclick=function(){var q=$("locManualInput").value;if(!q.trim()){$("locManualInput").focus();return;}setManualLocation(q,function(){$("locManualInput").value="";});};
   $("locManualInput").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();$("locManualBtn").click();}});
   $("refreshBtn").onclick=function(e){e.stopPropagation();state.live=null;refreshUV();};
   $("statusPill").onclick=function(){if(!state.loc)refreshUV();};
-  $("uvSlider").addEventListener("input",function(e){state.manualUV=parseInt(e.target.value,10);Store.write("bask.manualUV",state.manualUV);$("uvNum").textContent=state.manualUV;firstDraw=true;renderToday();});
+  $("uvSlider").addEventListener("input",function(e){state.manualUV=parseInt(e.target.value,10);Store.write("tanmax.manualUV",state.manualUV);$("uvNum").textContent=state.manualUV;firstDraw=true;renderToday();});
   $("quickAdd").onclick=function(){editingId=null;$("addTitle").textContent="Log a session";$("addSub").textContent="Add a tan you've already done.";$("addSave").textContent="Save";setAddBurn(0);var now=new Date();now.setMinutes(now.getMinutes()-now.getTimezoneOffset());$("aWhen").value=now.toISOString().slice(0,16);var pSides=activeSides().length,planMin=safeMin(currentUV())*pSides;$("aMin").value=planMin>0?planMin:"";$("aUV").value=Math.round(currentUV());$("aNote").value="";openSheet($("addSheet"));};
   $("addCancel").onclick=function(){editingId=null;closeSheets();};
   document.querySelectorAll("#aBurnSeg button").forEach(function(b){b.onclick=function(){setAddBurn(parseInt(b.dataset.burn,10));};});
@@ -1380,7 +1383,7 @@
       var s=state.sessions.find(function(x){return x.id===editingId;});
       if(s){s.when=when;s.min=min;s.uv=uv;s.note=note;s.burned=burned;}
       state.sessions.sort(function(a,b){return b.when-a.when;});
-      Store.write("bask.sessions",state.sessions);editingId=null;renderLog();renderTan();closeSheets();
+      Store.write("tanmax.sessions",state.sessions);editingId=null;renderLog();renderTan();closeSheets();
       if(burned)applyBurn(when);
       renderToday();toast("Session updated");
     }else{
@@ -1391,16 +1394,16 @@
     }
   };
   $("shareBtn").onclick=function(){haptic(10);shareGlow();};
-  $("recoveryClear").onclick=function(){state.recoveryUntil=0;Store.write("bask.recoveryUntil",0);renderToday();toast("Lockout cleared — tan gently");};
-  $("reapplyReset").onclick=function(){state.productAppliedAt=Date.now();Store.write("bask.productAppliedAt",state.productAppliedAt);renderReapply();haptic();toast("Logged — "+prodLabel(activeProd())+" reapplied");};
-  $("weekHead").onclick=function(){state.weekOpen=!state.weekOpen;Store.write("bask.weekOpen",state.weekOpen);$("weekCard").classList.toggle("open",state.weekOpen);};
+  $("recoveryClear").onclick=function(){state.recoveryUntil=0;Store.write("tanmax.recoveryUntil",0);renderToday();toast("Lockout cleared — tan gently");};
+  $("reapplyReset").onclick=function(){state.productAppliedAt=Date.now();Store.write("tanmax.productAppliedAt",state.productAppliedAt);renderReapply();haptic();toast("Logged — "+prodLabel(activeProd())+" reapplied");};
+  $("weekHead").onclick=function(){state.weekOpen=!state.weekOpen;Store.write("tanmax.weekOpen",state.weekOpen);$("weekCard").classList.toggle("open",state.weekOpen);};
 
   // ---- tan mode selectors ----
   function renderModeSeg(){
     var seg=$("modeSeg");if(seg){seg.innerHTML="";MODES.forEach(function(m){var b=document.createElement("button");b.type="button";b.setAttribute("aria-pressed",state.mode===m.id?"true":"false");b.innerHTML="<span class='mm'>"+m.icon+"</span>"+m.name;b.onclick=function(){setMode(m.id);};seg.appendChild(b);});}
     var s2=$("modeSegSettings");if(s2){s2.innerHTML="";MODES.forEach(function(m){var c=document.createElement("button");c.type="button";c.className="mode-card";c.setAttribute("aria-pressed",state.mode===m.id?"true":"false");c.innerHTML="<span class='mi'>"+m.icon+"</span><span class='mb'><span class='mn'>"+m.name+"</span><span class='md'>"+m.desc+"</span><span class='mt'>"+m.trade+"</span></span>";c.onclick=function(){setMode(m.id);};s2.appendChild(c);});}
   }
-  function setMode(id){haptic(8);state.mode=id;Store.write("bask.mode",id);renderModeSeg();renderToday();if(id==="max")toast("🔥 Max Tan — watch the burn line");}
+  function setMode(id){haptic(8);state.mode=id;Store.write("tanmax.mode",id);renderModeSeg();renderToday();if(id==="max")toast("🔥 Max Tan — watch the burn line");}
 
   // ---- skin-type quiz (Fitzpatrick) ----
   var QUIZ=[
@@ -1432,8 +1435,8 @@
   function gotoStep(n){onbStep=Math.max(0,Math.min(TOTAL-1,n));for(var i=0;i<TOTAL;i++)$("step"+i).classList.toggle("on",i===onbStep);buildProgress();$("onb").scrollTop=0;}
   function buildOnbSkins(){var h=$("onbSkins");h.innerHTML="";SKIN.forEach(function(t){var d=document.createElement("div");d.className="sk"+(t.id===onbSkin?" sel":"");d.innerHTML="<div class='d' style='background:"+TONE[t.id][0]+"'></div><div class='n'>"+t.label+"</div>";d.onclick=function(){onbSkin=t.id;buildOnbSkins();showResult();};h.appendChild(d);});}
   function showResult(){var sk=SKIN.find(function(x){return x.id===onbSkin;});var g=$("resultGem");g.style.background="radial-gradient(circle at 35% 28%,"+lerpHex(TONE[onbSkin][0],"#ffffff",.3)+","+TONE[onbSkin][0]+" 55%,"+lerpHex(TONE[onbSkin][0],"#000000",.25)+")";$("resultType").textContent="Type "+sk.label;$("resultDesc").textContent=sk.tip+" in the sun · burns near "+Math.round(sk.med/9)+" min at UV 6.";}
-  function buildModeCards(){var h=$("modeCards");h.innerHTML="";MODES.forEach(function(m){var c=document.createElement("div");c.className="mode-card";c.setAttribute("aria-pressed",state.mode===m.id?"true":"false");c.innerHTML="<span class='mi'>"+m.icon+"</span><span class='mb'><span class='mn'>"+m.name+"</span><span class='md'>"+m.desc+"</span><span class='mt'>"+m.trade+"</span></span>";c.onclick=function(){state.mode=m.id;Store.write("bask.mode",m.id);buildModeCards();};h.appendChild(c);});}
-  function finishOnb(){state.skin=onbSkin;state.onboarded=true;Store.write("bask.skin",state.skin);Store.write("bask.onboarded",true);$("onb").classList.remove("show");renderAll();renderGoalSeg();renderModeSeg();if(!state.live)refreshUV();}
+  function buildModeCards(){var h=$("modeCards");h.innerHTML="";MODES.forEach(function(m){var c=document.createElement("div");c.className="mode-card";c.setAttribute("aria-pressed",state.mode===m.id?"true":"false");c.innerHTML="<span class='mi'>"+m.icon+"</span><span class='mb'><span class='mn'>"+m.name+"</span><span class='md'>"+m.desc+"</span><span class='mt'>"+m.trade+"</span></span>";c.onclick=function(){state.mode=m.id;Store.write("tanmax.mode",m.id);buildModeCards();};h.appendChild(c);});}
+  function finishOnb(){state.skin=onbSkin;state.onboarded=true;Store.write("tanmax.skin",state.skin);Store.write("tanmax.onboarded",true);$("onb").classList.remove("show");renderAll();renderGoalSeg();renderModeSeg();if(!state.live)refreshUV();}
   function startOnb(retake){onbSkin=state.skin;quizAns={};onbStep=0;buildProgress();buildQuiz();buildOnbSkins();buildModeCards();showResult();gotoStep(retake?1:0);$("onb").classList.add("show");}
 
   $("go0").onclick=function(){gotoStep(1);};
@@ -1444,7 +1447,7 @@
   $("back3").onclick=function(){gotoStep(2);};
   $("go3").onclick=function(){gotoStep(4);};
   $("back4").onclick=function(){gotoStep(3);};
-  $("onbLoc").onclick=function(){state.loc=null;state.live=null;Store.write("bask.loc",null);refreshUV();$("onbLoc").textContent="📍 Location enabled ✓";};
+  $("onbLoc").onclick=function(){state.loc=null;state.live=null;Store.write("tanmax.loc",null);refreshUV();$("onbLoc").textContent="📍 Location enabled ✓";};
   $("onbLocSet").onclick=function(){var q=$("onbLocInput").value;if(!q.trim()){$("onbLocInput").focus();return;}setManualLocation(q,function(loc){$("onbLoc").textContent="📍 "+loc.place+" ✓";});};
   $("onbLocInput").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();$("onbLocSet").click();}});
   $("onbGo").onclick=finishOnb;
@@ -1467,7 +1470,7 @@
 
   applyTheme();try{matchMedia("(prefers-color-scheme:dark)").addEventListener("change",function(){if(state.theme==="auto"){applyTheme();renderToday();drawTanChart();}});}catch(e){}
   initSettingsUI();renderGoalSeg();renderAll();clock();
-  (function(){var st=Store.read("bask.timer",null);if(st&&(st.running||st.paused)){var extra=st.running?(Date.now()-st.start)/1000:0;timer.paused=true;timer.running=false;timer.accumulatedSec=(st.accumulatedSec||0)+extra;timer.completedSidesSec=st.completedSidesSec||0;timer.currentSide=st.currentSide||activeSides()[0];timer.sidesDone=st.sidesDone||[];timer.alerted=st.alerted||false;timer.warned2min=st.warned2min||false;setupActionButtonUI();renderDial();toast("Session paused — tap Resume to continue");}})();
+  (function(){var st=Store.read("tanmax.timer",null);if(st&&(st.running||st.paused)){var extra=st.running?(Date.now()-st.start)/1000:0;timer.paused=true;timer.running=false;timer.accumulatedSec=(st.accumulatedSec||0)+extra;timer.completedSidesSec=st.completedSidesSec||0;timer.currentSide=st.currentSide||activeSides()[0];timer.sidesDone=st.sidesDone||[];timer.alerted=st.alerted||false;timer.warned2min=st.warned2min||false;setupActionButtonUI();renderDial();toast("Session paused — tap Resume to continue");}})();
   if(state.live)setStatus("warn","Saved UV ("+liveAge()+")");else setStatus("warn","Tap to enable live UV");
   if(!state.onboarded){startOnb(false);}else{refreshUV();}
   syncClockToSystem();

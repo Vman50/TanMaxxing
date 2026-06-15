@@ -29,13 +29,13 @@ companion **`sw.js`** service worker for offline caching.
   `apple-touch-icon`, and the manifest's 192/512 `any` + 512 `maskable` PNG icons all come
   from it. A static inline SVG `apple-touch-icon` in `<head>` is the pre-JS fallback.
 - **State** is a single in-memory `state` object persisted to `localStorage` under keys
-  prefixed `bask.` (e.g. `bask.sessions`, `bask.skin`, `bask.loc`) via the `Store.read()` /
+  prefixed `tanmax.` (e.g. `tanmax.sessions`, `tanmax.skin`, `tanmax.loc`) via the `Store.read()` /
   `Store.write()` helpers, which fall back to an in-memory `mem` object if `localStorage`
-  is unavailable. The OpenUV key is base64-encoded (`btoa`/`atob`) under `bask.openuvKey`.
-  Other keys: `bask.sides` (body sides the timer rotates through — `Front/Back/Left/Right`),
-  `bask.env` (reflective-environment multipliers, see `ENV`/`envMult()`), `bask.recoveryUntil`
-  (sunburn-lockout timestamp), `bask.productAppliedAt` (sunscreen re-application timer), and
-  `bask.weekOpen` (weekly-summary expanded state), and `bask.theme` (`auto`/`light`/`dark`
+  is unavailable. The OpenUV key is base64-encoded (`btoa`/`atob`) under `tanmax.openuvKey`.
+  Other keys: `tanmax.sides` (body sides the timer rotates through — `Front/Back/Left/Right`),
+  `tanmax.env` (reflective-environment multipliers, see `ENV`/`envMult()`), `tanmax.recoveryUntil`
+  (sunburn-lockout timestamp), `tanmax.productAppliedAt` (sunscreen re-application timer), and
+  `tanmax.weekOpen` (weekly-summary expanded state), and `tanmax.theme` (`auto`/`light`/`dark`
   appearance preference). Sessions may carry `sides` (array), `burned` (bool), and `spf`
   (effective-SPF multiplier captured at finalize, used to discount that session's contribution
   to the daily UV budget — see `todayDose()`) fields.
