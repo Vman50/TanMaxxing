@@ -152,7 +152,7 @@
   /* sections / chips */
   .sec-head{display:flex;justify-content:space-between;align-items:center;margin:18px 4px 9px;}
   .sec-head .lbl{margin:0;} .sec-head button{background:none;border:none;color:var(--accent);font:inherit;font-size:11px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;font-weight:600;}
-  .chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+  .chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;touch-action:pan-x;}
   .chips::-webkit-scrollbar{display:none;}
   .chip{flex:none;padding:11px 15px;border-radius:15px;border:1px solid var(--chip-line);background:var(--chip);color:var(--muted2);font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;backdrop-filter:blur(8px);transition:.15s;display:flex;flex-direction:column;gap:1px;}
   .chip .t{font-size:11px;color:var(--muted);font-weight:400;}
@@ -161,7 +161,7 @@
 
   .uv-input{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--card-line);border-radius:20px;padding:14px 18px;backdrop-filter:blur(10px);}
   .uv-input .num{font-family:'Fraunces',serif;font-weight:600;font-size:26px;min-width:40px;text-align:center;color:var(--accent);}
-  input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:8px;border-radius:99px;background:linear-gradient(90deg,var(--curve-a),var(--curve-b),var(--curve-c));outline:none;}
+  input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:8px;border-radius:99px;background:linear-gradient(90deg,var(--curve-a),var(--curve-b),var(--curve-c));outline:none;touch-action:pan-y;}
   input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;border:3px solid var(--bg);box-shadow:0 2px 8px rgba(0,0,0,.4);cursor:pointer;}
   input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--bg);cursor:pointer;}
   .hint{font-size:12px;color:var(--muted);margin:8px 4px 0;line-height:1.5;}
@@ -275,14 +275,16 @@
   .onb-nav .next{flex:1;border:none;background:var(--accent-grad);color:#fff;font-family:'Fraunces',serif;font-weight:600;font-size:17px;padding:16px;border-radius:18px;cursor:pointer;}
   /* Today mode selector */
   .modeseg{padding:2px 0 10px;margin-bottom:8px;}
-  .mode-slider-wrap{padding:4px 2px 2px;}
-  .mode-slider-wrap input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:4px;outline:none;cursor:pointer;background:linear-gradient(to right,var(--accent) var(--pct,50%),var(--ring-track) var(--pct,50%));}
+  .mode-top-label{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px;}
+  .mode-top-label .mn{font-family:'Fraunces',serif;font-weight:600;font-size:16px;color:var(--heading);}
+  .mode-top-label .ms{font-size:11.5px;color:var(--muted);}
+  .mode-slider-wrap{display:flex;align-items:center;gap:9px;}
+  .mode-slider-wrap .mode-end{font-size:16px;flex:none;}
+  .mode-slider-wrap input[type=range]{-webkit-appearance:none;appearance:none;flex:1;height:5px;border-radius:4px;outline:none;cursor:pointer;touch-action:pan-y;background:linear-gradient(to right,var(--accent) var(--pct,50%),var(--ring-track) var(--pct,50%));}
   .mode-slider-wrap input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--accent);cursor:pointer;border:3px solid var(--bg);box-shadow:0 1px 4px rgba(0,0,0,.2);}
   .mode-slider-wrap input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--accent);cursor:pointer;border:3px solid var(--bg);}
-  .mode-slider-labels{display:flex;justify-content:space-between;margin-top:8px;}
-  .mode-slider-labels span{font-size:11px;color:var(--muted2);text-align:center;flex:1;line-height:1.3;transition:color .15s;}
-  .mode-slider-labels span.on{color:var(--accent);font-weight:700;}
-  .modeseg-settings{display:flex;flex-direction:column;gap:8px;}
+  .mode-slide-desc{font-size:12px;color:var(--muted);margin-top:9px;line-height:1.45;}
+  .modeseg-settings{display:flex;flex-direction:column;gap:4px;}
   .aside-grid{display:grid;grid-template-columns:56px 1fr 28px;gap:6px 8px;align-items:center;}
   .aside-lbl{font-size:13px;color:var(--sub);}
   .aside-unit{font-size:13px;color:var(--muted2);}
@@ -637,7 +639,8 @@
       <h2>Your tan.<br><em>Dialed in.</em></h2>
       <p class="lede">TanMaxxing reads the real UV where you stand, balances it against your skin metrics and your topical SPF setups to calculate precision side-split safety sessions.</p>
       <div class="onb-nav" style="margin-top:30px;"><button class="next" id="go0">Get started</button></div>
-      <button class="skip" id="onbSkip">Skip setup</button>
+      <button class="skip" id="onbKnowType">I know my Fitzpatrick skin type</button>
+      <button class="skip" id="onbSkip">Skip for now</button>
     </div>
 
     <!-- Step 2: quiz -->
@@ -709,7 +712,7 @@
     loc:Store.read("tanmax.loc",null), live:Store.read("tanmax.live",null),
     sessions:Store.read("tanmax.sessions",[]),
     goal:Store.read("tanmax.goal",0), onboarded:Store.read("tanmax.onboarded",false),
-    mode:Store.read("tanmax.mode","build"),
+    mode:(function(){var v=Store.read("tanmax.mode","build");return typeof v==="number"?v:(v==="cautious"?0:v==="max"?1:0.5);})(),
     sides:Store.read("tanmax.sides",["Front","Back"]),
     env:Store.read("tanmax.env",{}),
     recoveryUntil:Store.read("tanmax.recoveryUntil",0),
@@ -729,7 +732,8 @@
     {id:"build",name:"Build",icon:"☀️",factor:0.65,cap:75,desc:"Balanced. Builds a steady tan below the burn line.",trade:"The recommended default."},
     {id:"max",name:"Max Tan",icon:"🔥",factor:0.92,cap:90,desc:"Pushes right up to the burn threshold for the most melanin per session.",trade:"Fastest tan — riskier. Burning peels and undoes progress, so it stays just under the line."}
   ];
-  function curMode(){return MODES.find(function(m){return m.id===state.mode;})||MODES[1];}
+  function curMode(){var t=state.mode;return{factor:0.45+(0.92-0.45)*t,cap:Math.round(60+(90-60)*t),name:t<=0.15?"No Burn":t<=0.65?"Build":"Max Tan",icon:t<=0.15?"🛡️":t<=0.65?"☀️":"🔥",desc:t<=0.15?"Cautious — stops well short of the burn line. Slowest tan, safest skin.":t<=0.65?"Balanced — below the burn line. Steady tan rate with a good safety margin.":"Pushing toward the burn threshold. Fastest melanin gain — riskier; burning peels and undoes progress."};}
+
 
   function $(id){return document.getElementById(id);}
   function skin(){return SKIN.find(function(s){return s.id===state.skin;})||SKIN[2];}
@@ -1533,20 +1537,33 @@
 
   // ---- tan mode selectors ----
   function renderModeSeg(){
-    var seg=$("modeSeg");
-    if(seg){
-      var idx=Math.max(0,MODES.findIndex(function(m){return m.id===state.mode;}));
-      var pct=Math.round(idx/(MODES.length-1)*100)+"%";
-      seg.innerHTML="<div class='mode-slider-wrap'><input type='range' id='modeSlider' min='0' max='"+(MODES.length-1)+"' step='1' value='"+idx+"' style='--pct:"+pct+"'></div><div class='mode-slider-labels'>"+MODES.map(function(m,i){return "<span"+(i===idx?" class='on'":"")+">"+m.icon+"<br>"+m.name+"</span>";}).join("")+"</div>";
-      $("modeSlider").addEventListener("input",function(){
-        var i=parseInt(this.value,10);
-        this.style.setProperty("--pct",Math.round(i/(MODES.length-1)*100)+"%");
-        setMode(MODES[i].id);
+    var m=curMode(),pct=Math.round(state.mode*100);
+    function makeSlider(slId,nameId,statId,descId){
+      return "<div class='mode-top-label'><span class='mn' id='"+nameId+"'>"+m.icon+" "+m.name+"</span><span class='ms' id='"+statId+"'>"+Math.round(m.factor*100)+"% of burn time</span></div>"+
+             "<div class='mode-slider-wrap'><span class='mode-end'>🛡️</span><input type='range' id='"+slId+"' min='0' max='100' step='1' value='"+pct+"' style='--pct:"+pct+"%'><span class='mode-end'>🔥</span></div>"+
+             (descId?"<p class='mode-slide-desc' id='"+descId+"'>"+m.desc+"</p>":"");
+    }
+    function wireSlider(slId,nameId,statId,descId){
+      var sl=$(slId);if(!sl)return;
+      sl.addEventListener("input",function(){
+        var v=parseInt(this.value,10)/100;
+        state.mode=v;Store.write("tanmax.mode",v);
+        this.style.setProperty("--pct",this.value+"%");
+        var m2=curMode(),nameEl=$(nameId),statEl=$(statId),descEl=descId?$(descId):null;
+        if(nameEl)nameEl.textContent=m2.icon+" "+m2.name;
+        if(statEl)statEl.textContent=Math.round(m2.factor*100)+"% of burn time";
+        if(descEl)descEl.textContent=m2.desc;
+        if(v>=0.9&&!sl._warned){sl._warned=true;toast("🔥 Max Tan — watch the burn line");}
+        else if(v<0.9)sl._warned=false;
+        renderToday();
       });
     }
-    var s2=$("modeSegSettings");if(s2){s2.innerHTML="";MODES.forEach(function(m){var c=document.createElement("button");c.type="button";c.className="mode-card";c.setAttribute("aria-pressed",state.mode===m.id?"true":"false");c.innerHTML="<span class='mi'>"+m.icon+"</span><span class='mb'><span class='mn'>"+m.name+"</span><span class='md'>"+m.desc+"</span><span class='mt'>"+m.trade+"</span></span>";c.onclick=function(){setMode(m.id);};s2.appendChild(c);});}
+    var seg=$("modeSeg");
+    if(seg){seg.innerHTML=makeSlider("modeSlider","modeSliderName","modeSliderStat",null);wireSlider("modeSlider","modeSliderName","modeSliderStat",null);}
+    var s2=$("modeSegSettings");
+    if(s2){s2.innerHTML=makeSlider("modeSliderSet","modeSliderSetName","modeSliderSetStat","modeSliderSetDesc");wireSlider("modeSliderSet","modeSliderSetName","modeSliderSetStat","modeSliderSetDesc");}
   }
-  function setMode(id){haptic(8);state.mode=id;Store.write("tanmax.mode",id);renderModeSeg();renderToday();if(id==="max")toast("🔥 Max Tan — watch the burn line");}
+  function setMode(v){haptic(8);state.mode=v;Store.write("tanmax.mode",v);renderModeSeg();renderToday();if(v>=0.9)toast("🔥 Max Tan — watch the burn line");}
 
   // ---- skin-type quiz (Fitzpatrick) ----
   var QUIZ=[
@@ -1578,7 +1595,8 @@
   function gotoStep(n){onbStep=Math.max(0,Math.min(TOTAL-1,n));for(var i=0;i<TOTAL;i++)$("step"+i).classList.toggle("on",i===onbStep);buildProgress();$("onb").scrollTop=0;}
   function buildOnbSkins(){var h=$("onbSkins");h.innerHTML="";SKIN.forEach(function(t){var d=document.createElement("div");d.className="sk"+(t.id===onbSkin?" sel":"");d.innerHTML="<div class='d' style='background:"+TONE[t.id][0]+"'></div><div class='n'>"+t.label+"</div>";d.onclick=function(){onbSkin=t.id;buildOnbSkins();showResult();};h.appendChild(d);});}
   function showResult(){var sk=SKIN.find(function(x){return x.id===onbSkin;});var g=$("resultGem");g.style.background="radial-gradient(circle at 35% 28%,"+lerpHex(TONE[onbSkin][0],"#ffffff",.3)+","+TONE[onbSkin][0]+" 55%,"+lerpHex(TONE[onbSkin][0],"#000000",.25)+")";$("resultType").textContent="Type "+sk.label;$("resultDesc").textContent=sk.tip+" in the sun · burns near "+Math.round(sk.med/9)+" min at UV 6.";}
-  function buildModeCards(){var h=$("modeCards");h.innerHTML="";MODES.forEach(function(m){var c=document.createElement("div");c.className="mode-card";c.setAttribute("aria-pressed",state.mode===m.id?"true":"false");c.innerHTML="<span class='mi'>"+m.icon+"</span><span class='mb'><span class='mn'>"+m.name+"</span><span class='md'>"+m.desc+"</span><span class='mt'>"+m.trade+"</span></span>";c.onclick=function(){state.mode=m.id;Store.write("tanmax.mode",m.id);buildModeCards();};h.appendChild(c);});}
+  var MODE_VALS={cautious:0,build:0.5,max:1};
+  function buildModeCards(){var h=$("modeCards");h.innerHTML="";MODES.forEach(function(m){var v=MODE_VALS[m.id];var c=document.createElement("div");c.className="mode-card";c.setAttribute("aria-pressed",Math.abs(state.mode-v)<0.15?"true":"false");c.innerHTML="<span class='mi'>"+m.icon+"</span><span class='mb'><span class='mn'>"+m.name+"</span><span class='md'>"+m.desc+"</span><span class='mt'>"+m.trade+"</span></span>";c.onclick=function(){state.mode=v;Store.write("tanmax.mode",v);buildModeCards();};h.appendChild(c);});}
   function finishOnb(){state.skin=onbSkin;state.onboarded=true;Store.write("tanmax.skin",state.skin);Store.write("tanmax.onboarded",true);$("onb").classList.remove("show");renderAll();renderGoalSeg();renderModeSeg();if(!state.live)refreshUV();}
   function startOnb(retake){onbSkin=state.skin;quizAns={};onbStep=0;buildProgress();buildQuiz();buildOnbSkins();buildModeCards();showResult();gotoStep(retake?1:0);$("onb").classList.add("show");}
 
@@ -1594,6 +1612,7 @@
   $("onbLocSet").onclick=function(){var q=$("onbLocInput").value;if(!q.trim()){$("onbLocInput").focus();return;}setManualLocation(q,function(loc){$("onbLoc").textContent="📍 "+loc.place+" ✓";});};
   $("onbLocInput").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();$("onbLocSet").click();}});
   $("onbGo").onclick=finishOnb;
+  $("onbKnowType").onclick=function(){gotoStep(2);};
   $("onbSkip").onclick=finishOnb;
   $("retakeQuiz").onclick=function(){closeSheets();setTimeout(function(){startOnb(true);},150);};
 
