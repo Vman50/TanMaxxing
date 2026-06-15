@@ -6,15 +6,17 @@
 <title>TanMaxxing — Optimize Your Glow</title>
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="TanMaxxing" />
 <meta name="theme-color" content="#efe3d4" id="themeColorMeta" />
+<script>try{var _t=JSON.parse(localStorage.getItem("bask.theme")||'"auto"');var _d=_t==="dark"||(_t!=="light"&&matchMedia("(prefers-color-scheme:dark)").matches);document.documentElement.setAttribute("data-theme",_d?"dark":"light");var _m=document.getElementById("themeColorMeta");if(_m)_m.setAttribute("content",_d?"#15100c":"#efe3d4");}catch(e){}</script>
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cdefs%3E%3CradialGradient id='g' cx='35%25' cy='30%25'%3E%3Cstop offset='0' stop-color='%23f0c79a'/%3E%3Cstop offset='.6' stop-color='%23c9824e'/%3E%3Cstop offset='1' stop-color='%238c5028'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='42' fill='%23efe3d4'/%3E%3Ccircle cx='90' cy='90' r='54' fill='url(%23g)'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
   /* ---------- THEME TOKENS ---------- */
   html{
+    color-scheme:light;
     --bg:#efe3d4;
     --bg-grad:linear-gradient(180deg,#f3e8da 0%,#ecdcc9 55%,#e7d0b8 100%);
     --frame-glow:radial-gradient(120% 50% at 80% -5%,rgba(230,177,95,.4),transparent 55%),radial-gradient(90% 40% at 10% 8%,rgba(223,157,118,.3),transparent 55%);
@@ -29,8 +31,27 @@
     --nav:rgba(243,232,218,.8); --sheet:#f3e8da; --input:rgba(255,255,255,.6); --input-line:rgba(120,80,40,.18);
     --good:#4f9d6b; --warn:#cf7a3a; --danger:#d9534f;
   }
-  *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent;}
+  html[data-theme="dark"]{
+    color-scheme:dark;
+    --bg:#15100c;
+    --bg-grad:linear-gradient(180deg,#1b150f 0%,#150f0b 55%,#0f0b08 100%);
+    --frame-glow:radial-gradient(120% 50% at 80% -5%,rgba(230,177,95,.14),transparent 55%),radial-gradient(90% 40% at 10% 8%,rgba(223,157,118,.10),transparent 55%);
+    --text:#f1e6d8; --heading:#f7eee2; --muted:#a9947f; --muted2:#c1ac97;
+    --card:rgba(255,255,255,.055); --card-line:rgba(255,255,255,.11); --card-shadow:0 8px 26px rgba(0,0,0,.5);
+    --accent:#e2a861; --accent-grad:linear-gradient(120deg,#cf8a3f,#ecb87f);
+    --curve-a:#e9b483; --curve-b:#e0a35c; --curve-c:#f0c06a; --curve-fill:rgba(224,163,92,.22); --night:rgba(0,0,0,.30);
+    --ring-track:rgba(255,255,255,.10);
+    --pill:rgba(226,168,97,.18); --pill-text:#ecbd7e;
+    --chip:rgba(255,255,255,.06); --chip-line:rgba(255,255,255,.12); --chip-on:#f7eee2;
+    --gem-glow:0 22px 46px rgba(0,0,0,.55);
+    --nav:rgba(21,16,12,.82); --sheet:#1c1610; --input:rgba(255,255,255,.06); --input-line:rgba(255,255,255,.14);
+    --good:#5cc185; --warn:#e0934a; --danger:#e0635f;
+  }
+  *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}
   html,body{height:100%;}
+  /* app-like: don't let chrome text get selected on long-press, but keep inputs + science copy selectable */
+  body{-webkit-user-select:none;user-select:none;}
+  input,textarea,.sci p,.sci{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default;}
   body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;overscroll-behavior-y:none;font-variant-numeric:tabular-nums;transition:background .4s,color .4s;}
   .app{max-width:460px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;position:relative;background:var(--frame-glow),var(--bg-grad);transition:background .4s;}
   .fraunces{font-family:'Fraunces',Georgia,serif;}
@@ -320,6 +341,38 @@
   .envchips{display:flex;flex-wrap:wrap;gap:8px;}
   .envchip{padding:10px 13px;border-radius:13px;border:1px solid var(--input-line);background:var(--input);color:var(--muted2);font:inherit;font-weight:600;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;}
   .envchip[aria-pressed=true]{border-color:var(--accent);color:var(--text);background:var(--card);box-shadow:0 0 0 1px var(--accent) inset;}
+  /* ---------- tactile micro-interactions ---------- */
+  .tab,.seg button,.modeseg button,.chip,.opt,.envchip,.sk{transition:transform .13s cubic-bezier(.2,.7,.2,1),color .15s,background .15s,border-color .15s,box-shadow .15s;}
+  .chip:active,.opt:active,.seg button:active,.envchip:active,.modeseg button:active,.sk:active,.mode-card:active,.prod-row .del:active{transform:scale(.95);}
+  .tab:active{transform:scale(.9);}
+  .tab[aria-current=true] svg{animation:tabPop .34s cubic-bezier(.2,.8,.2,1);}
+  @keyframes tabPop{0%{transform:scale(1);}40%{transform:scale(1.22);}100%{transform:scale(1);}}
+  .rf:active,.del:active,.clr:active,.skip:active,.sec-head button:active{opacity:.55;}
+
+  /* ---------- smooth screen + sheet motion ---------- */
+  @keyframes screenIn{from{opacity:0;}to{opacity:1;}}
+  .screen{animation:screenIn .28s ease;}
+  .grab{cursor:grab;touch-action:none;transition:width .2s,background .2s;}
+  .sheet{will-change:transform;touch-action:pan-y;}
+  .sheet.dragging{transition:none!important;}
+  .sheet.dragging .grab{width:48px;background:var(--accent);}
+  .screen,.sheet{overscroll-behavior:contain;}
+  /* smooth cross-fade of surfaces when the theme changes */
+  .card,nav,.uv-input{transition:background .35s ease,border-color .35s ease,box-shadow .35s ease;}
+
+  /* press feedback on list rows */
+  .log-item,.prod-row{transition:transform .13s cubic-bezier(.2,.7,.2,1);}
+  .log-item:active{transform:scale(.985);}
+  .icon-btn,.fab,.btn{transition:transform .12s cubic-bezier(.2,.7,.2,1),box-shadow .2s,background .2s;}
+
+  /* ---------- pull-to-refresh ---------- */
+  #ptr{position:absolute;top:calc(env(safe-area-inset-top,0px) + 8px);left:50%;margin-left:-17px;width:34px;height:34px;border-radius:50%;background:var(--card);border:1px solid var(--card-line);box-shadow:var(--card-shadow);backdrop-filter:blur(10px);display:grid;place-items:center;color:var(--accent);opacity:0;pointer-events:none;z-index:5;transition:opacity .2s;}
+  #ptr svg{width:18px;height:18px;}
+  #ptr.spin{opacity:1!important;transform:translateY(8px)!important;}
+  #ptr.spin svg{animation:spin .8s linear infinite;}
+  .rf.busy{animation:spin .8s linear infinite;display:inline-block;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
 </style>
 </head>
@@ -335,6 +388,8 @@
       <button class="icon-btn" id="openSettings" aria-label="Settings"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
     </div>
   </header>
+
+  <div id="ptr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v5h-5"/></svg></div>
 
   <!-- TODAY -->
   <main class="screen" id="screen-today">
@@ -504,10 +559,11 @@
   <div class="grab"></div><h2>Settings</h2><p class="sub">Tune TanMaxxing to you.</p>
   <div class="field"><label>Your skin type (Fitzpatrick)</label><div class="chips" id="skinChips"></div><button class="btn btn-ghost" id="retakeQuiz" style="margin-top:10px;font-size:14px;padding:12px;">Retake skin-type quiz</button></div>
   <div class="field"><label>Tan mode</label><div class="modeseg-settings" id="modeSegSettings"></div></div>
+  <div class="field"><label>Appearance</label><div class="seg" id="themeSeg"></div></div>
   <div class="field"><label>Sides to rotate</label><div class="envchips" id="sidesChips"></div><div class="hint">The timer rotates through these so each side gets even sun.</div></div>
   <div class="field"><label>Reflective environment</label><div class="envchips" id="envChips"></div><div class="hint">Sand, snow and water bounce extra UV onto your skin — this raises the effective UV used in every calculation.</div></div>
   <div class="field"><label>Glow goal</label><div class="seg" id="goalSeg"></div></div>
-  <div class="field"><label>Location</label><button class="btn btn-ghost" id="useLocation" style="margin-bottom:8px;">📍 Use my location</button><div style="display:flex;gap:8px;margin-bottom:8px;"><input type="text" id="locManualInput" placeholder="Or type a city or place" style="flex:1;" /><button class="btn btn-ghost" id="locManualBtn" style="flex:none;width:auto;padding:13px 18px;font-size:14px;">Set</button></div><div class="hint" id="locSetting">Not set yet.</div></div>
+  <div class="field"><label>Location</label><button class="btn btn-ghost" id="useLocation" style="margin-bottom:8px;">📍 Use my location</button><div style="display:flex;gap:8px;margin-bottom:8px;"><input type="text" id="locManualInput" autocapitalize="words" autocomplete="off" enterkeyhint="search" placeholder="Or type a city or place" style="flex:1;" /><button class="btn btn-ghost" id="locManualBtn" style="flex:none;width:auto;padding:13px 18px;font-size:14px;">Set</button></div><div class="hint" id="locSetting">Not set yet.</div></div>
   <div class="field"><label>UV data source</label><div class="seg" id="sourceSeg"><button data-src="openmeteo" aria-pressed="true">Open-Meteo<br><span style="font-size:11px;color:var(--muted);">free · no key</span></button><button data-src="openuv" aria-pressed="false">OpenUV<br><span style="font-size:11px;color:var(--muted);">needs key</span></button></div></div>
   <div class="field" id="keyField" style="display:none;"><label>OpenUV API key</label><input type="password" id="openuvKey" placeholder="x-access-token from openuv.io" /><div class="hint">Free key, 50 lookups/day. Stored only on this device.</div></div>
   <div class="field"><label>Your data</label><div class="row2"><button class="btn btn-ghost" id="exportBtn">Export</button><button class="btn btn-ghost" id="importBtn">Import</button></div><input type="file" id="importFile" accept="application/json" style="display:none;" /></div>
@@ -520,7 +576,7 @@
 <div class="sheet" id="productsSheet">
   <div class="grab"></div><h2>Your products</h2><p class="sub">Add the sunscreens and tanning oils you own to accurately optimize UV absorption rules.</p>
   <div id="productList"></div>
-  <div class="field"><label>Add a product</label><input type="text" id="pName" placeholder="e.g. Hawaiian Tropic oil" style="margin-bottom:8px;" /><div class="seg" id="pKindSeg" style="margin-bottom:8px;"><button data-kind="oil" aria-pressed="true">🟠 Tanning oil</button><button data-kind="sunscreen" aria-pressed="false">🟢 Sunscreen</button></div><input type="number" id="pSpf" min="0" max="100" placeholder="SPF on the bottle (0 if none)" /></div>
+  <div class="field"><label>Add a product</label><input type="text" id="pName" autocapitalize="words" autocomplete="off" enterkeyhint="done" placeholder="e.g. Hawaiian Tropic oil" style="margin-bottom:8px;" /><div class="seg" id="pKindSeg" style="margin-bottom:8px;"><button data-kind="oil" aria-pressed="true">🟠 Tanning oil</button><button data-kind="sunscreen" aria-pressed="false">🟢 Sunscreen</button></div><input type="number" id="pSpf" min="0" max="100" inputmode="numeric" enterkeyhint="done" placeholder="SPF on the bottle (0 if none)" /></div>
   <button class="btn btn-go" id="addProduct">Add product</button><div style="height:8px"></div><button class="btn btn-ghost" id="closeProducts">Done</button><div style="height:8px"></div>
 </div>
 
@@ -542,8 +598,8 @@
 <div class="sheet" id="addSheet">
   <div class="grab"></div><h2 id="addTitle">Log a session</h2><p class="sub" id="addSub">Add a tan you've already done.</p>
   <div class="field"><label>When</label><input type="datetime-local" id="aWhen" /></div>
-  <div class="field"><label>Minutes (Total)</label><input type="number" id="aMin" min="1" max="600" placeholder="e.g. 25" /></div>
-  <div class="field"><label>Peak UV</label><input type="number" id="aUV" min="0" max="14" placeholder="e.g. 6" /></div>
+  <div class="field"><label>Minutes (Total)</label><input type="number" id="aMin" min="1" max="600" inputmode="numeric" enterkeyhint="next" placeholder="e.g. 25" /></div>
+  <div class="field"><label>Peak UV</label><input type="number" id="aUV" min="0" max="14" inputmode="decimal" enterkeyhint="next" placeholder="e.g. 6" /></div>
   <div class="field"><label>Did your skin burn?</label><div class="seg" id="aBurnSeg"><button type="button" data-burn="0" aria-pressed="true">No burn</button><button type="button" data-burn="1" aria-pressed="false">🔴 Got burned</button></div></div>
   <div class="field"><label>Note (optional)</label><textarea id="aNote" placeholder="Front + back, coconut oil, slight pink…"></textarea></div>
   <div class="row2"><button class="btn btn-ghost" id="addCancel">Cancel</button><button class="btn btn-go" id="addSave">Save</button></div><div style="height:8px"></div>
@@ -601,7 +657,7 @@
       <h2>Turn on live UV</h2>
       <p class="lede">TanMaxxing uses your location to pull the real UV forecast. It stays on your device — no account, no tracking.</p>
       <button class="loc" id="onbLoc">📍 Use my location</button>
-      <div style="display:flex;gap:8px;margin-top:10px;"><input type="text" id="onbLocInput" placeholder="Or type a city / place" style="flex:1;" /><button class="btn btn-ghost" id="onbLocSet" style="flex:none;width:auto;padding:14px 16px;font-size:14px;">Set</button></div>
+      <div style="display:flex;gap:8px;margin-top:10px;"><input type="text" id="onbLocInput" autocapitalize="words" autocomplete="off" enterkeyhint="search" placeholder="Or type a city / place" style="flex:1;" /><button class="btn btn-ghost" id="onbLocSet" style="flex:none;width:auto;padding:14px 16px;font-size:14px;">Set</button></div>
       <div class="onb-nav" style="margin-top:12px;"><button class="back" id="back4">‹</button><button class="next" id="onbGo">Start glowing</button></div>
     </div>
   </div>
@@ -633,7 +689,8 @@
     env:Store.read("bask.env",{}),
     recoveryUntil:Store.read("bask.recoveryUntil",0),
     productAppliedAt:Store.read("bask.productAppliedAt",0),
-    weekOpen:Store.read("bask.weekOpen",false)
+    weekOpen:Store.read("bask.weekOpen",false),
+    theme:Store.read("bask.theme","auto")
   };
   var ALL_SIDES=["Front","Back","Left","Right"];
   var ENV=[{id:"beach",label:"Beach sand",mult:0.25,icon:"🏖️"},{id:"snow",label:"Snow",mult:0.80,icon:"❄️"},
@@ -696,7 +753,12 @@
   // Window where effective UV sits inside the sweet spot band, plus a status for the nudge.
   function tanZone(dayData){var data=dayData||curveData(),ss=sweetSpot(),m=envMult();var lo=null,hi=null;data.forEach(function(p){var u=p.uv*m;if(u>=ss.lo&&u<=ss.hi+1.5){if(lo===null)lo=p.h;hi=p.h;}});if(lo===null)return null;return{lo:lo,hi:hi};}
 
-  function themeColors(){return {a:"#df9d76",b:"#b3702f",c:"#e6b15f",fill:"rgba(179,112,47,.26)",night:"rgba(120,80,40,.14)",dot:"#b3702f"};}
+  function themeColors(){
+    if(document.documentElement.getAttribute("data-theme")==="dark")
+      return {a:"#e9b483",b:"#e0a35c",c:"#f0c06a",fill:"rgba(224,163,92,.22)",night:"rgba(0,0,0,.30)",dot:"#e0a35c"};
+    return {a:"#df9d76",b:"#b3702f",c:"#e6b15f",fill:"rgba(179,112,47,.26)",night:"rgba(120,80,40,.14)",dot:"#b3702f"};
+  }
+  function applyTheme(){var resolved=state.theme==="dark"?"dark":(state.theme==="light"?"light":(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light"));document.documentElement.setAttribute("data-theme",resolved);var meta=$("themeColorMeta");if(meta)meta.setAttribute("content",resolved==="dark"?"#15100c":"#efe3d4");}
 
   // ---- curve ----
   var W=360,H=78,firstDraw=true;
@@ -718,7 +780,7 @@
   }
 
   // ---- chips ----
-  function buildChips(host,items,getA,onPick,fmt,extra){host.innerHTML="";items.forEach(function(it){var b=document.createElement("button");b.className="chip";b.type="button";b.setAttribute("aria-pressed",getA()===it.id?"true":"false");b.innerHTML=fmt(it);b.onclick=function(){onPick(it.id);renderAll();};host.appendChild(b);});if(extra){var e=document.createElement("button");e.className="chip add";e.type="button";e.innerHTML=extra.label;e.onclick=extra.onClick;host.appendChild(e);}}
+  function buildChips(host,items,getA,onPick,fmt,extra){host.innerHTML="";items.forEach(function(it){var b=document.createElement("button");b.className="chip";b.type="button";b.setAttribute("aria-pressed",getA()===it.id?"true":"false");b.innerHTML=fmt(it);b.onclick=function(){haptic(8);onPick(it.id);renderAll();};host.appendChild(b);});if(extra){var e=document.createElement("button");e.className="chip add";e.type="button";e.innerHTML=extra.label;e.onclick=extra.onClick;host.appendChild(e);}}
   function renderSkinChips(){buildChips($("skinChips"),SKIN,function(){return state.skin;},function(v){state.skin=v;Store.write("bask.skin",v);},function(it){return "<span>Type "+it.label+"</span><span class='t'>"+it.tip+"</span>";});}
   function renderProductChips(){buildChips($("productChips"),state.products,function(){return state.activeProduct;},function(v){state.activeProduct=v;Store.write("bask.activeProduct",v);var p=state.products.find(function(x){return x.id===v;});if(p&&p.id!=="bare"&&(p.kind==="sunscreen"||p.spf>0)){state.productAppliedAt=Date.now();}else{state.productAppliedAt=0;}Store.write("bask.productAppliedAt",state.productAppliedAt);},function(p){return "<span>"+(p.kind==="oil"?"🟠 ":"🟢 ")+p.name+"</span><span class='t'>"+(p.spf?("SPF "+p.spf):"no SPF")+"</span>";},{label:"+ Add",onClick:function(){openSheet($("productsSheet"));}});}
 
@@ -752,6 +814,15 @@
   // ---- today ----
   var RING=2*Math.PI*90;
   function greetWord(){var h=new Date().getHours();return h<12?"Good morning":h<18?"Good afternoon":"Good evening";}
+  // Smoothly count a "%" value from its previous render to the new one.
+  function animateCount(el,to){
+    if(!el)return;to=Math.round(to);var from=parseInt(el.getAttribute("data-v"),10);if(isNaN(from))from=0;
+    el.setAttribute("data-v",to);
+    if(from===to){el.textContent=to+"%";return;}
+    if(matchMedia("(prefers-reduced-motion:reduce)").matches){el.textContent=to+"%";return;}
+    var t0=performance.now(),dur=650;
+    (function step(t){var p=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-p,3);el.textContent=Math.round(from+(to-from)*e)+"%";if(p<1)requestAnimationFrame(step);})(t0);
+  }
   function renderToday(){
     $("greet").textContent=greetWord();
     var cu=currentUV(),pk=peakUV();
@@ -831,7 +902,8 @@
       big.textContent=s>0?s:"0";
       big.className="n";
       lab.textContent="min per side";
-      tap.textContent="tap to start";
+      var nSides=activeSides().length;
+      tap.textContent=s>0?("≈ "+(s*nSides)+" min total · set a phone timer"):"tap to start";
       ring.setAttribute("stroke-dashoffset","0");
       document.querySelector(".dial .glow").style.setProperty("--dialglow",0);
       dialContainer.setAttribute("aria-valuenow", "0");
@@ -842,7 +914,7 @@
     var p=tanAt(Date.now()),cap=skin().cap;
     var shade=lerpHex(TONE[state.skin][0],TONE[state.skin][1],Math.min(1,p/cap));
     var gem=$("gem");gem.style.setProperty("--gem1",lerpHex(shade,"#ffffff",.32));gem.style.setProperty("--gem2",shade);gem.style.setProperty("--gem3",lerpHex(shade,"#000000",.34));
-    $("gemPct").textContent=Math.round(p)+"%";
+    animateCount($("gemPct"),p);
     $("tanShade").textContent=shadeName(p);
     var last=lastSessionMs(),badge=$("tanBadge"),note=$("tanNote"),gw=$("goalWrap");
     gw.style.display="none";
@@ -867,7 +939,7 @@
     else{card.className="card nudge reveal wait";$("nudgeTitle").textContent="Window has passed";$("nudgeTxt").innerHTML="Today's tanning zone was <b>"+fmtH(z.lo)+"–"+fmtH(z.hi)+"</b>. UV is dropping now.";}
   }
 
-  function todayDose(){var t=new Date();t.setHours(0,0,0,0);var start=t.getTime(),d=0;state.sessions.forEach(function(s){if(s.when>=start)d+=(s.uv||2)*s.min*1.5;});return d;}
+  function todayDose(){var t=new Date();t.setHours(0,0,0,0);var start=t.getTime(),d=0;state.sessions.forEach(function(s){if(s.when>=start)d+=(s.uv||2)*s.min*1.5/(s.spf||1);});return d;}
   function renderBudget(){
     var card=$("budgetCard"),dose=todayDose(),med=skin().med;
     if(dose<=0){card.style.display="none";return;}
@@ -1085,6 +1157,7 @@
       when:when,
       min:mins,
       uv:cu,
+      spf:calculateEffectiveSPF(),
       sides:sides,
       burned:burned,
       note:(prod.id==="bare"?"Bare skin":prod.name)+(prod.spf?(" · SPF "+prod.spf):"")+" · "+sides.join("+")+(burned?" · 🔴 burned":"")
@@ -1102,31 +1175,37 @@
   function setupActionButtonUI(){
     var mainBtn = $("timerBtn");
     var pauseZone = $("pauseControls");
-    
+    var resumeBtn = $("resumeBtn");
+
     if(!timer.running && !timer.paused){
       if(recoveryActive()){mainBtn.textContent = "🔒 Locked — recovering";mainBtn.className = "btn btn-ghost";mainBtn.disabled = true;}
-      else{mainBtn.textContent = "Start Session";mainBtn.className = "btn btn-go";mainBtn.disabled = false;}
+      else{mainBtn.textContent = "Start session";mainBtn.className = "btn btn-go";mainBtn.disabled = false;}
       pauseZone.style.display = "none";
     } else if(timer.running){
       mainBtn.disabled = false;
-      mainBtn.textContent = "Pause Session";
+      mainBtn.textContent = "Pause session";
       mainBtn.className = "btn btn-stop";
-      pauseZone.style.display = "none";
+      resumeBtn.style.display = "none";            // running: Flip + Finish, no Resume
+      pauseZone.style.gridTemplateColumns = "1fr 1fr";
+      pauseZone.style.display = "grid";
     } else if(timer.paused){
       mainBtn.disabled = false;
-      mainBtn.textContent = "Session Paused";
+      mainBtn.textContent = "Session paused";
       mainBtn.className = "btn btn-ghost";
+      resumeBtn.style.display = "";                 // paused: Resume + Flip + Finish
+      pauseZone.style.gridTemplateColumns = "repeat(3,1fr)";
       pauseZone.style.display = "grid";
     }
   }
 
-  function burnAlert(){try{if(navigator.vibrate)navigator.vibrate([200,80,200]);}catch(e){}try{var ac=new (window.AudioContext||window.webkitAudioContext)();var o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);o.frequency.value=660;g.gain.setValueAtTime(.0001,ac.currentTime);g.gain.exponentialRampToValueAtTime(.25,ac.currentTime+.02);g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+.6);o.start();o.stop(ac.currentTime+.62);}catch(e){}toast("⚠ Side safe limit achieved — consider flipping sides or wrapping up.");fireNotify("Side limit reached","Your "+timer.currentSide+" side hit its safe limit. Flip sides or wrap up to avoid burning.");}
+  // Soft in-app reminder only (no alarm) — the live timer is a glance reference, not something to rely on in the background. Use a phone Clock timer for the real alert.
+  function burnAlert(){try{if(navigator.vibrate)navigator.vibrate([200,80,200]);}catch(e){}toast("⚠ "+timer.currentSide+" side hit its safe limit — flip or wrap up.");fireNotify("Side limit reached","Your "+timer.currentSide+" side hit its safe limit. Flip sides or wrap up to avoid burning.");}
   
-  $("timerBtn").onclick=handleMainControlClick;
-  $("dial").onclick=handleMainControlClick;
-  $("resumeBtn").onclick=resumeSession;
-  $("flipBtn").onclick=flipSides;
-  $("finishBtn").onclick=triggerFinishConfirmation;
+  $("timerBtn").onclick=function(){haptic(12);handleMainControlClick();};
+  $("dial").onclick=function(){haptic(12);handleMainControlClick();};
+  $("resumeBtn").onclick=function(){haptic(12);resumeSession();};
+  $("flipBtn").onclick=function(){haptic([15,40,15]);flipSides();};
+  $("finishBtn").onclick=function(){haptic(20);triggerFinishConfirmation();};
   $("confirmCancelBtn").onclick=closeSheets;
   $("confirmSaveBtn").onclick=saveFinalizedSession;
 
@@ -1152,19 +1231,10 @@
     setAddBurn(s.burned?1:0);
     openSheet($("addSheet"));
   }
-  function attachLongPress(el,fn){
-    var t,moved;
-    function start(e){if(e&&e.target&&e.target.closest&&e.target.closest(".del"))return;moved=false;t=setTimeout(function(){if(!moved)fn();},500);}
-    function cancel(){clearTimeout(t);}
-    el.addEventListener("touchstart",start,{passive:true});
-    el.addEventListener("touchmove",function(){moved=true;cancel();},{passive:true});
-    el.addEventListener("touchend",cancel);el.addEventListener("touchcancel",cancel);
-    el.addEventListener("mousedown",start);el.addEventListener("mouseup",cancel);el.addEventListener("mouseleave",cancel);
-  }
   function renderLog(){var list=$("logList"),n=state.sessions.length,mins=0;state.sessions.forEach(function(s){mins+=s.min;});$("sTotal").textContent=n;$("sMins").textContent=mins;$("sStreak").textContent=streak();drawTanChart();renderWeek();renderTanForecast();
     if(n===0){list.innerHTML="<div class='empty'><div class='ico'>☀️</div><p>No sessions yet.</p><p>Start the timer or tap + to log one.</p></div>";return;}
-    list.innerHTML="";state.sessions.forEach(function(s){var d=new Date(s.when),date=d.toLocaleDateString([],{weekday:"short",month:"short",day:"numeric"}),time=d.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});var el=document.createElement("div");el.className="card log-item";el.innerHTML="<div class='log-uv' style='background:"+uvColor(s.uv)+"'>"+(s.uv!=null?s.uv:"–")+"</div><div class='log-body'><div class='d'>"+date+" · "+time+"</div><div class='m'>"+(s.note||"Tanning session")+"</div></div><div class='log-min'>"+s.min+"m</div><button class='del' aria-label='Delete'>×</button>";el.querySelector(".del").onclick=function(){delSession(s.id);};attachLongPress(el,function(){openEdit(s);});list.appendChild(el);});}
-  function drawTanChart(){var svg=$("tanchart");svg.innerHTML="";var ns="http://www.w3.org/2000/svg",cw=320,ch=100,pad=6,now=Date.now(),days=30,cap=skin().cap,tc=themeColors();var pts=[];for(var i=days;i>=0;i--)pts.push({x:(days-i)/days,y:tanAt(now-i*864e5)});$("chartPct").textContent=Math.round(tanAt(now))+"%";var t0=TONE[state.skin][0],t1=TONE[state.skin][1];var defs=document.createElementNS(ns,'defs');defs.innerHTML="<linearGradient id='tg' x1='0' y1='0' x2='1' y2='0'><stop offset='0' stop-color='"+t0+"'/><stop offset='1' stop-color='"+t1+"'/></linearGradient><linearGradient id='tgf' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='"+t1+"' stop-opacity='.35'/><stop offset='1' stop-color='"+t1+"' stop-opacity='0'/></linearGradient>";svg.appendChild(defs);function X(x){return pad+x*(cw-2*pad);}function Y(y){return (ch-pad)-(y/Math.max(cap,1))*(ch-2*pad);}var line="";pts.forEach(function(p,i){line+=(i===0?"M":"L")+X(p.x).toFixed(1)+" "+Y(p.y).toFixed(1)+" ";});var ar=document.createElementNS(ns,'path');ar.setAttribute('d',line+"L"+X(1)+" "+(ch-pad)+" L"+X(0)+" "+(ch-pad)+" Z");ar.setAttribute('fill','url(#tgf)');svg.appendChild(ar);var ln=document.createElementNS(ns,'path');ln.setAttribute('d',line);ln.setAttribute('fill','none');ln.setAttribute('stroke','url(#tg)');ln.setAttribute('stroke-width','2.5');ln.setAttribute('stroke-linecap','round');svg.appendChild(ln);var lp=pts[pts.length-1],c=document.createElementNS(ns,'circle');c.setAttribute('cx',X(lp.x));c.setAttribute('cy',Y(lp.y));c.setAttribute('r','4');c.setAttribute('fill',t1);svg.appendChild(c);}
+    list.innerHTML="";state.sessions.forEach(function(s){var d=new Date(s.when),date=d.toLocaleDateString([],{weekday:"short",month:"short",day:"numeric"}),time=d.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});var el=document.createElement("div");el.className="card log-item";el.innerHTML="<div class='log-uv' style='background:"+uvColor(s.uv)+"'>"+(s.uv!=null?s.uv:"–")+"</div><div class='log-body'><div class='d'>"+date+" · "+time+"</div><div class='m'>"+(s.note||"Tanning session")+"</div></div><div class='log-min'>"+s.min+"m</div><button class='del' aria-label='Delete'>×</button>";el.querySelector(".del").onclick=function(ev){ev.stopPropagation();delSession(s.id);};el.style.cursor="pointer";el.setAttribute("role","button");el.setAttribute("aria-label","Edit session");el.onclick=function(){haptic(8);openEdit(s);};list.appendChild(el);});}
+  function drawTanChart(){var svg=$("tanchart");svg.innerHTML="";var ns="http://www.w3.org/2000/svg",cw=320,ch=100,pad=6,now=Date.now(),days=30,cap=skin().cap,tc=themeColors();var pts=[];for(var i=days;i>=0;i--)pts.push({x:(days-i)/days,y:tanAt(now-i*864e5)});animateCount($("chartPct"),tanAt(now));var t0=TONE[state.skin][0],t1=TONE[state.skin][1];var defs=document.createElementNS(ns,'defs');defs.innerHTML="<linearGradient id='tg' x1='0' y1='0' x2='1' y2='0'><stop offset='0' stop-color='"+t0+"'/><stop offset='1' stop-color='"+t1+"'/></linearGradient><linearGradient id='tgf' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='"+t1+"' stop-opacity='.35'/><stop offset='1' stop-color='"+t1+"' stop-opacity='0'/></linearGradient>";svg.appendChild(defs);function X(x){return pad+x*(cw-2*pad);}function Y(y){return (ch-pad)-(y/Math.max(cap,1))*(ch-2*pad);}var line="";pts.forEach(function(p,i){line+=(i===0?"M":"L")+X(p.x).toFixed(1)+" "+Y(p.y).toFixed(1)+" ";});var ar=document.createElementNS(ns,'path');ar.setAttribute('d',line+"L"+X(1)+" "+(ch-pad)+" L"+X(0)+" "+(ch-pad)+" Z");ar.setAttribute('fill','url(#tgf)');svg.appendChild(ar);var ln=document.createElementNS(ns,'path');ln.setAttribute('d',line);ln.setAttribute('fill','none');ln.setAttribute('stroke','url(#tg)');ln.setAttribute('stroke-width','2.5');ln.setAttribute('stroke-linecap','round');svg.appendChild(ln);var lp=pts[pts.length-1],c=document.createElementNS(ns,'circle');c.setAttribute('cx',X(lp.x));c.setAttribute('cy',Y(lp.y));c.setAttribute('r','4');c.setAttribute('fill',t1);svg.appendChild(c);}
 
   // ---- products ----
   function renderProductList(){var host=$("productList");host.innerHTML="";state.products.forEach(function(p){var row=document.createElement("div");row.className="prod-row";row.innerHTML="<div class='pi' style='background:"+(p.kind==="oil"?"rgba(255,157,60,.18)":"rgba(122,209,154,.18)")+"'>"+(p.kind==="oil"?"🟠":"🟢")+"</div><div class='pb'><div class='n'>"+p.name+"</div><div class='s'>"+(p.kind==="oil"?"Tanning oil":"Sunscreen")+" · "+(p.spf?("SPF "+p.spf):"no SPF")+"</div></div>";if(!p.fixed){var del=document.createElement("button");del.className="del";del.textContent="×";del.onclick=function(){state.products=state.products.filter(function(x){return x.id!==p.id;});if(state.activeProduct===p.id){state.activeProduct="bare";Store.write("bask.activeProduct","bare");}Store.write("bask.products",state.products);renderProductList();renderProductChips();renderToday();};row.appendChild(del);}host.appendChild(row);});}
@@ -1173,13 +1243,14 @@
 
   // ---- goal ----
   function renderGoalSeg(){var seg=$("goalSeg");seg.innerHTML="";[{v:0,l:"Off"},{v:40,l:"Light"},{v:65,l:"Golden"},{v:90,l:"Deep"}].forEach(function(o){var b=document.createElement("button");b.textContent=o.l;b.setAttribute("aria-pressed",state.goal===o.v?"true":"false");b.onclick=function(){state.goal=o.v;Store.write("bask.goal",o.v);renderGoalSeg();renderTan();};seg.appendChild(b);});}
+  function renderThemeSeg(){var seg=$("themeSeg");if(!seg)return;seg.innerHTML="";[{v:"auto",l:"Auto"},{v:"light",l:"Light"},{v:"dark",l:"Dark"}].forEach(function(o){var b=document.createElement("button");b.type="button";b.textContent=o.l;b.setAttribute("aria-pressed",state.theme===o.v?"true":"false");b.onclick=function(){state.theme=o.v;Store.write("bask.theme",o.v);applyTheme();renderThemeSeg();renderToday();drawTanChart();};seg.appendChild(b);});}
 
   // ---- environment multiplier & body sides (settings) ----
   function renderEnvChips(){var host=$("envChips");if(!host)return;host.innerHTML="";ENV.forEach(function(e){var b=document.createElement("button");b.type="button";b.className="envchip";b.setAttribute("aria-pressed",state.env[e.id]?"true":"false");b.innerHTML="<span>"+e.icon+"</span>"+e.label+" +"+Math.round(e.mult*100)+"%";b.onclick=function(){state.env[e.id]=!state.env[e.id];Store.write("bask.env",state.env);b.setAttribute("aria-pressed",state.env[e.id]?"true":"false");renderToday();};host.appendChild(b);});}
   function renderSidesChips(){var host=$("sidesChips");if(!host)return;host.innerHTML="";ALL_SIDES.forEach(function(name){var on=activeSides().indexOf(name)>=0;var b=document.createElement("button");b.type="button";b.className="envchip";b.setAttribute("aria-pressed",on?"true":"false");b.textContent=name;b.onclick=function(){var cur=activeSides(),has=cur.indexOf(name)>=0,next=ALL_SIDES.filter(function(n){return n===name?!has:cur.indexOf(n)>=0;});if(!next.length){toast("Keep at least one side");return;}state.sides=next;Store.write("bask.sides",next);renderSidesChips();};host.appendChild(b);});}
 
   // ---- location & fetch ----
-  function setStatus(k,t){$("statusDot").className="dot "+k;$("statusText").textContent=t;}
+  function setStatus(k,t){$("statusDot").className="dot "+k;$("statusText").textContent=t;var rf=$("refreshBtn"),ptr=$("ptr");if(rf)rf.classList.toggle("busy",k==="load");if(ptr&&k!=="load")ptr.classList.remove("spin");}
   function liveAge(){if(!state.live)return"";var m=Math.round((Date.now()-state.live.updatedAt)/60000);if(m<1)return"just now";if(m<60)return m+"m ago";return Math.round(m/60)+"h ago";}
   function getLocation(){return new Promise(function(res,rej){if(!navigator.geolocation){rej("no geolocation");return;}navigator.geolocation.getCurrentPosition(function(p){res({lat:p.coords.latitude,lng:p.coords.longitude});},function(e){rej(e&&e.message||"denied");},{enableHighAccuracy:false,timeout:9000,maximumAge:600000});});}
   function reverseGeocode(lat,lng){return fetch("https://api.bigdatacloud.net/data/reverse-geocode-client?latitude="+lat+"&longitude="+lng+"&localityLanguage=en").then(function(r){return r.json();}).then(function(j){return j.city||j.locality||j.principalSubdivision||"";}).catch(function(){return"";});}
@@ -1216,12 +1287,66 @@
   // ---- toast ----
   var toastT;function toast(msg){var t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove("show");},2600);}
 
+  // ---- haptics (no-op on platforms without the API, e.g. iOS) ----
+  function haptic(p){try{if(navigator.vibrate)navigator.vibrate(p||8);}catch(e){}}
+
   // ---- nav & sheets ----
-  var tabs=document.querySelectorAll(".tab");tabs.forEach(function(t){t.onclick=function(){tabs.forEach(function(x){x.setAttribute("aria-current","false");});t.setAttribute("aria-current","true");var w=t.dataset.tab;$("screen-today").classList.toggle("hidden",w!=="today");$("screen-log").classList.toggle("hidden",w!=="log");if(w==="log")drawTanChart();};});
+  var tabs=document.querySelectorAll(".tab");tabs.forEach(function(t){t.onclick=function(){if(t.getAttribute("aria-current")==="true")return;haptic(8);tabs.forEach(function(x){x.setAttribute("aria-current","false");});t.setAttribute("aria-current","true");var w=t.dataset.tab;$("screen-today").classList.toggle("hidden",w!=="today");$("screen-log").classList.toggle("hidden",w!=="log");var scr=$(w==="today"?"screen-today":"screen-log");scr.scrollTop=0;if(w==="log")drawTanChart();};});
   var scrim=$("scrim"),sheets=["settingsSheet","addSheet","productsSheet","sciSheet","confirmFinishSheet"].map($);
-  function openSheet(s){scrim.classList.add("open");s.classList.add("open");}
-  function closeSheets(){scrim.classList.remove("open");sheets.forEach(function(s){s.classList.remove("open");});}
+  var sheetOpen=false;
+  function openSheet(s){
+    haptic(8);
+    sheets.forEach(function(x){if(x!==s)x.classList.remove("open");});
+    s.style.transform="";s.scrollTop=0;
+    scrim.classList.add("open");s.classList.add("open");
+    if(!sheetOpen){sheetOpen=true;try{history.pushState({sheet:1},"");}catch(e){}}
+  }
+  function closeSheets(){
+    scrim.classList.remove("open");sheets.forEach(function(s){s.classList.remove("open");});
+    if(sheetOpen){sheetOpen=false;try{if(history.state&&history.state.sheet)history.back();}catch(e){}}
+  }
+  // OS back button / back-swipe closes the open sheet instead of leaving the app.
+  window.addEventListener("popstate",function(){if(sheetOpen){sheetOpen=false;scrim.classList.remove("open");sheets.forEach(function(s){s.classList.remove("open");});}});
   scrim.onclick=closeSheets;
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"&&sheetOpen)closeSheets();});
+
+  // ---- swipe-down-to-dismiss bottom sheets (native feel) ----
+  function makeSheetDraggable(s){
+    var grab=s.querySelector(".grab"),startY=0,curY=0,dragging=false;
+    function down(e){var y=e.touches?e.touches[0].clientY:e.clientY;if(e.target!==grab&&s.scrollTop>2)return;startY=y;curY=y;dragging=true;s.classList.add("dragging");}
+    function move(e){
+      if(!dragging)return;var y=e.touches?e.touches[0].clientY:e.clientY,dy=y-startY;
+      if(dy<0){if(e.target!==grab){dragging=false;s.classList.remove("dragging");s.style.transform="";return;}dy=0;}
+      curY=y;s.style.transform="translateY("+dy+"px)";if(dy>0&&e.cancelable)e.preventDefault();
+    }
+    function up(){if(!dragging)return;dragging=false;s.classList.remove("dragging");var dy=curY-startY;s.style.transform="";if(dy>110)closeSheets();}
+    s.addEventListener("touchstart",down,{passive:true});
+    s.addEventListener("touchmove",move,{passive:false});
+    s.addEventListener("touchend",up);s.addEventListener("touchcancel",up);
+  }
+  sheets.forEach(makeSheetDraggable);
+
+  // ---- pull-to-refresh on the Today screen ----
+  (function(){
+    var scr=$("screen-today"),ind=$("ptr"),startY=0,pulling=false,dist=0,TH=70;
+    if(!scr||!ind)return;
+    scr.addEventListener("touchstart",function(e){if(scr.scrollTop<=0&&!sheetOpen&&!ind.classList.contains("spin")){startY=e.touches[0].clientY;pulling=true;dist=0;}else pulling=false;},{passive:true});
+    scr.addEventListener("touchmove",function(e){
+      if(!pulling)return;
+      dist=e.touches[0].clientY-startY;
+      if(dist<=0){pulling=false;ind.style.opacity="";ind.style.transform="";return;}
+      var d=Math.min(dist*0.5,92);
+      ind.style.opacity=Math.min(1,d/TH);
+      ind.style.transform="translateY("+d.toFixed(0)+"px) rotate("+Math.round(d*4)+"deg)";
+      if(dist>6&&e.cancelable)e.preventDefault();
+    },{passive:false});
+    function end(){
+      if(!pulling)return;pulling=false;
+      var go=dist*0.5>=TH;ind.style.opacity="";ind.style.transform="";
+      if(go){haptic(15);ind.classList.add("spin");state.live=null;refreshUV();}
+    }
+    scr.addEventListener("touchend",end);scr.addEventListener("touchcancel",end);
+  })();
   $("openSettings").onclick=function(){updateLocLabels();openSheet($("settingsSheet"));};
   $("closeSettings").onclick=closeSheets;
   $("openSciBtn").onclick=function(){closeSheets();setTimeout(function(){openSheet($("sciSheet"));},120);};
@@ -1236,7 +1361,7 @@
   $("refreshBtn").onclick=function(e){e.stopPropagation();state.live=null;refreshUV();};
   $("statusPill").onclick=function(){if(!state.loc)refreshUV();};
   $("uvSlider").addEventListener("input",function(e){state.manualUV=parseInt(e.target.value,10);Store.write("bask.manualUV",state.manualUV);$("uvNum").textContent=state.manualUV;firstDraw=true;renderToday();});
-  $("quickAdd").onclick=function(){editingId=null;$("addTitle").textContent="Log a session";$("addSub").textContent="Add a tan you've already done.";$("addSave").textContent="Save";setAddBurn(0);var now=new Date();now.setMinutes(now.getMinutes()-now.getTimezoneOffset());$("aWhen").value=now.toISOString().slice(0,16);$("aMin").value="";$("aUV").value=Math.round(currentUV());$("aNote").value="";openSheet($("addSheet"));};
+  $("quickAdd").onclick=function(){editingId=null;$("addTitle").textContent="Log a session";$("addSub").textContent="Add a tan you've already done.";$("addSave").textContent="Save";setAddBurn(0);var now=new Date();now.setMinutes(now.getMinutes()-now.getTimezoneOffset());$("aWhen").value=now.toISOString().slice(0,16);var pSides=activeSides().length,planMin=safeMin(currentUV())*pSides;$("aMin").value=planMin>0?planMin:"";$("aUV").value=Math.round(currentUV());$("aNote").value="";openSheet($("addSheet"));};
   $("addCancel").onclick=function(){editingId=null;closeSheets();};
   document.querySelectorAll("#aBurnSeg button").forEach(function(b){b.onclick=function(){setAddBurn(parseInt(b.dataset.burn,10));};});
   document.querySelectorAll("#cBurnSeg button").forEach(function(b){b.onclick=function(){setConfirmBurn(parseInt(b.dataset.burn,10));};});
@@ -1259,7 +1384,7 @@
       renderToday();toast(burned?"Logged — recovery mode on":"Session logged");
     }
   };
-  $("shareBtn").onclick=shareGlow;
+  $("shareBtn").onclick=function(){haptic(10);shareGlow();};
   $("recoveryClear").onclick=function(){state.recoveryUntil=0;Store.write("bask.recoveryUntil",0);renderToday();toast("Lockout cleared — tan gently");};
   $("reapplyReset").onclick=function(){state.productAppliedAt=Date.now();Store.write("bask.productAppliedAt",state.productAppliedAt);renderReapply();toast("Reapplication timer reset");};
   $("weekHead").onclick=function(){state.weekOpen=!state.weekOpen;Store.write("bask.weekOpen",state.weekOpen);$("weekCard").classList.toggle("open",state.weekOpen);};
@@ -1269,7 +1394,7 @@
     var seg=$("modeSeg");if(seg){seg.innerHTML="";MODES.forEach(function(m){var b=document.createElement("button");b.type="button";b.setAttribute("aria-pressed",state.mode===m.id?"true":"false");b.innerHTML="<span class='mm'>"+m.icon+"</span>"+m.name;b.onclick=function(){setMode(m.id);};seg.appendChild(b);});}
     var s2=$("modeSegSettings");if(s2){s2.innerHTML="";MODES.forEach(function(m){var c=document.createElement("button");c.type="button";c.className="mode-card";c.setAttribute("aria-pressed",state.mode===m.id?"true":"false");c.innerHTML="<span class='mi'>"+m.icon+"</span><span class='mb'><span class='mn'>"+m.name+"</span><span class='md'>"+m.desc+"</span><span class='mt'>"+m.trade+"</span></span>";c.onclick=function(){setMode(m.id);};s2.appendChild(c);});}
   }
-  function setMode(id){state.mode=id;Store.write("bask.mode",id);renderModeSeg();renderToday();if(id==="max")toast("🔥 Max Tan — watch the burn line");}
+  function setMode(id){haptic(8);state.mode=id;Store.write("bask.mode",id);renderModeSeg();renderToday();if(id==="max")toast("🔥 Max Tan — watch the burn line");}
 
   // ---- skin-type quiz (Fitzpatrick) ----
   var QUIZ=[
@@ -1322,7 +1447,7 @@
 
   // ---- init ----
   function initSettingsUI(){document.querySelectorAll("#sourceSeg button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.src===state.source?"true":"false");});$("keyField").style.display=state.source==="openuv"?"block":"none";$("openuvKey").value=state.openuvKey||"";updateLocLabels();}
-  function renderAll(){renderSkinChips();renderProductChips();renderProductList();renderModeSeg();renderEnvChips();renderSidesChips();renderToday();renderLog();}
+  function renderAll(){renderSkinChips();renderProductChips();renderProductList();renderModeSeg();renderThemeSeg();renderEnvChips();renderSidesChips();renderToday();renderLog();}
   function clock(){var d=new Date();$("clock").textContent=" · "+d.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});}
 
   function syncClockToSystem() {
@@ -1334,11 +1459,14 @@
     }, msUntilNextMinute);
   }
 
+  applyTheme();try{matchMedia("(prefers-color-scheme:dark)").addEventListener("change",function(){if(state.theme==="auto"){applyTheme();renderToday();drawTanChart();}});}catch(e){}
   initSettingsUI();renderGoalSeg();renderAll();clock();
   (function(){var st=Store.read("bask.timer",null);if(st&&(st.running||st.paused)){var extra=st.running?(Date.now()-st.start)/1000:0;timer.paused=true;timer.running=false;timer.accumulatedSec=(st.accumulatedSec||0)+extra;timer.completedSidesSec=st.completedSidesSec||0;timer.currentSide=st.currentSide||activeSides()[0];timer.sidesDone=st.sidesDone||[];timer.alerted=st.alerted||false;timer.warned2min=st.warned2min||false;setupActionButtonUI();renderDial();toast("Session paused — tap Resume to continue");}})();
   if(state.live)setStatus("warn","Saved UV ("+liveAge()+")");else setStatus("warn","Tap to enable live UV");
   if(!state.onboarded){startOnb(false);}else{refreshUV();}
   syncClockToSystem();
+  // Let the entrance reveal play once, then drop the classes so tab switches just cross-fade.
+  setTimeout(function(){document.querySelectorAll(".reveal").forEach(function(e){e.classList.remove("reveal","d1","d2","d3");});},1100);
 
   // ---- app icon (generated as PNG from the brand "gem", so installs get a real raster icon) ----
   function drawAppIcon(size,maskable){
