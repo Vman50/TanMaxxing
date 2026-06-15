@@ -24,7 +24,10 @@ companion **`sw.js`** service worker for offline caching.
   registration is guarded in try/catch so `file://` still works. It must be served next to
   `index.html`. It also handles `notificationclick` to focus the app.
 - **Mobile-first / PWA.** Designed for a phone-width frame (`.app` max-width 460px),
-  uses `env(safe-area-inset-*)`, Apple web-app meta tags, and a data-URI touch icon.
+  uses `env(safe-area-inset-*)` and Apple web-app meta tags. App icons are generated at
+  runtime from a `<canvas>` (the brand "gem") by `drawAppIcon(size,maskable)` — favicon,
+  `apple-touch-icon`, and the manifest's 192/512 `any` + 512 `maskable` PNG icons all come
+  from it. A static inline SVG `apple-touch-icon` in `<head>` is the pre-JS fallback.
 - **State** is a single in-memory `state` object persisted to `localStorage` under keys
   prefixed `bask.` (e.g. `bask.sessions`, `bask.skin`, `bask.loc`) via the `Store.read()` /
   `Store.write()` helpers, which fall back to an in-memory `mem` object if `localStorage`
@@ -55,6 +58,10 @@ companion **`sw.js`** service worker for offline caching.
   `fetchOpenMeteo()`.
 - **BigDataCloud** (`api.bigdatacloud.net`) — keyless reverse geocoding for the location
   label. See `reverseGeocode()`.
+- **Open-Meteo Geocoding** (`geocoding-api.open-meteo.com`) — keyless forward geocoding for
+  manually-typed locations (a place name or a `lat, lng` pair). See `geocodePlace()` /
+  `setManualLocation()`; wired to the Settings and onboarding "type a city" inputs as the
+  second way to set location alongside `navigator.geolocation`.
 - **Geolocation** via the browser `navigator.geolocation` API (`getLocation()`).
 - **Google Fonts** (Fraunces, Inter) loaded from CDN.
 

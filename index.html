@@ -507,7 +507,7 @@
   <div class="field"><label>Sides to rotate</label><div class="envchips" id="sidesChips"></div><div class="hint">The timer rotates through these so each side gets even sun.</div></div>
   <div class="field"><label>Reflective environment</label><div class="envchips" id="envChips"></div><div class="hint">Sand, snow and water bounce extra UV onto your skin — this raises the effective UV used in every calculation.</div></div>
   <div class="field"><label>Glow goal</label><div class="seg" id="goalSeg"></div></div>
-  <div class="field"><label>Location</label><button class="btn btn-ghost" id="useLocation" style="margin-bottom:8px;">Use my location</button><div class="hint" id="locSetting">Not set yet.</div></div>
+  <div class="field"><label>Location</label><button class="btn btn-ghost" id="useLocation" style="margin-bottom:8px;">📍 Use my location</button><div style="display:flex;gap:8px;margin-bottom:8px;"><input type="text" id="locManualInput" placeholder="Or type a city or place" style="flex:1;" /><button class="btn btn-ghost" id="locManualBtn" style="flex:none;width:auto;padding:13px 18px;font-size:14px;">Set</button></div><div class="hint" id="locSetting">Not set yet.</div></div>
   <div class="field"><label>UV data source</label><div class="seg" id="sourceSeg"><button data-src="openmeteo" aria-pressed="true">Open-Meteo<br><span style="font-size:11px;color:var(--muted);">free · no key</span></button><button data-src="openuv" aria-pressed="false">OpenUV<br><span style="font-size:11px;color:var(--muted);">needs key</span></button></div></div>
   <div class="field" id="keyField" style="display:none;"><label>OpenUV API key</label><input type="password" id="openuvKey" placeholder="x-access-token from openuv.io" /><div class="hint">Free key, 50 lookups/day. Stored only on this device.</div></div>
   <div class="field"><label>Your data</label><div class="row2"><button class="btn btn-ghost" id="exportBtn">Export</button><button class="btn btn-ghost" id="importBtn">Import</button></div><input type="file" id="importFile" accept="application/json" style="display:none;" /></div>
@@ -601,6 +601,7 @@
       <h2>Turn on live UV</h2>
       <p class="lede">TanMaxxing uses your location to pull the real UV forecast. It stays on your device — no account, no tracking.</p>
       <button class="loc" id="onbLoc">📍 Use my location</button>
+      <div style="display:flex;gap:8px;margin-top:10px;"><input type="text" id="onbLocInput" placeholder="Or type a city / place" style="flex:1;" /><button class="btn btn-ghost" id="onbLocSet" style="flex:none;width:auto;padding:14px 16px;font-size:14px;">Set</button></div>
       <div class="onb-nav" style="margin-top:12px;"><button class="back" id="back4">‹</button><button class="next" id="onbGo">Start glowing</button></div>
     </div>
   </div>
@@ -1182,6 +1183,19 @@
   function liveAge(){if(!state.live)return"";var m=Math.round((Date.now()-state.live.updatedAt)/60000);if(m<1)return"just now";if(m<60)return m+"m ago";return Math.round(m/60)+"h ago";}
   function getLocation(){return new Promise(function(res,rej){if(!navigator.geolocation){rej("no geolocation");return;}navigator.geolocation.getCurrentPosition(function(p){res({lat:p.coords.latitude,lng:p.coords.longitude});},function(e){rej(e&&e.message||"denied");},{enableHighAccuracy:false,timeout:9000,maximumAge:600000});});}
   function reverseGeocode(lat,lng){return fetch("https://api.bigdatacloud.net/data/reverse-geocode-client?latitude="+lat+"&longitude="+lng+"&localityLanguage=en").then(function(r){return r.json();}).then(function(j){return j.city||j.locality||j.principalSubdivision||"";}).catch(function(){return"";});}
+  // Forward geocoding: accepts a "lat, lng" pair or a place name (keyless Open-Meteo geocoding).
+  function geocodePlace(query){
+    var q=(query||"").trim();
+    var coord=q.match(/^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/);
+    if(coord){var lat=parseFloat(coord[1]),lng=parseFloat(coord[2]);if(Math.abs(lat)<=90&&Math.abs(lng)<=180)return Promise.resolve({lat:lat,lng:lng,place:lat.toFixed(2)+", "+lng.toFixed(2)});return Promise.reject("bad coords");}
+    if(!q)return Promise.reject("empty");
+    return fetch("https://geocoding-api.open-meteo.com/v1/search?name="+encodeURIComponent(q)+"&count=1&language=en&format=json").then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();}).then(function(j){if(!j.results||!j.results.length)throw new Error("not found");var g=j.results[0],name=g.name+(g.admin1&&g.admin1!==g.name?(", "+g.admin1):"")+(g.country_code?(" ("+g.country_code+")"):"");return{lat:g.latitude,lng:g.longitude,place:name};});
+  }
+  // Resolve a typed place into state.loc and refresh UV. onName runs with the resolved loc.
+  function setManualLocation(query,onName){
+    setStatus("load","Finding place…");
+    return geocodePlace(query).then(function(loc){state.loc=loc;state.live=null;Store.write("bask.loc",loc);updateLocLabels();if(onName)onName(loc);refreshUV();toast("Location set to "+loc.place);return loc;}).catch(function(){toast("Couldn't find that place — try a city name or \"lat, lng\"");setStatus("warn","Tap to enable live UV");});
+  }
   function parseHM(s){return parseInt(s.substr(11,2),10)+parseInt(s.substr(14,2),10)/60;}
   function fetchOpenMeteo(lat,lng){var url="https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lng+"&hourly=uv_index&daily=uv_index_max,sunrise,sunset&current=uv_index&timezone=auto&forecast_days=7";return fetch(url).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();}).then(function(j){
     var byDay={};
@@ -1217,6 +1231,8 @@
   document.querySelectorAll("#sourceSeg button").forEach(function(btn){btn.onclick=function(){document.querySelectorAll("#sourceSeg button").forEach(function(b){b.setAttribute("aria-pressed","false");});btn.setAttribute("aria-pressed","true");state.source=btn.dataset.src;Store.write("bask.source",state.source);$("keyField").style.display=state.source==="openuv"?"block":"none";};});
   $("openuvKey").addEventListener("input",function(e){state.openuvKey=e.target.value.trim();Store.write("bask.openuvKey",btoa(state.openuvKey));});
   $("useLocation").onclick=function(){state.loc=null;state.live=null;Store.write("bask.loc",null);refreshUV();};
+  $("locManualBtn").onclick=function(){var q=$("locManualInput").value;if(!q.trim()){$("locManualInput").focus();return;}setManualLocation(q,function(){$("locManualInput").value="";});};
+  $("locManualInput").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();$("locManualBtn").click();}});
   $("refreshBtn").onclick=function(e){e.stopPropagation();state.live=null;refreshUV();};
   $("statusPill").onclick=function(){if(!state.loc)refreshUV();};
   $("uvSlider").addEventListener("input",function(e){state.manualUV=parseInt(e.target.value,10);Store.write("bask.manualUV",state.manualUV);$("uvNum").textContent=state.manualUV;firstDraw=true;renderToday();});
@@ -1298,6 +1314,8 @@
   $("go3").onclick=function(){gotoStep(4);};
   $("back4").onclick=function(){gotoStep(3);};
   $("onbLoc").onclick=function(){state.loc=null;state.live=null;Store.write("bask.loc",null);refreshUV();$("onbLoc").textContent="📍 Location enabled ✓";};
+  $("onbLocSet").onclick=function(){var q=$("onbLocInput").value;if(!q.trim()){$("onbLocInput").focus();return;}setManualLocation(q,function(loc){$("onbLoc").textContent="📍 "+loc.place+" ✓";});};
+  $("onbLocInput").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();$("onbLocSet").click();}});
   $("onbGo").onclick=finishOnb;
   $("onbSkip").onclick=finishOnb;
   $("retakeQuiz").onclick=function(){closeSheets();setTimeout(function(){startOnb(true);},150);};
@@ -1322,7 +1340,33 @@
   if(!state.onboarded){startOnb(false);}else{refreshUV();}
   syncClockToSystem();
 
-  try{var mani={name:"TanMaxxing",short_name:"TanMaxxing",display:"standalone",background_color:"#efe3d4",theme_color:"#efe3d4",start_url:".",icons:[{src:document.querySelector("link[rel='apple-touch-icon']").href,sizes:"180x180",type:"image/svg+xml",purpose:"any"}]};var blob=new Blob([JSON.stringify(mani)],{type:"application/json"});var l=document.createElement("link");l.rel="manifest";l.href=URL.createObjectURL(blob);document.head.appendChild(l);}catch(e){}
+  // ---- app icon (generated as PNG from the brand "gem", so installs get a real raster icon) ----
+  function drawAppIcon(size,maskable){
+    var c=document.createElement("canvas");c.width=size;c.height=size;var x=c.getContext("2d");
+    function rr(X,Y,w,h,r){x.beginPath();x.moveTo(X+r,Y);x.arcTo(X+w,Y,X+w,Y+h,r);x.arcTo(X+w,Y+h,X,Y+h,r);x.arcTo(X,Y+h,X,Y,r);x.arcTo(X,Y,X+w,Y,r);x.closePath();}
+    var bg=x.createLinearGradient(0,0,0,size);bg.addColorStop(0,"#f3e8da");bg.addColorStop(1,"#e7d0b8");
+    x.fillStyle=bg;
+    if(maskable){x.fillRect(0,0,size,size);} else {rr(0,0,size,size,size*0.23);x.fill();}
+    var cx=size/2,cy=size/2,gr=size*(maskable?0.27:0.30);
+    var g=x.createRadialGradient(cx-gr*0.35,cy-gr*0.4,gr*0.12,cx,cy,gr);
+    g.addColorStop(0,"#f0c79a");g.addColorStop(.42,"#c9824e");g.addColorStop(1,"#7c4624");
+    x.fillStyle=g;x.beginPath();x.arc(cx,cy,gr,0,7);x.fill();
+    var h=x.createRadialGradient(cx-gr*0.3,cy-gr*0.35,1,cx-gr*0.3,cy-gr*0.35,gr*0.55);
+    h.addColorStop(0,"rgba(255,255,255,.6)");h.addColorStop(1,"rgba(255,255,255,0)");
+    x.fillStyle=h;x.beginPath();x.arc(cx-gr*0.28,cy-gr*0.32,gr*0.5,0,7);x.fill();
+    return c.toDataURL("image/png");
+  }
+  try{
+    var icon192=drawAppIcon(192,false),icon512=drawAppIcon(512,false),iconMask=drawAppIcon(512,true),iconApple=drawAppIcon(180,false);
+    var apple=document.querySelector("link[rel='apple-touch-icon']");if(apple)apple.href=iconApple;
+    var fav=document.createElement("link");fav.rel="icon";fav.type="image/png";fav.href=drawAppIcon(64,false);document.head.appendChild(fav);
+    var mani={name:"TanMaxxing — Optimize Your Glow",short_name:"TanMaxxing",description:"Track UV and time your tanning sessions to build a tan without burning.",display:"standalone",background_color:"#efe3d4",theme_color:"#efe3d4",start_url:".",scope:".",icons:[
+      {src:icon192,sizes:"192x192",type:"image/png",purpose:"any"},
+      {src:icon512,sizes:"512x512",type:"image/png",purpose:"any"},
+      {src:iconMask,sizes:"512x512",type:"image/png",purpose:"maskable"}
+    ]};
+    var blob=new Blob([JSON.stringify(mani)],{type:"application/json"});var l=document.createElement("link");l.rel="manifest";l.href=URL.createObjectURL(blob);document.head.appendChild(l);
+  }catch(e){}
 
   // Service worker for offline use + lock-screen notifications. Needs sw.js served alongside index.html.
   try{if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}}catch(e){}

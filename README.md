@@ -4,13 +4,23 @@
 location and helps you time tanning sessions to build a tan while staying clear of
 sunburn.
 
-It's a single, self-contained `index.html` — no build step, no dependencies, no server
-required. Just open it in a browser.
+It's a self-contained `index.html` (plus a tiny `sw.js` service worker for offline use) —
+no build step and no dependencies.
+
+## Use it
+
+**▶️ Live app: https://vman50.github.io/TanMaxxing/**
+
+Just open that link on your phone or desktop — nothing to install. On mobile you can
+"Add to Home Screen" for an app-like, offline-capable experience.
+
+When you first open it, set your location either by **allowing location access** or by
+**typing a city / place** (or `lat, lng`) in onboarding or **Settings → Location**.
 
 ## Features
 
-- **Live UV index** for your current location with an hourly UV curve and the best
-  tanning window of the day.
+- **Live UV index** for your location — set by GPS or by typing a city/place — with an
+  hourly UV curve, a 7-day outlook, and the best tanning window of the day.
 - **Session timer** — a dial that tracks active sun time and warns you before you hit
   your burn limit.
 - **Tan progress** — a visual "tan gem" and goal bar showing how your tan is building,
@@ -22,20 +32,23 @@ required. Just open it in a browser.
 - **Session log** — history of past sessions on the Log screen.
 - Installable as a PWA on mobile, with offline-friendly local storage.
 
-## Getting started
+## Run it locally (for development)
+
+You only need this if you want to hack on the app — end users should just use the
+[live link](https://vman50.github.io/TanMaxxing/) above.
 
 1. Clone the repo:
    ```bash
    git clone https://github.com/Vman50/TanMaxxing.git
    cd TanMaxxing
    ```
-2. Open `index.html` in a browser. For full PWA behavior (geolocation, install to home
-   screen), serve it over HTTP, e.g.:
+2. Serve it over HTTP so the service worker, geolocation, and "install to home screen"
+   work (these are disabled on `file://`):
    ```bash
    python3 -m http.server 8000
    # then visit http://localhost:8000
    ```
-3. Allow location access when prompted.
+   Opening `index.html` directly still works for most things, just without the PWA bits.
 
 ### OpenUV API key (optional)
 
