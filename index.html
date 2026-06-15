@@ -292,7 +292,8 @@
   /* reapplication countdown */
   .reapply{margin:9px 2px 0;font-size:12.5px;color:var(--muted2);display:flex;align-items:center;gap:7px;}
   .reapply b{color:var(--accent);} .reapply.due{color:var(--danger);} .reapply.due b{color:var(--danger);}
-  .reapply button{margin-left:auto;background:none;border:none;color:var(--accent);font:inherit;font-size:12px;font-weight:600;cursor:pointer;}
+  .reapply button{margin-left:auto;background:var(--pill);border:1px solid var(--card-line);border-radius:999px;color:var(--pill-text);font:inherit;font-size:12px;font-weight:600;cursor:pointer;padding:5px 11px;white-space:nowrap;transition:.15s;}
+  .reapply button:active{transform:scale(.93);}
 
   /* daily UV budget */
   .budget{margin-top:12px;padding:14px 16px;}
@@ -421,7 +422,7 @@
       <h4>Smart SPF Advisor</h4>
       <p id="spfAdvisorTxt">Select or manage what you are wearing below to view optimization data.</p>
     </div>
-    <div class="reapply" id="reapplyLine" style="display:none;"><span id="reapplyTxt"></span><button id="reapplyReset">Reapplied</button></div>
+    <div class="reapply" id="reapplyLine" style="display:none;"><span id="reapplyTxt"></span><button id="reapplyReset">✓ I reapplied</button></div>
 
     <div class="trio reveal d1">
       <div class="card s"><div class="v" id="safeMin">—<u>m</u></div><div class="k">Per Side</div></div>
@@ -576,7 +577,7 @@
 <div class="sheet" id="productsSheet">
   <div class="grab"></div><h2>Your products</h2><p class="sub">Add the sunscreens and tanning oils you own to accurately optimize UV absorption rules.</p>
   <div id="productList"></div>
-  <div class="field"><label>Add a product</label><input type="text" id="pName" autocapitalize="words" autocomplete="off" enterkeyhint="done" placeholder="e.g. Hawaiian Tropic oil" style="margin-bottom:8px;" /><div class="seg" id="pKindSeg" style="margin-bottom:8px;"><button data-kind="oil" aria-pressed="true">🟠 Tanning oil</button><button data-kind="sunscreen" aria-pressed="false">🟢 Sunscreen</button></div><input type="number" id="pSpf" min="0" max="100" inputmode="numeric" enterkeyhint="done" placeholder="SPF on the bottle (0 if none)" /></div>
+  <div class="field"><label>Add a product</label><div class="seg" id="pKindSeg" style="margin-bottom:8px;"><button data-kind="oil" aria-pressed="true">🟠 Tanning oil</button><button data-kind="sunscreen" aria-pressed="false">🟢 Sunscreen</button></div><input type="number" id="pSpf" min="0" max="100" inputmode="numeric" enterkeyhint="done" placeholder="SPF on the bottle (0 if none)" /></div>
   <button class="btn btn-go" id="addProduct">Add product</button><div style="height:8px"></div><button class="btn btn-ghost" id="closeProducts">Done</button><div style="height:8px"></div>
 </div>
 
@@ -587,7 +588,7 @@
     <p><b>Live UV.</b> Real hourly forecasts from Open-Meteo (major weather models) for your coordinates, or OpenUV with a key. The curve is the real forecast, with night shaded between sunset and sunrise.</p>
     <p><b>Burn time.</b> UV Index means erythemal irradiance = <code>UVI × 0.025 W/m²</code> (CIE/WHO). Time to redness ≈ <code>MED ÷ (1.5 × UVI)</code> min, where MED is your skin's minimal erythemal dose.</p>
     <p><b>MED (J/m², approx):</b> I 200 · II 250 · III 350 · IV 450 · V 600 · VI 1000.</p>
-    <p><b>Sunscreen / oil.</b> Your product's SPF multiplies burn time, applied conservatively (~half label, since real coverage is thin) so the safe number errs short.</p>
+    <p><b>Sunscreen / oil.</b> SPF is rated at a thick lab coat (2 mg/cm²); real coverage is far thinner and protection drops off exponentially (Faurschou &amp; Wulf), so we use an effective SPF ≈ <code>√(label)</code> — e.g. SPF 15 ≈ 3.9×. Low-SPF barely changes; inflated high-SPF claims get discounted, so the safe time errs short. It also assumes you reapply on schedule — sweat and water strip it fast.</p>
     <p><b>Glow.</b> Each session adds UV dose <code>(UVI × min × 0.015 SED)</code> to a melanin stimulus that saturates toward your type's ceiling and fades on an ~18-day half-life.</p>
   </div>
   <button class="btn btn-go" id="closeSci">Got it</button>
@@ -700,19 +701,24 @@
   var BURN_LOCKOUT_DAYS=4;
   function recoveryActive(){return state.recoveryUntil>Date.now();}
   var MODES=[
-    {id:"cautious",name:"No Burn",icon:"🛡️",factor:0.45,desc:"Cautious. Stops well short of redness.",trade:"Slowest tan, safest skin."},
-    {id:"build",name:"Build",icon:"☀️",factor:0.65,desc:"Balanced. Builds a steady tan below the burn line.",trade:"The recommended default."},
-    {id:"max",name:"Max Tan",icon:"🔥",factor:0.92,desc:"Pushes right up to the burn threshold for the most melanin per session.",trade:"Fastest tan — riskier. Burning peels and undoes progress, so it stays just under the line."}
+    {id:"cautious",name:"No Burn",icon:"🛡️",factor:0.45,cap:60,desc:"Cautious. Stops well short of redness.",trade:"Slowest tan, safest skin."},
+    {id:"build",name:"Build",icon:"☀️",factor:0.65,cap:75,desc:"Balanced. Builds a steady tan below the burn line.",trade:"The recommended default."},
+    {id:"max",name:"Max Tan",icon:"🔥",factor:0.92,cap:90,desc:"Pushes right up to the burn threshold for the most melanin per session.",trade:"Fastest tan — riskier. Burning peels and undoes progress, so it stays just under the line."}
   ];
   function curMode(){return MODES.find(function(m){return m.id===state.mode;})||MODES[1];}
 
   function $(id){return document.getElementById(id);}
   function skin(){return SKIN.find(function(s){return s.id===state.skin;})||SKIN[2];}
   function activeProd(){return state.products.find(function(p){return p.id===state.activeProduct;})||state.products[0];}
-  function calculateEffectiveSPF(){var s=activeProd().spf||0;return s<=1?1:Math.max(1,s*0.5);}
+  // Effective SPF: real-world coverage is far thinner than the 2 mg/cm² lab test, and
+  // protection vs. thickness is exponential (Faurschou & Wulf 2007), so labelled SPF over-
+  // states real protection. At typical application that's ≈ √(label): SPF 15 ⇒ ~3.9×.
+  function calculateEffectiveSPF(){var s=activeProd().spf||0;return s<=1?1:Math.max(1,Math.sqrt(s));}
   function burnMin(uv){if(uv<=0.2)return Infinity;return skin().med/(1.5*uv)*calculateEffectiveSPF();}
   
-  function safeMin(uv){var burnTimeMinutes=burnMin(uv);if(!isFinite(burnTimeMinutes))return 0;return Math.max(0,Math.round(Math.min((burnTimeMinutes*curMode().factor)/2,90)));}
+  function safeMin(uv){var burnTimeMinutes=burnMin(uv);if(!isFinite(burnTimeMinutes))return 0;var m=curMode();return Math.max(0,Math.round(Math.min((burnTimeMinutes*m.factor)/2,m.cap)));}
+  // Human label for a product, derived from kind + SPF (no user-given name).
+  function prodLabel(p){if(!p)return "";if(p.id==="bare")return "Bare skin";var k=p.kind==="oil"?"Tanning Oil":"Sunscreen";return (p.spf>0?("SPF "+p.spf+" "):"")+k;}
   
   function vitDIU(uv,min){if(uv<=0||min<=0)return 0;return Math.min(10000,Math.round(uv*min*skin().vd));}
   function nowHour(){var d=new Date();return d.getHours()+d.getMinutes()/60;}
@@ -743,7 +749,7 @@
   function peakUV(){var base;if(state.live&&state.live.hourly&&state.live.hourly.length)base=Math.max.apply(null,state.live.hourly.map(function(p){return p.uv;}));else if(state.live&&typeof state.live.max==="number")base=state.live.max;else base=state.manualUV;return base*envMult();}
   function uvColor(uv){if(uv<3)return"#7ad19a";if(uv<6)return"#ffce4a";if(uv<8)return"#ff9d3c";if(uv<11)return"#ff5d73";return"#c2417f";}
   function fmtClock(sec){var m=Math.floor(sec/60),s=Math.floor(sec%60);return (m<10?"0":"")+m+":"+(s<10?"0":"")+s;}
-  function fmtH(h){var hh=Math.floor(h),mm=Math.round((h-hh)*60);if(mm===60){hh++;mm=0;}return hh+":"+(mm<10?"0":"")+mm;}
+  function fmtH(h){var hh=Math.floor(h),mm=Math.round((h-hh)*60);if(mm===60){hh++;mm=0;}if(hh>=24)hh-=24;var ap=hh<12?"AM":"PM",h12=hh%12||12;return h12+(mm?(":"+(mm<10?"0":"")+mm):"")+" "+ap;}
 
   function sunTime(lat,lng,date,tz,rising){var D2R=Math.PI/180,R2D=180/Math.PI,Z=90.833;var start=Date.UTC(date.getUTCFullYear(),0,0);var N=Math.floor((Date.UTC(date.getUTCFullYear(),date.getUTCMonth(),date.getUTCDate())-start)/864e5);var lngHour=lng/15,t=N+(((rising?6:18)-lngHour)/24),M=0.9856*t-3.289;var L=M+1.916*Math.sin(M*D2R)+0.020*Math.sin(2*M*D2R)+282.634;L=(L%360+360)%360;var RA=R2D*Math.atan(0.91764*Math.tan(L*D2R));RA=(RA%360+360)%360;var Lq=Math.floor(L/90)*90,RAq=Math.floor(RA/90)*90;RA=(RA+(Lq-RAq))/15;var sinDec=0.39782*Math.sin(L*D2R),cosDec=Math.cos(Math.asin(sinDec));var cosH=(Math.cos(Z*D2R)-sinDec*Math.sin(lat*D2R))/(cosDec*Math.cos(lat*D2R));if(cosH>1||cosH<-1)return rising?5:21;var Hh=rising?360-R2D*Math.acos(cosH):R2D*Math.acos(cosH);Hh/=15;var T=Hh+RA-0.06571*t-6.622,UT=((T-lngHour)%24+24)%24,loc=((UT+tz)%24+24)%24;return loc;}
   function sunWindow(){if(state.live&&state.live.sunrise!=null&&state.live.sunset!=null)return{sr:state.live.sunrise,ss:state.live.sunset};if(state.loc){var tz=-new Date().getTimezoneOffset()/60;return{sr:sunTime(state.loc.lat,state.loc.lng,new Date(),tz,true),ss:sunTime(state.loc.lat,state.loc.lng,new Date(),tz,false)};}return{sr:6.5,ss:20};}
@@ -782,7 +788,7 @@
   // ---- chips ----
   function buildChips(host,items,getA,onPick,fmt,extra){host.innerHTML="";items.forEach(function(it){var b=document.createElement("button");b.className="chip";b.type="button";b.setAttribute("aria-pressed",getA()===it.id?"true":"false");b.innerHTML=fmt(it);b.onclick=function(){haptic(8);onPick(it.id);renderAll();};host.appendChild(b);});if(extra){var e=document.createElement("button");e.className="chip add";e.type="button";e.innerHTML=extra.label;e.onclick=extra.onClick;host.appendChild(e);}}
   function renderSkinChips(){buildChips($("skinChips"),SKIN,function(){return state.skin;},function(v){state.skin=v;Store.write("bask.skin",v);},function(it){return "<span>Type "+it.label+"</span><span class='t'>"+it.tip+"</span>";});}
-  function renderProductChips(){buildChips($("productChips"),state.products,function(){return state.activeProduct;},function(v){state.activeProduct=v;Store.write("bask.activeProduct",v);var p=state.products.find(function(x){return x.id===v;});if(p&&p.id!=="bare"&&(p.kind==="sunscreen"||p.spf>0)){state.productAppliedAt=Date.now();}else{state.productAppliedAt=0;}Store.write("bask.productAppliedAt",state.productAppliedAt);},function(p){return "<span>"+(p.kind==="oil"?"🟠 ":"🟢 ")+p.name+"</span><span class='t'>"+(p.spf?("SPF "+p.spf):"no SPF")+"</span>";},{label:"+ Add",onClick:function(){openSheet($("productsSheet"));}});}
+  function renderProductChips(){buildChips($("productChips"),state.products,function(){return state.activeProduct;},function(v){state.activeProduct=v;Store.write("bask.activeProduct",v);var p=state.products.find(function(x){return x.id===v;});if(p&&p.id!=="bare"&&(p.kind==="sunscreen"||p.spf>0)){state.productAppliedAt=Date.now();}else{state.productAppliedAt=0;}Store.write("bask.productAppliedAt",state.productAppliedAt);},function(p){return "<span>"+(p.kind==="oil"?"🟠 ":"🟢 ")+(p.id==="bare"?"Bare skin":(p.kind==="oil"?"Tanning Oil":"Sunscreen"))+"</span><span class='t'>"+(p.spf?("SPF "+p.spf):"no SPF")+"</span>";},{label:"+ Add",onClick:function(){openSheet($("productsSheet"));}});}
 
   // ---- Smart Science SPF Advisor logic ----
   function updateSpfAdvisor(uv) {
@@ -806,7 +812,7 @@
       } else if (prod.kind === "sunscreen" && prod.spf >= 30) {
         advisor.innerHTML = "🛡️ <b>Optimal Protection:</b> Your SPF " + prod.spf + " Sunscreen allows safely extended tracking windows. Melanin builds cleanly while blocking intense erythemal burn risks.";
       } else {
-        advisor.innerHTML = "Your current selection of <b>" + prod.name + " (SPF " + prod.spf + ")</b> offers stable protection. Safe limits have been expanded based on its scientific conversion curve factor.";
+        advisor.innerHTML = "Your current selection of <b>" + prodLabel(prod) + "</b> offers steady protection. Safe limits use its real-world effective SPF (≈ √ of the label, since coverage is thin), so they err short — reapply on schedule.";
       }
     }
   }
@@ -980,8 +986,8 @@
     var line=$("reapplyLine");
     if(!reapplyEligible()||!state.productAppliedAt){line.style.display="none";return;}
     line.style.display="flex";var left=state.productAppliedAt+2*36e5-Date.now();
-    if(left<=0){line.classList.add("due");$("reapplyTxt").innerHTML="⏰ <b>Reapplication due</b> — reapply "+activeProd().name+".";}
-    else{line.classList.remove("due");var mm=Math.ceil(left/6e4);$("reapplyTxt").innerHTML="Reapply "+activeProd().name+" in <b>"+(mm>=60?(Math.floor(mm/60)+"h "+(mm%60)+"m"):(mm+"m"))+"</b>";}
+    if(left<=0){line.classList.add("due");$("reapplyTxt").innerHTML="⏰ <b>Reapplication due</b> — reapply "+prodLabel(activeProd())+".";}
+    else{line.classList.remove("due");var mm=Math.ceil(left/6e4);$("reapplyTxt").innerHTML="Reapply "+prodLabel(activeProd())+" in <b>"+(mm>=60?(Math.floor(mm/60)+"h "+(mm%60)+"m"):(mm+"m"))+"</b>";}
   }
 
   function weekStats(){
@@ -1160,7 +1166,7 @@
       spf:calculateEffectiveSPF(),
       sides:sides,
       burned:burned,
-      note:(prod.id==="bare"?"Bare skin":prod.name)+(prod.spf?(" · SPF "+prod.spf):"")+" · "+sides.join("+")+(burned?" · 🔴 burned":"")
+      note:prodLabel(prod)+" · "+sides.join("+")+(burned?" · 🔴 burned":"")
     });
     if(burned)applyBurn(when);
     timer.accumulatedSec=0;
@@ -1233,13 +1239,13 @@
   }
   function renderLog(){var list=$("logList"),n=state.sessions.length,mins=0;state.sessions.forEach(function(s){mins+=s.min;});$("sTotal").textContent=n;$("sMins").textContent=mins;$("sStreak").textContent=streak();drawTanChart();renderWeek();renderTanForecast();
     if(n===0){list.innerHTML="<div class='empty'><div class='ico'>☀️</div><p>No sessions yet.</p><p>Start the timer or tap + to log one.</p></div>";return;}
-    list.innerHTML="";state.sessions.forEach(function(s){var d=new Date(s.when),date=d.toLocaleDateString([],{weekday:"short",month:"short",day:"numeric"}),time=d.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});var el=document.createElement("div");el.className="card log-item";el.innerHTML="<div class='log-uv' style='background:"+uvColor(s.uv)+"'>"+(s.uv!=null?s.uv:"–")+"</div><div class='log-body'><div class='d'>"+date+" · "+time+"</div><div class='m'>"+(s.note||"Tanning session")+"</div></div><div class='log-min'>"+s.min+"m</div><button class='del' aria-label='Delete'>×</button>";el.querySelector(".del").onclick=function(ev){ev.stopPropagation();delSession(s.id);};el.style.cursor="pointer";el.setAttribute("role","button");el.setAttribute("aria-label","Edit session");el.onclick=function(){haptic(8);openEdit(s);};list.appendChild(el);});}
+    list.innerHTML="";state.sessions.forEach(function(s){var d=new Date(s.when),date=d.toLocaleDateString([],{weekday:"short",month:"short",day:"numeric"}),time=d.toLocaleTimeString([],{hour:"numeric",minute:"2-digit",hour12:true});var el=document.createElement("div");el.className="card log-item";el.innerHTML="<div class='log-uv' style='background:"+uvColor(s.uv)+"'>"+(s.uv!=null?s.uv:"–")+"</div><div class='log-body'><div class='d'>"+date+" · "+time+"</div><div class='m'>"+(s.note||"Tanning session")+"</div></div><div class='log-min'>"+s.min+"m</div><button class='del' aria-label='Delete'>×</button>";el.querySelector(".del").onclick=function(ev){ev.stopPropagation();delSession(s.id);};el.style.cursor="pointer";el.setAttribute("role","button");el.setAttribute("aria-label","Edit session");el.onclick=function(){haptic(8);openEdit(s);};list.appendChild(el);});}
   function drawTanChart(){var svg=$("tanchart");svg.innerHTML="";var ns="http://www.w3.org/2000/svg",cw=320,ch=100,pad=6,now=Date.now(),days=30,cap=skin().cap,tc=themeColors();var pts=[];for(var i=days;i>=0;i--)pts.push({x:(days-i)/days,y:tanAt(now-i*864e5)});animateCount($("chartPct"),tanAt(now));var t0=TONE[state.skin][0],t1=TONE[state.skin][1];var defs=document.createElementNS(ns,'defs');defs.innerHTML="<linearGradient id='tg' x1='0' y1='0' x2='1' y2='0'><stop offset='0' stop-color='"+t0+"'/><stop offset='1' stop-color='"+t1+"'/></linearGradient><linearGradient id='tgf' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='"+t1+"' stop-opacity='.35'/><stop offset='1' stop-color='"+t1+"' stop-opacity='0'/></linearGradient>";svg.appendChild(defs);function X(x){return pad+x*(cw-2*pad);}function Y(y){return (ch-pad)-(y/Math.max(cap,1))*(ch-2*pad);}var line="";pts.forEach(function(p,i){line+=(i===0?"M":"L")+X(p.x).toFixed(1)+" "+Y(p.y).toFixed(1)+" ";});var ar=document.createElementNS(ns,'path');ar.setAttribute('d',line+"L"+X(1)+" "+(ch-pad)+" L"+X(0)+" "+(ch-pad)+" Z");ar.setAttribute('fill','url(#tgf)');svg.appendChild(ar);var ln=document.createElementNS(ns,'path');ln.setAttribute('d',line);ln.setAttribute('fill','none');ln.setAttribute('stroke','url(#tg)');ln.setAttribute('stroke-width','2.5');ln.setAttribute('stroke-linecap','round');svg.appendChild(ln);var lp=pts[pts.length-1],c=document.createElementNS(ns,'circle');c.setAttribute('cx',X(lp.x));c.setAttribute('cy',Y(lp.y));c.setAttribute('r','4');c.setAttribute('fill',t1);svg.appendChild(c);}
 
   // ---- products ----
-  function renderProductList(){var host=$("productList");host.innerHTML="";state.products.forEach(function(p){var row=document.createElement("div");row.className="prod-row";row.innerHTML="<div class='pi' style='background:"+(p.kind==="oil"?"rgba(255,157,60,.18)":"rgba(122,209,154,.18)")+"'>"+(p.kind==="oil"?"🟠":"🟢")+"</div><div class='pb'><div class='n'>"+p.name+"</div><div class='s'>"+(p.kind==="oil"?"Tanning oil":"Sunscreen")+" · "+(p.spf?("SPF "+p.spf):"no SPF")+"</div></div>";if(!p.fixed){var del=document.createElement("button");del.className="del";del.textContent="×";del.onclick=function(){state.products=state.products.filter(function(x){return x.id!==p.id;});if(state.activeProduct===p.id){state.activeProduct="bare";Store.write("bask.activeProduct","bare");}Store.write("bask.products",state.products);renderProductList();renderProductChips();renderToday();};row.appendChild(del);}host.appendChild(row);});}
+  function renderProductList(){var host=$("productList");host.innerHTML="";state.products.forEach(function(p){var row=document.createElement("div");row.className="prod-row";row.innerHTML="<div class='pi' style='background:"+(p.kind==="oil"?"rgba(255,157,60,.18)":"rgba(122,209,154,.18)")+"'>"+(p.kind==="oil"?"🟠":"🟢")+"</div><div class='pb'><div class='n'>"+(p.id==="bare"?"Bare skin":(p.kind==="oil"?"Tanning Oil":"Sunscreen"))+"</div><div class='s'>"+(p.spf?("SPF "+p.spf):"no SPF")+"</div></div>";if(!p.fixed){var del=document.createElement("button");del.className="del";del.textContent="×";del.onclick=function(){state.products=state.products.filter(function(x){return x.id!==p.id;});if(state.activeProduct===p.id){state.activeProduct="bare";Store.write("bask.activeProduct","bare");}Store.write("bask.products",state.products);renderProductList();renderProductChips();renderToday();};row.appendChild(del);}host.appendChild(row);});}
   var pKind="oil";document.querySelectorAll("#pKindSeg button").forEach(function(btn){btn.onclick=function(){document.querySelectorAll("#pKindSeg button").forEach(function(b){b.setAttribute("aria-pressed","false");});btn.setAttribute("aria-pressed","true");pKind=btn.dataset.kind;};});
-  $("addProduct").onclick=function(){var name=$("pName").value.trim();if(!name){$("pName").focus();return;}var spf=parseInt($("pSpf").value,10);if(isNaN(spf)||spf<0)spf=0;state.products.push({id:"p"+Date.now(),name:name,kind:pKind,spf:spf});Store.write("bask.products",state.products);$("pName").value="";$("pSpf").value="";renderProductList();renderProductChips();toast("Added "+name);};
+  $("addProduct").onclick=function(){var spf=parseInt($("pSpf").value,10);if(isNaN(spf)||spf<0)spf=0;if(spf>100)spf=100;var dup=state.products.find(function(p){return !p.fixed&&p.kind===pKind&&(p.spf||0)===spf;});var prod=dup||{id:"p"+Date.now(),kind:pKind,spf:spf};if(!dup){prod.name=prodLabel(prod);state.products.push(prod);Store.write("bask.products",state.products);}$("pSpf").value="";renderProductList();renderProductChips();toast((dup?"Already added · ":"Added ")+prodLabel(prod));};
 
   // ---- goal ----
   function renderGoalSeg(){var seg=$("goalSeg");seg.innerHTML="";[{v:0,l:"Off"},{v:40,l:"Light"},{v:65,l:"Golden"},{v:90,l:"Deep"}].forEach(function(o){var b=document.createElement("button");b.textContent=o.l;b.setAttribute("aria-pressed",state.goal===o.v?"true":"false");b.onclick=function(){state.goal=o.v;Store.write("bask.goal",o.v);renderGoalSeg();renderTan();};seg.appendChild(b);});}
@@ -1386,7 +1392,7 @@
   };
   $("shareBtn").onclick=function(){haptic(10);shareGlow();};
   $("recoveryClear").onclick=function(){state.recoveryUntil=0;Store.write("bask.recoveryUntil",0);renderToday();toast("Lockout cleared — tan gently");};
-  $("reapplyReset").onclick=function(){state.productAppliedAt=Date.now();Store.write("bask.productAppliedAt",state.productAppliedAt);renderReapply();toast("Reapplication timer reset");};
+  $("reapplyReset").onclick=function(){state.productAppliedAt=Date.now();Store.write("bask.productAppliedAt",state.productAppliedAt);renderReapply();haptic();toast("Logged — "+prodLabel(activeProd())+" reapplied");};
   $("weekHead").onclick=function(){state.weekOpen=!state.weekOpen;Store.write("bask.weekOpen",state.weekOpen);$("weekCard").classList.toggle("open",state.weekOpen);};
 
   // ---- tan mode selectors ----
@@ -1448,7 +1454,7 @@
   // ---- init ----
   function initSettingsUI(){document.querySelectorAll("#sourceSeg button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.src===state.source?"true":"false");});$("keyField").style.display=state.source==="openuv"?"block":"none";$("openuvKey").value=state.openuvKey||"";updateLocLabels();}
   function renderAll(){renderSkinChips();renderProductChips();renderProductList();renderModeSeg();renderThemeSeg();renderEnvChips();renderSidesChips();renderToday();renderLog();}
-  function clock(){var d=new Date();$("clock").textContent=" · "+d.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});}
+  function clock(){var d=new Date();$("clock").textContent=" · "+d.toLocaleTimeString([],{hour:"numeric",minute:"2-digit",hour12:true});}
 
   function syncClockToSystem() {
     var now = new Date();
