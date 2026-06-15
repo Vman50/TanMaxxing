@@ -1,6 +1,6 @@
 # TanMaxxing ☀️
 
-**Optimize Your Glow** — a mobile-first web app that tracks the UV index for your
+**Build Your Tan** — a mobile-first web app that tracks the UV index for your
 location and helps you time tanning sessions to build a tan while staying clear of
 sunburn.
 
