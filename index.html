@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>Bask — Tan by the numbers</title>
+<title>TanMaxxing — Optimize Your Glow</title>
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="Bask" />
+<meta name="apple-mobile-web-app-title" content="TanMaxxing" />
 <meta name="theme-color" content="#efe3d4" id="themeColorMeta" />
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cdefs%3E%3CradialGradient id='g' cx='35%25' cy='30%25'%3E%3Cstop offset='0' stop-color='%23f0c79a'/%3E%3Cstop offset='.6' stop-color='%23c9824e'/%3E%3Cstop offset='1' stop-color='%238c5028'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='42' fill='%23efe3d4'/%3E%3Ccircle cx='90' cy='90' r='54' fill='url(%23g)'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -75,26 +75,33 @@
   /* stat trio */
   .trio{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;}
   .trio .s{padding:14px 10px;text-align:center;}
-  .trio .s .v{font-family:'Fraunces',serif;font-weight:600;font-size:25px;line-height:1;color:var(--heading);}
-  .trio .s .v u{font-size:12px;text-decoration:none;color:var(--muted);}
+  .trio .s .v{font-family:'Fraunces',serif;font-weight:600;font-size:23px;line-height:1;color:var(--heading);}
+  .trio .s .v u{font-size:11px;text-decoration:none;color:var(--muted);}
   .trio .s .k{font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-top:6px;}
+
+  /* Advisor Card */
+  .advisor-card { margin-top: 12px; padding: 16px 18px; border-left: 4px solid var(--accent); }
+  .advisor-card h4 { font-family: 'Fraunces', serif; font-size: 16px; margin-bottom: 4px; color: var(--heading); }
+  .advisor-card p { font-size: 13px; color: var(--muted); line-height: 1.4; }
 
   /* dial */
   .dialcard{margin-top:14px;padding:22px 22px 20px;text-align:center;}
-  .dial{position:relative;width:206px;height:206px;margin:2px auto 16px;cursor:pointer;}
+  .dial{position:relative;width:206px;height:206px;margin:2px auto 16px;}
   .dial svg{transform:rotate(-90deg);}
   .dial .glow{position:absolute;inset:26px;border-radius:50%;background:radial-gradient(circle,rgba(201,130,79,.16),transparent 70%);filter:blur(8px);opacity:var(--dialglow,0);}
   .dial .c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;}
   .dial .c .n{font-family:'Fraunces',serif;font-weight:600;font-size:52px;letter-spacing:-.02em;line-height:1;color:var(--heading);}
-  .dial .c .n.t{font-size:46px;}
-  .dial .c .l{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:8px;}
-  .dial .c .tap{font-size:11px;color:var(--accent);margin-top:8px;}
+  .dial .c .n.t{font-size:36px;}
+  .dial .c .l{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+  .dial .c .side-indicator{font-size:12px;font-weight:600;color:var(--accent);margin-top:4px;background:var(--pill);padding:2px 8px;border-radius:8px;}
+  .dial .c .tap{font-size:11px;color:var(--accent);margin-top:4px;}
   .btn{width:100%;border:none;border-radius:20px;padding:17px;font-family:'Fraunces',serif;font-weight:600;font-size:17px;cursor:pointer;transition:.12s;color:#fff;}
   .btn:active{transform:scale(.985);}
   .btn-go{background:var(--accent-grad);box-shadow:0 8px 24px rgba(179,112,47,.34);}
-  .btn-stop{background:linear-gradient(120deg,#d9534f,#df7d76);box-shadow:0 8px 24px rgba(217,83,79,.34);}
+  .btn-stop{background:linear-gradient(120deg,#cf7a3a,#df9d76);box-shadow:0 8px 24px rgba(207,122,58,.34);}
   .btn-ghost{background:var(--card);color:var(--text);border:1px solid var(--card-line);}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .row3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
 
   /* tan gem card */
   .tancard{margin-top:14px;padding:18px;display:flex;align-items:center;gap:18px;}
@@ -199,7 +206,7 @@
   .sk .n{font-family:'Fraunces',serif;font-size:13px;margin-top:6px;color:var(--text);}
   .onb .loc{width:100%;border:1px solid var(--card-line);background:var(--card);color:var(--text);font-weight:600;font-size:15px;padding:15px;border-radius:18px;cursor:pointer;margin-top:18px;backdrop-filter:blur(10px);}
   .onb .go{width:100%;border:none;background:var(--accent-grad);color:#fff;font-family:'Fraunces',serif;font-weight:600;font-size:17px;padding:17px;border-radius:18px;cursor:pointer;margin-top:12px;}
-  .onb .skip{background:none;border:none;color:var(--muted);font:inherit;font-size:13px;margin:14px auto 0;cursor:pointer;display:block;}
+  .onb .skip{background:none;border:none;color:var(--muted);font-family:'Inter';font-size:13px;margin:14px auto 0;cursor:pointer;display:block;}
   /* wizard */
   .onb-progress{display:flex;gap:7px;justify-content:center;padding:6px 0 4px;}
   .onb-progress .pd{width:8px;height:8px;border-radius:50%;background:var(--card-line);transition:.25s;}
@@ -272,10 +279,16 @@
       <div class="window">☀ <span id="windowTxt">Best tan window —</span></div>
     </div>
 
+    <!-- SPF CALCULATOR AND ADVISOR HOOK -->
+    <div class="card advisor-card reveal d1" id="spfAdvisor">
+      <h4>Smart SPF Advisor</h4>
+      <p id="spfAdvisorTxt">Select or manage what you are wearing below to view optimization data.</p>
+    </div>
+
     <div class="trio reveal d1">
-      <div class="card s"><div class="v" id="safeMin">—<u>m</u></div><div class="k">Tan time</div></div>
+      <div class="card s"><div class="v" id="safeMin">—<u>m</u></div><div class="k">Per Side</div></div>
+      <div class="card s"><div class="v" id="totalSessionMin">—<u>m</u></div><div class="k">Total Session</div></div>
       <div class="card s"><div class="v" id="burnMin">—<u>m</u></div><div class="k">Burns at</div></div>
-      <div class="card s"><div class="v" id="vitD">—</div><div class="k">Vit D ≈ IU</div></div>
     </div>
 
     <div class="card dialcard reveal d2">
@@ -290,9 +303,23 @@
             <linearGradient id="ringD" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbbf24"/><stop offset="1" stop-color="#f97316"/></linearGradient>
           </defs>
         </svg>
-        <div class="c"><div class="n" id="dialBig">—</div><div class="l" id="dialLab">min to tan</div><div class="tap" id="dialTap">tap to start</div></div>
+        <div class="c">
+          <div class="n" id="dialBig">—</div>
+          <div class="l" id="dialLab">min to tan</div>
+          <div class="side-indicator" id="dialSide" style="display:none;">Side A</div>
+          <div class="tap" id="dialTap">tap to start</div>
+        </div>
       </div>
-      <button class="btn btn-go" id="timerBtn">Start session</button>
+      
+      <!-- TIMING CONTROL TOGGLES -->
+      <div id="timerControls">
+        <button class="btn btn-go" id="timerBtn">Start session</button>
+      </div>
+      <div id="pauseControls" style="display:none; margin-top:10px;" class="row3">
+        <button class="btn btn-go" id="resumeBtn" style="padding:12px 6px; font-size:14px;">Resume</button>
+        <button class="btn btn-stop" id="flipBtn" style="padding:12px 6px; font-size:14px; background:linear-gradient(120deg,#b3702f,#df9d76);">Flip Sides</button>
+        <button class="btn btn-stop" id="finishBtn" style="padding:12px 6px; font-size:14px; background:linear-gradient(120deg,#d9534f,#df7d76);">Finish</button>
+      </div>
     </div>
 
     <div class="card tancard reveal d3">
@@ -344,9 +371,20 @@
 <div class="scrim" id="scrim"></div>
 <div class="toast" id="toast"></div>
 
+<!-- CONFIRMATION SHEET -->
+<div class="sheet" id="confirmFinishSheet">
+  <div class="grab"></div>
+  <h2>Finish Session?</h2>
+  <p class="sub" id="confirmSessionDetails">Are you sure you want to end and save your current session logs?</p>
+  <div class="row2">
+    <button class="btn btn-ghost" id="confirmCancelBtn">No, Keep Tracking</button>
+    <button class="btn btn-go" id="confirmSaveBtn" style="background:var(--accent-grad);">Yes, Save Logs</button>
+  </div>
+</div>
+
 <!-- SETTINGS -->
 <div class="sheet" id="settingsSheet">
-  <div class="grab"></div><h2>Settings</h2><p class="sub">Tune Bask to you.</p>
+  <div class="grab"></div><h2>Settings</h2><p class="sub">Tune TanMaxxing to you.</p>
   <div class="field"><label>Your skin type (Fitzpatrick)</label><div class="chips" id="skinChips"></div><button class="btn btn-ghost" id="retakeQuiz" style="margin-top:10px;font-size:14px;padding:12px;">Retake skin-type quiz</button></div>
   <div class="field"><label>Tan mode</label><div class="modeseg-settings" id="modeSegSettings"></div></div>
   <div class="field"><label>Glow goal</label><div class="seg" id="goalSeg"></div></div>
@@ -354,14 +392,14 @@
   <div class="field"><label>UV data source</label><div class="seg" id="sourceSeg"><button data-src="openmeteo" aria-pressed="true">Open-Meteo<br><span style="font-size:11px;color:var(--muted);">free · no key</span></button><button data-src="openuv" aria-pressed="false">OpenUV<br><span style="font-size:11px;color:var(--muted);">needs key</span></button></div></div>
   <div class="field" id="keyField" style="display:none;"><label>OpenUV API key</label><input type="password" id="openuvKey" placeholder="x-access-token from openuv.io" /><div class="hint">Free key, 50 lookups/day. Stored only on this device.</div></div>
   <div class="field"><label>Your data</label><div class="row2"><button class="btn btn-ghost" id="exportBtn">Export</button><button class="btn btn-ghost" id="importBtn">Import</button></div><input type="file" id="importFile" accept="application/json" style="display:none;" /></div>
-  <button class="btn btn-go" id="openSciBtn" style="margin-bottom:10px;">How Bask calculates</button>
+  <button class="btn btn-go" id="openSciBtn" style="margin-bottom:10px;">How TanMaxxing calculates</button>
   <button class="btn btn-ghost" id="closeSettings">Done</button>
   <p class="disclaimer">Estimates only, not medical advice. UV exposure carries skin-damage and skin-cancer risk; these numbers help avoid burning, not make tanning safe.</p>
 </div>
 
 <!-- PRODUCTS -->
 <div class="sheet" id="productsSheet">
-  <div class="grab"></div><h2>Your products</h2><p class="sub">Add the sunscreens and tanning oils you own. Pick one before each session.</p>
+  <div class="grab"></div><h2>Your products</h2><p class="sub">Add the sunscreens and tanning oils you own to accurately optimize UV absorption rules.</p>
   <div id="productList"></div>
   <div class="field"><label>Add a product</label><input type="text" id="pName" placeholder="e.g. Hawaiian Tropic oil" style="margin-bottom:8px;" /><div class="seg" id="pKindSeg" style="margin-bottom:8px;"><button data-kind="oil" aria-pressed="true">🟠 Tanning oil</button><button data-kind="sunscreen" aria-pressed="false">🟢 Sunscreen</button></div><input type="number" id="pSpf" min="0" max="100" placeholder="SPF on the bottle (0 if none)" /></div>
   <button class="btn btn-go" id="addProduct">Add product</button><div style="height:8px"></div><button class="btn btn-ghost" id="closeProducts">Done</button><div style="height:8px"></div>
@@ -369,14 +407,13 @@
 
 <!-- SCIENCE -->
 <div class="sheet" id="sciSheet">
-  <div class="grab"></div><h2>How Bask calculates</h2>
+  <div class="grab"></div><h2>How TanMaxxing calculates</h2>
   <div class="sci">
     <p><b>Live UV.</b> Real hourly forecasts from Open-Meteo (major weather models) for your coordinates, or OpenUV with a key. The curve is the real forecast, with night shaded between sunset and sunrise.</p>
     <p><b>Burn time.</b> UV Index means erythemal irradiance = <code>UVI × 0.025 W/m²</code> (CIE/WHO). Time to redness ≈ <code>MED ÷ (1.5 × UVI)</code> min, where MED is your skin's minimal erythemal dose.</p>
     <p><b>MED (J/m², approx):</b> I 200 · II 250 · III 350 · IV 450 · V 600 · VI 1000.</p>
     <p><b>Sunscreen / oil.</b> Your product's SPF multiplies burn time, applied conservatively (~half label, since real coverage is thin) so the safe number errs short.</p>
     <p><b>Glow.</b> Each session adds UV dose <code>(UVI × min × 0.015 SED)</code> to a melanin stimulus that saturates toward your type's ceiling and fades on an ~18-day half-life.</p>
-    <p><b>Vitamin D</b> is a rough estimate from UVB dose and skin type — lighter skin synthesises faster; skin self-limits, so it's capped.</p>
   </div>
   <button class="btn btn-go" id="closeSci">Got it</button>
   <p class="disclaimer">Models are estimates; individual skin varies. Not medical advice.</p>
@@ -386,7 +423,7 @@
 <div class="sheet" id="addSheet">
   <div class="grab"></div><h2>Log a session</h2><p class="sub">Add a tan you've already done.</p>
   <div class="field"><label>When</label><input type="datetime-local" id="aWhen" /></div>
-  <div class="field"><label>Minutes</label><input type="number" id="aMin" min="1" max="600" placeholder="e.g. 25" /></div>
+  <div class="field"><label>Minutes (Total)</label><input type="number" id="aMin" min="1" max="600" placeholder="e.g. 25" /></div>
   <div class="field"><label>Peak UV</label><input type="number" id="aUV" min="0" max="14" placeholder="e.g. 6" /></div>
   <div class="field"><label>Note (optional)</label><textarea id="aNote" placeholder="Front + back, coconut oil, slight pink…"></textarea></div>
   <div class="row2"><button class="btn btn-ghost" id="addCancel">Cancel</button><button class="btn btn-go" id="addSave">Save</button></div><div style="height:8px"></div>
@@ -400,8 +437,8 @@
     <!-- Step 1: welcome -->
     <div class="step on" id="step0">
       <div class="orb" style="margin-top:18px;"></div>
-      <h2>Your <em>golden</em><br>hour, measured.</h2>
-      <p class="lede">Bask reads the real UV where you stand, tunes it to your skin, and tracks every shade you earn. Let's set you up — takes a minute.</p>
+      <h2>Your <em>golden</em><br>hour, optimized.</h2>
+      <p class="lede">TanMaxxing reads the real UV where you stand, balances it against your skin metrics and your topical SPF setups to calculate precision side-split safety sessions.</p>
       <div class="onb-nav" style="margin-top:30px;"><button class="next" id="go0">Get started</button></div>
       <button class="skip" id="onbSkip">Skip setup</button>
     </div>
@@ -442,7 +479,7 @@
       <div class="orb" style="margin-top:18px;"></div>
       <div class="eyebrow">Step 3 · your sky</div>
       <h2>Turn on live UV</h2>
-      <p class="lede">Bask uses your location to pull the real UV forecast. It stays on your device — no account, no tracking.</p>
+      <p class="lede">TanMaxxing uses your location to pull the real UV forecast. It stays on your device — no account, no tracking.</p>
       <button class="loc" id="onbLoc">📍 Use my location</button>
       <div class="onb-nav" style="margin-top:12px;"><button class="back" id="back4">‹</button><button class="next" id="onbGo">Start glowing</button></div>
     </div>
@@ -465,7 +502,8 @@
   var state={
     skin:Store.read("bask.skin",3), products:Store.read("bask.products",DEFAULT_PRODUCTS),
     activeProduct:Store.read("bask.activeProduct","bare"), manualUV:Store.read("bask.manualUV",5),
-    source:Store.read("bask.source","openmeteo"), openuvKey:Store.read("bask.openuvKey",""),
+    source:Store.read("bask.source","openmeteo"),
+    openuvKey: (function(){ try { var k=Store.read("bask.openuvKey",""); return k ? atob(k) : ""; } catch(e) { return ""; } })(),
     loc:Store.read("bask.loc",null), live:Store.read("bask.live",null),
     sessions:Store.read("bask.sessions",[]),
     goal:Store.read("bask.goal",0), onboarded:Store.read("bask.onboarded",false),
@@ -481,14 +519,31 @@
   function $(id){return document.getElementById(id);}
   function skin(){return SKIN.find(function(s){return s.id===state.skin;})||SKIN[2];}
   function activeProd(){return state.products.find(function(p){return p.id===state.activeProduct;})||state.products[0];}
-  function effSPF(){var s=activeProd().spf||0;return s<=1?1:1+(s-1)*0.5;}
-  function burnMin(uv){if(uv<=0.2)return Infinity;return skin().med/(1.5*uv)*effSPF();}
-  function safeMin(uv){var b=burnMin(uv);if(!isFinite(b))return 0;return Math.max(0,Math.round(Math.min(b*curMode().factor,180)));}
+  function calculateEffectiveSPF(){var s=activeProd().spf||0;return s<=1?1:Math.max(1, Math.sqrt(s));}
+  function burnMin(uv){if(uv<=0.2)return Infinity;return skin().med/(1.5*uv)*calculateEffectiveSPF();}
+  
+  function safeMin(uv){var burnTimeMinutes=burnMin(uv);if(!isFinite(burnTimeMinutes))return 0;return Math.max(0,Math.round(Math.min((burnTimeMinutes*curMode().factor)/2,90)));}
+  
   function vitDIU(uv,min){if(uv<=0||min<=0)return 0;return Math.min(10000,Math.round(uv*min*skin().vd));}
   function nowHour(){var d=new Date();return d.getHours()+d.getMinutes()/60;}
   function lerpHex(a,b,t){function h(x){return parseInt(x,16);}function c(x){x=Math.max(0,Math.min(255,Math.round(x))).toString(16);return x.length<2?"0"+x:x;}return "#"+c(h(a.slice(1,3))+(h(b.slice(1,3))-h(a.slice(1,3)))*t)+c(h(a.slice(3,5))+(h(b.slice(3,5))-h(a.slice(3,5)))*t)+c(h(a.slice(5,7))+(h(b.slice(5,7))-h(a.slice(5,7)))*t);}
 
-  function tanAt(ms){var cap=skin().cap,Ss=8,dd=Math.pow(0.5,1/18);var ss=state.sessions.filter(function(s){return s.when<=ms;}).sort(function(a,b){return a.when-b.when;});if(!ss.length)return 0;var S=0,last=ss[0].when;for(var i=0;i<ss.length;i++){var d=(ss[i].when-last)/864e5;if(d>0)S*=Math.pow(dd,d);S+=(ss[i].uv||2)*ss[i].min*0.015;last=ss[i].when;}var d2=(ms-last)/864e5;if(d2>0)S*=Math.pow(dd,d2);return Math.max(0,Math.min(cap,cap*(1-Math.exp(-S/Ss))));}
+  function tanAt(ms){
+      var cap=skin().cap, sessionSaturator=8, dailyDecay=Math.pow(0.5,1/18);
+      var ss=state.sessions.filter(function(s){return s.when<=ms;}).sort(function(a,b){return a.when-b.when;});
+      if(!ss.length)return 0;
+      var cumulativeDose=0, last=ss[0].when;
+      for(var i=0;i<ss.length;i++){
+        var daysSince=(ss[i].when-last)/864e5;
+        if(daysSince>0) cumulativeDose*=Math.pow(dailyDecay,daysSince);
+        cumulativeDose+=(ss[i].uv||2)*ss[i].min*0.015;
+        last=ss[i].when;
+      }
+      var daysSinceLast=(ms-last)/864e5;
+      if(daysSinceLast>0) cumulativeDose*=Math.pow(dailyDecay,daysSinceLast);
+      return Math.max(0,Math.min(cap,cap*(1-Math.exp(-cumulativeDose/sessionSaturator))));
+  }
+
   function lastSessionMs(){if(!state.sessions.length)return null;return Math.max.apply(null,state.sessions.map(function(s){return s.when;}));}
   function shadeName(p){var c=skin().cap,r=p/c;if(p<2)return"Untanned";if(r<0.25)return"Faint glow";if(r<0.5)return"Light tan";if(r<0.75)return"Golden";if(r<0.95)return"Bronzed";return"Deep bronze";}
   function streak(){if(!state.sessions.length)return 0;var days={};state.sessions.forEach(function(s){days[new Date(s.when).toDateString()]=1;});var n=0,d=new Date();d.setHours(12,0,0,0);if(!days[d.toDateString()]){d.setDate(d.getDate()-1);if(!days[d.toDateString()])return 0;}while(days[d.toDateString()]){n++;d.setDate(d.getDate()-1);}return n;}
@@ -530,6 +585,33 @@
   function renderSkinChips(){buildChips($("skinChips"),SKIN,function(){return state.skin;},function(v){state.skin=v;Store.write("bask.skin",v);},function(it){return "<span>Type "+it.label+"</span><span class='t'>"+it.tip+"</span>";});}
   function renderProductChips(){buildChips($("productChips"),state.products,function(){return state.activeProduct;},function(v){state.activeProduct=v;Store.write("bask.activeProduct",v);},function(p){return "<span>"+(p.kind==="oil"?"🟠 ":"🟢 ")+p.name+"</span><span class='t'>"+(p.spf?("SPF "+p.spf):"no SPF")+"</span>";},{label:"+ Add",onClick:function(){openSheet($("productsSheet"));}});}
 
+  // ---- Smart Science SPF Advisor logic ----
+  function updateSpfAdvisor(uv) {
+    var advisor = $("spfAdvisorTxt");
+    var prod = activeProd();
+    
+    if (uv <= 1) {
+      advisor.innerHTML = "UV Index is low. No specialized sunscreen factor required for melanin synthesis right now.";
+      return;
+    }
+
+    if (prod.id === "bare") {
+      if (uv >= 6) {
+        advisor.innerHTML = "⚠️ <b>High UV Warning:</b> Tanning on bare skin is highly risky. Based on your profile, we strongly advise swapping to a product with at least <b>SPF 15-30</b> to prevent peeling and tissue harm.";
+      } else {
+        advisor.innerHTML = "UV index is moderate. Bare skin will synthesize melanin quickly but limits your session time. Monitor timers carefully.";
+      }
+    } else {
+      if (prod.kind === "oil" && prod.spf < 15 && uv >= 6) {
+        advisor.innerHTML = "⚡ <b>Warning:</b> Your current Tanning Oil (SPF " + prod.spf + ") provides minimal protection for this heavy UV index (" + uv.toFixed(1) + "). Consider stepping up to an oil or sunscreen with a higher metric to extend safe exposure window.";
+      } else if (prod.kind === "sunscreen" && prod.spf >= 30) {
+        advisor.innerHTML = "🛡️ <b>Optimal Protection:</b> Your SPF " + prod.spf + " Sunscreen allows safely extended tracking windows. Melanin builds cleanly while blocking intense erythemal burn risks.";
+      } else {
+        advisor.innerHTML = "Your current selection of <b>" + prod.name + " (SPF " + prod.spf + ")</b> offers stable protection. Safe limits have been expanded based on its scientific conversion curve factor.";
+      }
+    }
+  }
+
   // ---- today ----
   var RING=2*Math.PI*90;
   function greetWord(){var h=new Date().getHours();return h<12?"Good morning":h<18?"Good afternoon":"Good evening";}
@@ -537,22 +619,77 @@
     $("greet").textContent=greetWord();
     var cu=currentUV(),pk=peakUV();
     $("uvNowBig").innerHTML=cu.toFixed(1)+"<i id='uvSub'> now · peak "+(pk?pk.toFixed(1):"—")+"</i>";
-    $("safeMin").innerHTML=safeMin(cu)+"<u>m</u>";
+    
+    var singleSide = safeMin(cu);
+    $("safeMin").innerHTML=singleSide+"<u>m</u>";
+    $("totalSessionMin").innerHTML=(singleSide * 2)+"<u>m</u>";
+    
     var b=burnMin(cu);$("burnMin").innerHTML=(isFinite(b)?Math.round(b):"∞")+"<u>m</u>";
-    $("vitD").textContent=vitDIU(cu,safeMin(cu)).toLocaleString();
     var sw=sunWindow();$("sunTimes").innerHTML="<span>☀ "+fmtH(sw.sr)+"</span><span>golden "+fmtH(Math.max(sw.sr,sw.ss-1.5))+"</span><span>"+fmtH(sw.ss)+" ☾</span>";
     var bw=bestWindow();$("windowTxt").innerHTML=bw?("Best tan window <b>"+fmtH(bw.lo)+"–"+fmtH(bw.hi)+"</b>"):"UV stays low today";
+    
+    updateSpfAdvisor(cu);
     drawWave();renderDial();renderTan();
     $("manualBlock").style.display=state.live?"none":"block";
     if(!state.live){$("uvNum").textContent=state.manualUV;$("uvSlider").value=state.manualUV;}
   }
+  
+  // ---- tracking system state & engine update ----
+  var timer={running:false, paused:false, start:0, accumulatedSec:0, currentSide: "A", alerted:false};
+
   function renderDial(){
-    var big=$("dialBig"),lab=$("dialLab"),tap=$("dialTap"),ring=$("ring");
+    var big=$("dialBig"),lab=$("dialLab"),tap=$("dialTap"),ring=$("ring"), sideInd=$("dialSide");
+    var dialContainer=$("dial");
+    dialContainer.setAttribute("role", "progressbar");
+    dialContainer.setAttribute("aria-valuemin", "0");
+    dialContainer.setAttribute("aria-valuemax", "100");
     ring.setAttribute("stroke","url(#ringL)");
-    if(timer.running){var sec=(Date.now()-timer.start)/1000,cu=currentUV(),tgt=safeMin(cu)*60||1800;big.textContent=fmtClock(sec);big.className="n t";var left=Math.ceil((tgt-sec)/60);lab.textContent=left>0?(left+" min left"):"over limit";var dose=Math.round(sec/60/Math.max(burnMin(cu),0.1)*100);tap.textContent=dose+"% to redness";var frac=Math.min(sec/tgt,1);ring.setAttribute("stroke-dashoffset",(RING*frac).toFixed(1));if(frac>=1)ring.setAttribute("stroke","#d9534f");document.querySelector(".dial .glow").style.setProperty("--dialglow",frac>0.5?1:0);
-      if(!timer.alerted&&sec>=tgt){timer.alerted=true;burnAlert();}
-    }else{var s=safeMin(currentUV());big.textContent=s>0?s:"0";big.className="n";lab.textContent="min · "+curMode().name;tap.textContent="tap to start";ring.setAttribute("stroke-dashoffset","0");document.querySelector(".dial .glow").style.setProperty("--dialglow",0);}
+    
+    if(timer.running || timer.paused){
+      sideInd.style.display = "inline-block";
+      sideInd.textContent = "Side " + timer.currentSide;
+      
+      var totalSec = timer.accumulatedSec;
+      if (timer.running) {
+        totalSec += (Date.now() - timer.start) / 1000;
+      }
+      
+      var currentUvIndex=currentUV();
+      var tgtSideMins = safeMin(currentUvIndex);
+      var totalTgtSec = tgtSideMins * 60 || 1800;
+      
+      big.textContent=fmtClock(totalSec);
+      big.className="n t";
+      
+      var left = Math.ceil((totalTgtSec - totalSec) / 60);
+      lab.textContent=left>0?(left+" min to flip"):"side limit reached";
+      
+      var dose=Math.round(totalSec/60/Math.max(burnMin(currentUvIndex),0.1)*100);
+      tap.textContent=dose+"% to redness";
+      
+      var frac=Math.min(totalSec/totalTgtSec,1);
+      ring.setAttribute("stroke-dashoffset",(RING*frac).toFixed(1));
+      if(frac >= 1) ring.setAttribute("stroke","#d9534f");
+      document.querySelector(".dial .glow").style.setProperty("--dialglow",frac>0.5?1:0);
+      dialContainer.setAttribute("aria-valuenow", Math.floor(frac * 100));
+      
+      if(!timer.alerted && totalSec>=totalTgtSec){
+        timer.alerted=true;
+        burnAlert();
+      }
+    }else{
+      sideInd.style.display = "none";
+      var s = safeMin(currentUV());
+      big.textContent=s>0?s:"0";
+      big.className="n";
+      lab.textContent="min per side";
+      tap.textContent="tap to start";
+      ring.setAttribute("stroke-dashoffset","0");
+      document.querySelector(".dial .glow").style.setProperty("--dialglow",0);
+      dialContainer.setAttribute("aria-valuenow", "0");
+    }
   }
+
   function renderTan(){
     var p=tanAt(Date.now()),cap=skin().cap;
     var shade=lerpHex(TONE[state.skin][0],TONE[state.skin][1],Math.min(1,p/cap));
@@ -570,14 +707,153 @@
     if(state.goal>0){gw.style.display="block";$("goalFill").style.width=Math.min(100,Math.round(p/state.goal*100))+"%";if(p>=state.goal&&p>=2){note.textContent="🎉 Goal reached — "+Math.round(p)+"% glow.";}else if(p>=2){note.textContent+=" Goal "+state.goal+"%.";}}
   }
 
-  // ---- timer + alert ----
-  var timer={running:false,start:0,raf:null,alerted:false};
-  function tick(){if(!timer.running)return;renderDial();timer.raf=requestAnimationFrame(tick);}
-  function startTimer(){timer.running=true;timer.start=Date.now();timer.alerted=false;var btn=$("timerBtn");btn.textContent="Stop & log";btn.className="btn btn-stop";tick();}
-  function stopTimer(){timer.running=false;cancelAnimationFrame(timer.raf);var sec=(Date.now()-timer.start)/1000;var mins=Math.max(1,Math.round(sec/60));var cu=Math.round(currentUV()*10)/10;var prod=activeProd();addSession({when:Date.now(),min:mins,uv:cu,note:(prod.id==="bare"?"Bare skin":prod.name)+(prod.spf?(" · SPF "+prod.spf):"")});var btn=$("timerBtn");btn.textContent="Start session";btn.className="btn btn-go";toast("Logged "+mins+" min · "+vitDIU(cu,mins).toLocaleString()+" IU vit D");renderToday();}
-  function toggleTimer(){timer.running?stopTimer():startTimer();}
-  function burnAlert(){try{if(navigator.vibrate)navigator.vibrate([200,80,200]);}catch(e){}try{var ac=new (window.AudioContext||window.webkitAudioContext)();var o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);o.frequency.value=660;g.gain.setValueAtTime(.0001,ac.currentTime);g.gain.exponentialRampToValueAtTime(.25,ac.currentTime+.02);g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+.6);o.start();o.stop(ac.currentTime+.62);}catch(e){}toast("⚠ Safe tan limit reached — time to cover up");}
-  $("timerBtn").onclick=toggleTimer;$("dial").onclick=toggleTimer;
+  // ---- updated side tracking + confirmations controls engine ----
+  let wakeLock = null;
+  let timerWorker = null;
+
+  async function keepScreenAwake() {
+    try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); }
+    catch (err) { console.warn("Wake Lock failed:", err); }
+  }
+
+  function startReliableTimer() {
+    keepScreenAwake();
+    if (!timerWorker) {
+      const workerCode = `
+        let interval;
+        self.onmessage = function(e) {
+          if (e.data === 'start') {
+            if (interval) clearInterval(interval);
+            interval = setInterval(() => self.postMessage('tick'), 1000);
+          } else if (e.data === 'stop') {
+            clearInterval(interval);
+          }
+        };
+      `;
+      const blob = new Blob([workerCode], { type: 'application/javascript' });
+      timerWorker = new Worker(URL.createObjectURL(blob));
+      timerWorker.onmessage = function() {
+        if (timer.running) renderDial();
+      };
+    }
+    timerWorker.postMessage('start');
+  }
+
+  function stopReliableTimer() {
+    if (timerWorker) timerWorker.postMessage('stop');
+    if (wakeLock) wakeLock.release().then(() => wakeLock = null);
+  }
+  
+  function handleMainControlClick(){
+    if(!timer.running && !timer.paused){
+      // Start Session
+      timer.running=true;
+      timer.paused=false;
+      timer.start=Date.now();
+      timer.accumulatedSec=0;
+      timer.currentSide="A";
+      timer.alerted=false;
+      setupActionButtonUI();
+      startReliableTimer();
+    } else if(timer.running){
+      // Intermediary Pausing trigger
+      timer.running=false;
+      timer.paused=true;
+      timer.accumulatedSec += (Date.now() - timer.start) / 1000;
+      stopReliableTimer();
+      setupActionButtonUI();
+      renderDial();
+    }
+  }
+
+  function resumeSession(){
+    timer.running=true;
+    timer.paused=false;
+    timer.start=Date.now();
+    setupActionButtonUI();
+    startReliableTimer();
+  }
+
+  function flipSides(){
+    // Save current side segment progress cleanly to temporary buffer if necessary, reset target factor
+    var sideFinished = timer.currentSide;
+    timer.currentSide = (timer.currentSide === "A") ? "B" : "A";
+    timer.accumulatedSec = 0; // Fresh tracking window layout for Side B
+    timer.start = Date.now();
+    timer.alerted = false;
+    toast("Flipped over to Side " + timer.currentSide);
+    
+    // Automatically resume activity on new side structure
+    resumeSession();
+  }
+
+  function triggerFinishConfirmation(){
+    // Calculate accurate accumulated stats before triggering modal interface layout profiles
+    var calculatedCurrentSec = timer.accumulatedSec;
+    if(timer.running) {
+      calculatedCurrentSec += (Date.now() - timer.start) / 1000;
+    }
+    var totalMins = Math.max(1, Math.round(calculatedCurrentSec / 60));
+    
+    $("confirmSessionDetails").innerHTML = "You have been tracking for a total calculation of <b>" + totalMins + " minutes</b> on your profile layers. Save this workout?";
+    openSheet($("confirmFinishSheet"));
+  }
+
+  function saveFinalizedSession(){
+    closeSheets();
+    timer.running=false;
+    timer.paused=false;
+    stopReliableTimer();
+    
+    var calculatedSec = timer.accumulatedSec;
+    var mins=Math.max(1,Math.round(calculatedSec/60));
+    var cu=Math.round(currentUV()*10)/10;
+    var prod=activeProd();
+    
+    addSession({
+      when:Date.now(),
+      min:mins,
+      uv:cu,
+      note:(prod.id==="bare"?"Bare skin":prod.name)+(prod.spf?(" · SPF "+prod.spf):"") + " (Two-Sided Tracked)"
+    });
+    
+    // reset configurations structural flags completely
+    timer.accumulatedSec=0;
+    timer.currentSide="A";
+    setupActionButtonUI();
+    toast("Logged "+mins+" min · "+vitDIU(cu,mins).toLocaleString()+" IU vit D");
+    renderToday();
+  }
+
+  function setupActionButtonUI(){
+    var mainBtn = $("timerBtn");
+    var pauseZone = $("pauseControls");
+    
+    if(!timer.running && !timer.paused){
+      mainBtn.textContent = "Start Session";
+      mainBtn.className = "btn btn-go";
+      pauseZone.style.display = "none";
+    } else if(timer.running){
+      mainBtn.textContent = "Pause Session";
+      mainBtn.className = "btn btn-stop";
+      pauseZone.style.display = "none";
+    } else if(timer.paused){
+      mainBtn.textContent = "Session Paused";
+      mainBtn.className = "btn btn-ghost";
+      pauseZone.style.display = "grid";
+    }
+  }
+
+  function burnAlert(){try{if(navigator.vibrate)navigator.vibrate([200,80,200]);}catch(e){}try{var ac=new (window.AudioContext||window.webkitAudioContext)();var o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);o.frequency.value=660;g.gain.setValueAtTime(.0001,ac.currentTime);g.gain.exponentialRampToValueAtTime(.25,ac.currentTime+.02);g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+.6);o.start();o.stop(ac.currentTime+.62);}catch(e){}toast("⚠ Side safe limit achieved — consider flipping sides or wrapping up.");}
+  
+  // Bind Tracking Engine Actions
+  $("timerBtn").onclick=handleMainControlClick;
+  $("dial").onclick=handleMainControlClick;
+  $("resumeBtn").onclick=resumeSession;
+  $("flipBtn").onclick=flipSides;
+  $("finishBtn").onclick=triggerFinishConfirmation;
+  $("confirmCancelBtn").onclick=closeSheets;
+  $("confirmSaveBtn").onclick=saveFinalizedSession;
 
   // ---- sessions ----
   function addSession(s){s.id=Date.now()+"-"+Math.random().toString(36).slice(2,6);state.sessions.unshift(s);Store.write("bask.sessions",state.sessions);renderLog();renderTan();}
@@ -607,7 +883,7 @@
   function updateLocLabels(){var name=(state.loc&&state.loc.place)?state.loc.place:(state.loc?"Your location":"Set location");$("locName").textContent=name;$("locSetting").textContent=state.loc?(name+" ("+state.loc.lat.toFixed(2)+", "+state.loc.lng.toFixed(2)+")"):"Not set yet.";}
 
   // ---- export / import ----
-  $("exportBtn").onclick=function(){var data={app:"Bask",version:1,exported:new Date().toISOString(),skin:state.skin,goal:state.goal,products:state.products,sessions:state.sessions};var blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="bask-data-"+new Date().toISOString().slice(0,10)+".json";a.click();toast("Exported your data");};
+  $("exportBtn").onclick=function(){var data={app:"TanMaxxing",version:1,exported:new Date().toISOString(),skin:state.skin,goal:state.goal,products:state.products,sessions:state.sessions};var blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="tanmaxxing-data-"+new Date().toISOString().slice(0,10)+".json";a.click();toast("Exported your data");};
   $("importBtn").onclick=function(){$("importFile").click();};
   $("importFile").onchange=function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(d.sessions)state.sessions=d.sessions;if(d.products)state.products=d.products;if(typeof d.skin==="number")state.skin=d.skin;if(typeof d.goal==="number")state.goal=d.goal;Store.write("bask.sessions",state.sessions);Store.write("bask.products",state.products);Store.write("bask.skin",state.skin);Store.write("bask.goal",state.goal);renderAll();renderGoalSeg();toast("Imported "+(d.sessions?d.sessions.length:0)+" sessions");}catch(err){toast("Couldn't read that file");}};r.readAsText(f);e.target.value="";};
 
@@ -616,7 +892,7 @@
 
   // ---- nav & sheets ----
   var tabs=document.querySelectorAll(".tab");tabs.forEach(function(t){t.onclick=function(){tabs.forEach(function(x){x.setAttribute("aria-current","false");});t.setAttribute("aria-current","true");var w=t.dataset.tab;$("screen-today").classList.toggle("hidden",w!=="today");$("screen-log").classList.toggle("hidden",w!=="log");if(w==="log")drawTanChart();};});
-  var scrim=$("scrim"),sheets=["settingsSheet","addSheet","productsSheet","sciSheet"].map($);
+  var scrim=$("scrim"),sheets=["settingsSheet","addSheet","productsSheet","sciSheet","confirmFinishSheet"].map($);
   function openSheet(s){scrim.classList.add("open");s.classList.add("open");}
   function closeSheets(){scrim.classList.remove("open");sheets.forEach(function(s){s.classList.remove("open");});}
   scrim.onclick=closeSheets;
@@ -627,7 +903,7 @@
   $("manageProducts").onclick=function(){openSheet($("productsSheet"));};
   $("closeProducts").onclick=closeSheets;
   document.querySelectorAll("#sourceSeg button").forEach(function(btn){btn.onclick=function(){document.querySelectorAll("#sourceSeg button").forEach(function(b){b.setAttribute("aria-pressed","false");});btn.setAttribute("aria-pressed","true");state.source=btn.dataset.src;Store.write("bask.source",state.source);$("keyField").style.display=state.source==="openuv"?"block":"none";};});
-  $("openuvKey").addEventListener("input",function(e){state.openuvKey=e.target.value.trim();Store.write("bask.openuvKey",state.openuvKey);});
+  $("openuvKey").addEventListener("input",function(e){state.openuvKey=e.target.value.trim();Store.write("bask.openuvKey",btoa(state.openuvKey));});
   $("useLocation").onclick=function(){state.loc=null;state.live=null;Store.write("bask.loc",null);refreshUV();};
   $("refreshBtn").onclick=function(e){e.stopPropagation();state.live=null;refreshUV();};
   $("statusPill").onclick=function(){if(!state.loc)refreshUV();};
@@ -695,12 +971,21 @@
   function renderAll(){renderSkinChips();renderProductChips();renderProductList();renderModeSeg();renderToday();renderLog();}
   function clock(){var d=new Date();$("clock").textContent=" · "+d.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});}
 
+  function syncClockToSystem() {
+    var now = new Date();
+    var msUntilNextMinute = 60000 - (now.getSeconds() * 1000 + now.getMilliseconds());
+    setTimeout(function() {
+      clock(); if(!timer.running) renderToday();
+      setInterval(function(){clock();if(!timer.running)renderToday();}, 60000);
+    }, msUntilNextMinute);
+  }
+
   initSettingsUI();renderGoalSeg();renderAll();clock();
   if(state.live)setStatus("warn","Saved UV ("+liveAge()+")");else setStatus("warn","Tap to enable live UV");
   if(!state.onboarded){startOnb(false);}else{refreshUV();}
-  setInterval(function(){clock();if(!timer.running)renderToday();},60000);
+  syncClockToSystem();
 
-  try{var mani={name:"Bask",short_name:"Bask",display:"standalone",background_color:"#efe3d4",theme_color:"#efe3d4",start_url:".",icons:[{src:document.querySelector("link[rel='apple-touch-icon']").href,sizes:"180x180",type:"image/svg+xml",purpose:"any"}]};var blob=new Blob([JSON.stringify(mani)],{type:"application/json"});var l=document.createElement("link");l.rel="manifest";l.href=URL.createObjectURL(blob);document.head.appendChild(l);}catch(e){}
+  try{var mani={name:"TanMaxxing",short_name:"TanMaxxing",display:"standalone",background_color:"#efe3d4",theme_color:"#efe3d4",start_url:".",icons:[{src:document.querySelector("link[rel='apple-touch-icon']").href,sizes:"180x180",type:"image/svg+xml",purpose:"any"}]};var blob=new Blob([JSON.stringify(mani)],{type:"application/json"});var l=document.createElement("link");l.rel="manifest";l.href=URL.createObjectURL(blob);document.head.appendChild(l);}catch(e){}
 })();
 </script>
 </body>
