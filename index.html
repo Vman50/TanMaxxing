@@ -740,7 +740,7 @@
   function calculateEffectiveSPF(){var s=activeProd().spf||0;return s<=1?1:Math.max(1,Math.sqrt(s));}
   function burnMin(uv){if(uv<=0.2)return Infinity;return skin().med/(1.5*uv)*calculateEffectiveSPF();}
   
-  function safeMin(uv){var burnTimeMinutes=burnMin(uv);if(!isFinite(burnTimeMinutes))return 0;var m=curMode();return Math.max(0,Math.round(Math.min((burnTimeMinutes*m.factor)/2,m.cap)));}
+  function safeMin(uv){var m=curMode(),burnTimeMinutes=burnMin(uv);if(!isFinite(burnTimeMinutes))return m.cap;return Math.max(0,Math.round(Math.min((burnTimeMinutes*m.factor)/activeSides().length,m.cap)));}
   // Human label for a product, derived from kind + SPF (no user-given name).
   function prodLabel(p){if(!p)return "";if(p.id==="bare")return "Bare skin";var k=p.kind==="oil"?"Tanning Oil":"Sunscreen";return (p.spf>0?("SPF "+p.spf+" "):"")+k;}
   
@@ -756,7 +756,7 @@
       for(var i=0;i<ss.length;i++){
         var daysSince=(ss[i].when-last)/864e5;
         if(daysSince>0) cumulativeDose*=Math.pow(dailyDecay,daysSince);
-        cumulativeDose+=(ss[i].uv||2)*ss[i].min*0.015;
+        if(!ss[i].burned) cumulativeDose+=(ss[i].uv||2)*ss[i].min*0.015/(ss[i].spf||1);
         last=ss[i].when;
       }
       var daysSinceLast=(ms-last)/864e5;
@@ -860,7 +860,7 @@
     
     var singleSide = safeMin(cu);
     $("safeMin").innerHTML=singleSide+"<u>m</u>";
-    var vd=vitDIU(cu,singleSide*2);
+    var vd=vitDIU(cu,singleSide*activeSides().length);
     $("vitDStat").innerHTML=(vd>=1000?(vd/1000).toFixed(1)+"<u>k IU</u>":vd+"<u>IU</u>");
     
     var b=burnMin(cu);$("burnMin").innerHTML=(isFinite(b)?Math.round(b):"∞")+"<u>m</u>";

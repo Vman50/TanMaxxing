@@ -100,6 +100,24 @@ for the 7-day forecast.
 
 No API keys are committed to the repo. Never hard-code a key in `index.html`.
 
+## Development
+
+**Run locally:** Serve the app over HTTP so PWA features (service worker, geolocation,
+Add-to-Home-Screen) work:
+```bash
+python3 -m http.server 8000
+# visit http://localhost:8000
+```
+Opening `index.html` directly still works for most features, just not PWA bits.
+
+**Syntax check:** Extract the `<script>` block and validate it:
+```bash
+node -e "new Function($(sed -n '/<script>/,/<\/script>/p' index.html | sed '1d;$d'))"
+```
+
+**Git workflow:** Always push to the `dev` branch first. Only push to `main` after a full
+codebase review and explicit approval from Vince.
+
 ## Conventions
 
 - Match the existing terse, single-line vanilla-JS style and the CSS-token approach.
@@ -107,7 +125,7 @@ No API keys are committed to the repo. Never hard-code a key in `index.html`.
   the relevant `render*` (e.g. `renderAll()`, `renderToday()`, `renderTan()`).
 - Keep it dependency-free and single-file unless there's a strong reason to split.
 - **Keep this file up to date.** Whenever a change alters something documented here —
-  architecture, state keys, screens/sheets, external services, conventions, or testing —
+  architecture, state keys, screens/sheets, external services, conventions, or development/testing —
   update `CLAUDE.md` in the same change so it never drifts from `index.html`.
 
 ## Testing
