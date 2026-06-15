@@ -287,6 +287,7 @@
   .aside-lbl{font-size:13px;color:var(--sub);}
   .aside-unit{font-size:13px;color:var(--muted2);}
 
+  .dev-banner{background:#1a3a1a;color:#6fdd6f;font-size:11px;font-weight:700;letter-spacing:.12em;text-align:center;padding:4px 0;text-transform:uppercase;}
   .toast{position:fixed;left:50%;bottom:calc(120px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);z-index:90;background:var(--heading);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:99px;opacity:0;pointer-events:none;transition:.25s;max-width:90%;text-align:center;}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
   .toast .ub{background:var(--accent);color:#fff;border:none;border-radius:99px;font:inherit;font-weight:700;font-size:12px;padding:5px 12px;margin-left:10px;cursor:pointer;}
@@ -686,6 +687,7 @@
 <script>
 (function(){
   "use strict";
+  var IS_DEV = (function(){var p=window.location.pathname;return p.includes("/dev/") || p.endsWith("/dev");})();
   var mem={};
   var Store={read:function(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return (k in mem)?mem[k]:d;}},
              write:function(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){mem[k]=v;}}};
@@ -841,7 +843,7 @@
 
   // ---- today ----
   var RING=2*Math.PI*90;
-  function greetWord(){var h=new Date().getHours();return h<12?"Good morning":h<18?"Good afternoon":"Good evening";}
+  function greetWord(){if(IS_DEV)return "DEV BUILD";var h=new Date().getHours();return h<12?"Good morning":h<18?"Good afternoon":"Good evening";}
   // Smoothly count a "%" value from its previous render to the new one.
   function animateCount(el,to){
     if(!el)return;to=Math.round(to);var from=parseInt(el.getAttribute("data-v"),10);if(isNaN(from))from=0;
@@ -1610,6 +1612,7 @@
   }
 
   applyTheme();try{matchMedia("(prefers-color-scheme:dark)").addEventListener("change",function(){if(state.theme==="auto"){applyTheme();renderToday();drawTanChart();}});}catch(e){}
+  if(IS_DEV){var banner=document.createElement("div");banner.className="dev-banner";banner.textContent="⚠ Dev Build";document.querySelector(".app").insertBefore(banner,document.querySelector(".app").firstChild);}
   initSettingsUI();renderGoalSeg();renderAll();clock();
   (function(){var st=Store.read("tanmax.timer",null);if(st&&(st.running||st.paused)){var extra=st.running?(Date.now()-st.start)/1000:0;timer.paused=true;timer.running=false;timer.accumulatedSec=(st.accumulatedSec||0)+extra;timer.completedSidesSec=st.completedSidesSec||0;timer.sideTimes=st.sideTimes||{};timer.currentSide=st.currentSide||activeSides()[0];timer.sidesDone=st.sidesDone||[];timer.alerted=st.alerted||false;timer.warned2min=st.warned2min||false;setupActionButtonUI();renderDial();toast("Session paused — tap Resume to continue");}else{renderPreFill();}})();
   if(state.live)setStatus("warn","Saved UV ("+liveAge()+")");else setStatus("warn","Tap to enable live UV");
@@ -1638,7 +1641,7 @@
     var icon192=drawAppIcon(192,false),icon512=drawAppIcon(512,false),iconMask=drawAppIcon(512,true),iconApple=drawAppIcon(180,false);
     var apple=document.querySelector("link[rel='apple-touch-icon']");if(apple)apple.href=iconApple;
     var fav=document.createElement("link");fav.rel="icon";fav.type="image/png";fav.href=drawAppIcon(64,false);document.head.appendChild(fav);
-    var mani={name:"TanMaxxing — Build Your Tan",short_name:"TanMaxxing",description:"Track UV and time your tanning sessions to build a tan without burning.",display:"standalone",background_color:"#efe3d4",theme_color:"#efe3d4",start_url:".",scope:".",icons:[
+    var mani={name:IS_DEV?"TanMaxxing Dev":"TanMaxxing — Build Your Tan",short_name:IS_DEV?"TanMaxxing Dev":"TanMaxxing",description:"Track UV and time your tanning sessions to build a tan without burning.",display:"standalone",background_color:IS_DEV?"#1a2a1a":"#efe3d4",theme_color:IS_DEV?"#2a4a2a":"#efe3d4",start_url:".",scope:".",icons:[
       {src:icon192,sizes:"192x192",type:"image/png",purpose:"any"},
       {src:icon512,sizes:"512x512",type:"image/png",purpose:"any"},
       {src:iconMask,sizes:"512x512",type:"image/png",purpose:"maskable"}
