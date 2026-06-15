@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>TanMaxxing — Optimize Your Glow</title>
+<title>TanMaxxing — Build Your Tan</title>
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -401,7 +401,7 @@
       <div class="loc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span id="locName">—</span><span id="clock"></span></div>
     </div>
     <div class="hbtns">
-      <button class="icon-btn" id="shareBtn" aria-label="Share my glow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></button>
+      <button class="icon-btn" id="shareBtn" aria-label="Share my tan"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></button>
       <button class="icon-btn" id="openSettings" aria-label="Settings"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
     </div>
   </header>
@@ -490,7 +490,7 @@
       <div class="tan-info">
         <span class="badge" id="tanBadge">No tan</span>
         <h3 id="tanShade">Untanned</h3>
-        <p id="tanNote">Log a session to start your glow.</p>
+        <p id="tanNote">Log a session to start your tan.</p>
         <div class="goalbar" id="goalWrap" style="display:none;"><i id="goalFill"></i></div>
       </div>
     </div>
@@ -517,7 +517,7 @@
   <!-- SESSIONS -->
   <main class="screen hidden" id="screen-log">
     <div class="card tan-chart-card reveal">
-      <div class="top"><h3>Your glow over time</h3><span class="pct" id="chartPct">0%</span></div>
+      <div class="top"><h3>Your tan over time</h3><span class="pct" id="chartPct">0%</span></div>
       <svg class="tanchart" id="tanchart" viewBox="0 0 320 100" preserveAspectRatio="none"></svg>
     </div>
     <div class="stats-grid reveal d1">
@@ -533,7 +533,7 @@
         <div class="wg">
           <div class="wc"><div class="v" id="wkSessions">0</div><div class="k">Sessions</div><div class="dl" id="wkSessionsD"></div></div>
           <div class="wc"><div class="v" id="wkMins">0</div><div class="k">Minutes</div><div class="dl" id="wkMinsD"></div></div>
-          <div class="wc"><div class="v" id="wkPeak">0%</div><div class="k">Peak glow</div></div>
+          <div class="wc"><div class="v" id="wkPeak">0%</div><div class="k">Peak tan</div></div>
           <div class="wc"><div class="v" id="wkStreak">0</div><div class="k">Day streak</div></div>
         </div>
       </div>
@@ -542,7 +542,7 @@
     <!-- TAN FORECAST -->
     <div class="card tanfc reveal d1" id="tanfcCard" style="display:none;">
       <h3>Tan forecast</h3>
-      <div class="lede">If you stop tanning now, your glow fades like this:</div>
+      <div class="lede">If you stop tanning now, your tan fades like this:</div>
       <div id="tanfcRows"></div>
     </div>
 
@@ -581,7 +581,7 @@
   <div class="field"><label>Appearance</label><div class="seg" id="themeSeg"></div></div>
   <div class="field"><label>Sides to rotate</label><div class="envchips" id="sidesChips"></div><div class="hint">The timer rotates through these so each side gets even sun.</div></div>
   <div class="field"><label>Reflective environment</label><div class="envchips" id="envChips"></div><div class="hint">Sand, snow and water bounce extra UV onto your skin — this raises the effective UV used in every calculation.</div></div>
-  <div class="field"><label>Glow goal</label><div class="seg" id="goalSeg"></div></div>
+  <div class="field"><label>Tan goal</label><div class="seg" id="goalSeg"></div></div>
   <div class="field"><label>Location</label><button class="btn btn-ghost" id="useLocation" style="margin-bottom:8px;">📍 Use my location</button><div style="display:flex;gap:8px;margin-bottom:8px;"><input type="text" id="locManualInput" autocapitalize="words" autocomplete="off" enterkeyhint="search" placeholder="Or type a city or place" style="flex:1;" /><button class="btn btn-ghost" id="locManualBtn" style="flex:none;width:auto;padding:13px 18px;font-size:14px;">Set</button></div><div class="hint" id="locSetting">Not set yet.</div></div>
   <div class="field"><label>UV data source</label><div class="seg" id="sourceSeg"><button data-src="openmeteo" aria-pressed="true">Open-Meteo<br><span style="font-size:11px;color:var(--muted);">free · no key</span></button><button data-src="openuv" aria-pressed="false">OpenUV<br><span style="font-size:11px;color:var(--muted);">needs key</span></button></div></div>
   <div class="field" id="keyField" style="display:none;"><label>OpenUV API key</label><input type="password" id="openuvKey" placeholder="x-access-token from openuv.io" /><div class="hint">Free key, 50 lookups/day. Stored only on this device.</div></div>
@@ -607,7 +607,7 @@
     <p><b>Burn time.</b> UV Index means erythemal irradiance = <code>UVI × 0.025 W/m²</code> (CIE/WHO). Time to redness ≈ <code>MED ÷ (1.5 × UVI)</code> min, where MED is your skin's minimal erythemal dose.</p>
     <p><b>MED (J/m², approx):</b> I 200 · II 250 · III 350 · IV 450 · V 600 · VI 1000.</p>
     <p><b>Sunscreen / oil.</b> SPF is rated at a thick lab coat (2 mg/cm²); real coverage is far thinner and protection drops off exponentially (Faurschou &amp; Wulf), so we use an effective SPF ≈ <code>√(label)</code> — e.g. SPF 15 ≈ 3.9×. Low-SPF barely changes; inflated high-SPF claims get discounted, so the safe time errs short. It also assumes you reapply on schedule — sweat and water strip it fast.</p>
-    <p><b>Glow.</b> Each session adds UV dose <code>(UVI × min × 0.015 SED)</code> to a melanin stimulus that saturates toward your type's ceiling and fades on an ~18-day half-life.</p>
+    <p><b>Tan.</b> Each session adds UV dose <code>(UVI × min × 0.015 SED)</code> to a melanin stimulus that saturates toward your type's ceiling and fades on an ~18-day half-life.</p>
   </div>
   <button class="btn btn-go" id="closeSci">Got it</button>
   <p class="disclaimer">Models are estimates; individual skin varies. Not medical advice.</p>
@@ -632,7 +632,7 @@
     <!-- Step 1: welcome -->
     <div class="step on" id="step0">
       <div class="orb" style="margin-top:18px;"></div>
-      <h2>Your <em>golden</em><br>hour, optimized.</h2>
+      <h2>Your tan.<br><em>Dialed in.</em></h2>
       <p class="lede">TanMaxxing reads the real UV where you stand, balances it against your skin metrics and your topical SPF setups to calculate precision side-split safety sessions.</p>
       <div class="onb-nav" style="margin-top:30px;"><button class="next" id="go0">Get started</button></div>
       <button class="skip" id="onbSkip">Skip setup</button>
@@ -677,7 +677,7 @@
       <p class="lede">TanMaxxing uses your location to pull the real UV forecast. It stays on your device — no account, no tracking.</p>
       <button class="loc" id="onbLoc">📍 Use my location</button>
       <div style="display:flex;gap:8px;margin-top:10px;"><input type="text" id="onbLocInput" autocapitalize="words" autocomplete="off" enterkeyhint="search" placeholder="Or type a city / place" style="flex:1;" /><button class="btn btn-ghost" id="onbLocSet" style="flex:none;width:auto;padding:14px 16px;font-size:14px;">Set</button></div>
-      <div class="onb-nav" style="margin-top:12px;"><button class="back" id="back4">‹</button><button class="next" id="onbGo">Start glowing</button></div>
+      <div class="onb-nav" style="margin-top:12px;"><button class="back" id="back4">‹</button><button class="next" id="onbGo">Start tracking</button></div>
     </div>
   </div>
 </div>
@@ -762,7 +762,7 @@
   }
 
   function lastSessionMs(){if(!state.sessions.length)return null;return Math.max.apply(null,state.sessions.map(function(s){return s.when;}));}
-  function shadeName(p){var c=skin().cap,r=p/c;if(p<2)return"Untanned";if(r<0.25)return"Faint glow";if(r<0.5)return"Light tan";if(r<0.75)return"Golden";if(r<0.95)return"Bronzed";return"Deep bronze";}
+  function shadeName(p){var c=skin().cap,r=p/c;if(p<2)return"Untanned";if(r<0.25)return"Base tan";if(r<0.5)return"Light tan";if(r<0.75)return"Golden";if(r<0.95)return"Bronzed";return"Deep bronze";}
   function streak(){if(!state.sessions.length)return 0;var days={};state.sessions.forEach(function(s){days[new Date(s.when).toDateString()]=1;});var n=0,d=new Date();d.setHours(12,0,0,0);if(!days[d.toDateString()]){d.setDate(d.getDate()-1);if(!days[d.toDateString()])return 0;}while(days[d.toDateString()]){n++;d.setDate(d.getDate()-1);}return n;}
 
   function liveCurrent(){if(!state.live)return null;var h=state.live.hourly;if(h&&h.length){var t=nowHour(),lo=null,hi=null;for(var i=0;i<h.length;i++){if(h[i].h<=t)lo=h[i];if(h[i].h>=t&&hi===null)hi=h[i];}if(lo&&hi&&hi.h!==lo.h){var f=(t-lo.h)/(hi.h-lo.h);return Math.max(0,lo.uv+(hi.uv-lo.uv)*f);}if(lo)return Math.max(0,lo.uv);if(hi)return Math.max(0,hi.uv);}return (typeof state.live.current==="number")?state.live.current:null;}
@@ -861,7 +861,7 @@
     $("vitDStat").innerHTML=(vd>=1000?(vd/1000).toFixed(1)+"<u>k IU</u>":vd+"<u>IU</u>");
     
     var b=burnMin(cu);$("burnMin").innerHTML=(isFinite(b)?Math.round(b):"∞")+"<u>m</u>";
-    var sw=sunWindow();$("sunTimes").innerHTML="<span>☀ "+fmtH(sw.sr)+"</span><span>golden "+fmtH(Math.max(sw.sr,sw.ss-1.5))+"</span><span>"+fmtH(sw.ss)+" ☾</span>";
+    var sw=sunWindow();$("sunTimes").innerHTML="<span>☀ "+fmtH(sw.sr)+"</span><span>peak "+fmtH(Math.max(sw.sr,sw.ss-1.5))+"</span><span>"+fmtH(sw.ss)+" ☾</span>";
     var bw=bestWindow();$("windowTxt").innerHTML=bw?("Best tan window <b>"+fmtH(bw.lo)+"–"+fmtH(bw.hi)+"</b>"):"UV stays low today";
     
     updateSpfAdvisor(cu);
@@ -948,13 +948,13 @@
     $("tanShade").textContent=shadeName(p);
     var last=lastSessionMs(),badge=$("tanBadge"),note=$("tanNote"),gw=$("goalWrap");
     gw.style.display="none";
-    if(p<2){badge.className="badge";badge.textContent="No tan";note.textContent="Log a session to start your glow.";$("tanShade").textContent="Untanned";}
+    if(p<2){badge.className="badge";badge.textContent="No tan";note.textContent="Log a session to start your tan.";$("tanShade").textContent="Untanned";}
     else{var days=last?Math.floor((Date.now()-last)/864e5):0;
-      if(days<=2){badge.className="badge up";badge.textContent="Building";note.textContent=days===0?"Tanned today — beautifully on track.":days+" day"+(days>1?"s":"")+" since last session.";}
+      if(days<=2){badge.className="badge up";badge.textContent="Building";note.textContent=days===0?"Tanned today — locked in.":days+" day"+(days>1?"s":"")+" since last session.";}
       else if(days<=6){badge.className="badge hold";badge.textContent="Holding";note.textContent=days+" days since last — tan again to keep it.";}
-      else{badge.className="badge fade";badge.textContent="Fading";note.textContent=days+" days off — your glow is fading.";}
+      else{badge.className="badge fade";badge.textContent="Fading";note.textContent=days+" days off — your tan is fading.";}
     }
-    if(state.goal>0){gw.style.display="block";$("goalFill").style.width=Math.min(100,Math.round(p/state.goal*100))+"%";if(p>=state.goal&&p>=2){note.textContent="🎉 Goal reached — "+Math.round(p)+"% glow.";}else if(p>=2){note.textContent+=" Goal "+state.goal+"%.";}}
+    if(state.goal>0){gw.style.display="block";$("goalFill").style.width=Math.min(100,Math.round(p/state.goal*100))+"%";if(p>=state.goal&&p>=2){note.textContent="🎉 Goal reached — "+Math.round(p)+"% — goal hit.";}else if(p>=2){note.textContent+=" Goal "+state.goal+"%.";}}
   }
 
   // ---- best-time nudge / planning / insights ----
@@ -1035,7 +1035,7 @@
   function renderTanForecast(){
     var card=$("tanfcCard"),host=$("tanfcRows"),cap=skin().cap,now=Date.now(),cur=tanAt(now);
     if(cur<2){card.style.display="none";return;}
-    var bands=[{n:"Deep bronze",t:0.95*cap},{n:"Bronzed",t:0.75*cap},{n:"Golden",t:0.5*cap},{n:"Light tan",t:0.25*cap},{n:"Faint glow",t:2}];
+    var bands=[{n:"Deep bronze",t:0.95*cap},{n:"Bronzed",t:0.75*cap},{n:"Golden",t:0.5*cap},{n:"Light tan",t:0.25*cap},{n:"Base tan",t:2}];
     var rows=[];
     bands.forEach(function(b){if(cur<b.t)return;var day=null;for(var i=1;i<=14;i++){if(tanAt(now+i*864e5)<b.t){day=i;break;}}rows.push({n:b.n,day:day});});
     if(!rows.length){card.style.display="none";return;}
@@ -1064,14 +1064,14 @@
     x.fillStyle="#b3702f";x.font="600 48px Fraunces, Georgia, serif";x.fillText("TanMaxxing",cx,975);
     return c;
   }
-  function downloadCanvas(c){var a=document.createElement("a");a.href=c.toDataURL("image/png");a.download="my-glow.png";a.click();toast("Saved your glow card");}
+  function downloadCanvas(c){var a=document.createElement("a");a.href=c.toDataURL("image/png");a.download="my-tan.png";a.click();toast("Saved your tan card");}
   function shareGlow(){
-    if(!state.sessions.length){toast("Log a session first to share your glow");return;}
+    if(!state.sessions.length){toast("Log a session first to share");return;}
     var c=buildShareCanvas();
     c.toBlob(function(blob){
       if(!blob){downloadCanvas(c);return;}
-      var p=tanAt(Date.now()),file=new File([blob],"my-glow.png",{type:"image/png"});
-      var data={title:"My glow today",text:"My TanMaxxing glow: "+shadeName(p)+" ("+Math.round(p)+"%)"};
+      var p=tanAt(Date.now()),file=new File([blob],"my-tan.png",{type:"image/png"});
+      var data={title:"My tan today",text:"My TanMaxxing tan: "+shadeName(p)+" ("+Math.round(p)+"%)"};
       if(navigator.canShare&&navigator.canShare({files:[file]})){data.files=[file];navigator.share(data).catch(function(){});}
       else if(navigator.share){navigator.share(data).catch(function(){downloadCanvas(c);});}
       else downloadCanvas(c);
@@ -1624,7 +1624,7 @@
     var icon192=drawAppIcon(192,false),icon512=drawAppIcon(512,false),iconMask=drawAppIcon(512,true),iconApple=drawAppIcon(180,false);
     var apple=document.querySelector("link[rel='apple-touch-icon']");if(apple)apple.href=iconApple;
     var fav=document.createElement("link");fav.rel="icon";fav.type="image/png";fav.href=drawAppIcon(64,false);document.head.appendChild(fav);
-    var mani={name:"TanMaxxing — Optimize Your Glow",short_name:"TanMaxxing",description:"Track UV and time your tanning sessions to build a tan without burning.",display:"standalone",background_color:"#efe3d4",theme_color:"#efe3d4",start_url:".",scope:".",icons:[
+    var mani={name:"TanMaxxing — Build Your Tan",short_name:"TanMaxxing",description:"Track UV and time your tanning sessions to build a tan without burning.",display:"standalone",background_color:"#efe3d4",theme_color:"#efe3d4",start_url:".",scope:".",icons:[
       {src:icon192,sizes:"192x192",type:"image/png",purpose:"any"},
       {src:icon512,sizes:"512x512",type:"image/png",purpose:"any"},
       {src:iconMask,sizes:"512x512",type:"image/png",purpose:"maskable"}
