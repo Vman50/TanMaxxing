@@ -122,6 +122,15 @@
   .btn-ghost{background:var(--card);color:var(--text);border:1px solid var(--card-line);}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   .row3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+  .pf-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px;}
+  .pf-item{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--card-line);border-radius:12px;padding:7px 10px;}
+  .pf-label{font-size:12px;color:var(--sub);min-width:36px;}
+  .pf-ctrl{display:flex;align-items:center;gap:5px;}
+  .pf-btn{background:var(--ring-track);border:none;border-radius:6px;width:26px;height:26px;font-size:15px;cursor:pointer;color:var(--fg);line-height:1;padding:0;}
+  .pf-btn:active{transform:scale(.9);}
+  .pf-val{font-size:13px;font-weight:600;min-width:32px;text-align:center;color:var(--heading);}
+  .pf-hint{font-size:11px;color:var(--accent);text-align:center;margin-top:5px;letter-spacing:.04em;}
+  .log-sides{font-size:11px;color:var(--sub);margin-top:2px;}
 
   /* tan gem card */
   .tancard{margin-top:14px;padding:18px;display:flex;align-items:center;gap:18px;}
@@ -460,11 +469,13 @@
       <div id="timerControls">
         <button class="btn btn-go" id="timerBtn">Start session</button>
       </div>
+      <div id="preFillArea" style="display:none;"></div>
       <div id="pauseControls" style="display:none; margin-top:10px;" class="row3">
         <button class="btn btn-go" id="resumeBtn" style="padding:12px 6px; font-size:14px;">Resume</button>
         <button class="btn btn-stop" id="flipBtn" style="padding:12px 6px; font-size:14px; background:linear-gradient(120deg,#b3702f,#df9d76);">Flip Sides</button>
         <button class="btn btn-stop" id="finishBtn" style="padding:12px 6px; font-size:14px; background:linear-gradient(120deg,#d9534f,#df7d76);">Finish</button>
       </div>
+      <button id="resetBtn" class="btn btn-ghost" style="display:none; margin-top:8px; font-size:13px; padding:10px; color:var(--sub);">↺ Reset timer</button>
     </div>
 
     <div class="card tancard reveal d3">
@@ -855,9 +866,12 @@
   }
   
   // ---- tracking system state & engine update ----
-  var timer={running:false,paused:false,start:0,accumulatedSec:0,completedSidesSec:0,currentSide:"Front",sidesDone:[],alerted:false,warned2min:false};
-  function saveTimer(){Store.write("tanmax.timer",{running:timer.running,paused:timer.paused,start:timer.start,accumulatedSec:timer.accumulatedSec,completedSidesSec:timer.completedSidesSec,currentSide:timer.currentSide,sidesDone:timer.sidesDone,alerted:timer.alerted,warned2min:timer.warned2min});}
+  var timer={running:false,paused:false,start:0,accumulatedSec:0,completedSidesSec:0,currentSide:"Front",sidesDone:[],alerted:false,warned2min:false,sideTimes:{}};
+  var preFill={};
+  function saveTimer(){Store.write("tanmax.timer",{running:timer.running,paused:timer.paused,start:timer.start,accumulatedSec:timer.accumulatedSec,completedSidesSec:timer.completedSidesSec,currentSide:timer.currentSide,sidesDone:timer.sidesDone,alerted:timer.alerted,warned2min:timer.warned2min,sideTimes:timer.sideTimes});}
   function clearTimer(){Store.write("tanmax.timer",null);}
+  function timerSumSides(){return Object.keys(timer.sideTimes).reduce(function(a,k){return a+timer.sideTimes[k];},0);}
+  function currentSideCommitted(){return timer.sideTimes[timer.currentSide]||0;}
 
   function renderDial(){
     var big=$("dialBig"),lab=$("dialLab"),tap=$("dialTap"),ring=$("ring"), sideInd=$("dialSide");
@@ -870,38 +884,37 @@
     if(timer.running || timer.paused){
       sideInd.style.display = "inline-block";
       sideInd.textContent = timer.currentSide;
-      
-      var totalSec = timer.accumulatedSec;
-      if (timer.running) {
-        totalSec += (Date.now() - timer.start) / 1000;
-      }
-      
+
+      var runningElapsed = timer.running ? (Date.now() - timer.start) / 1000 : 0;
+      // total time on the current side: previously committed + current paused segment + live running time
+      var currentSideSec = currentSideCommitted() + timer.accumulatedSec + runningElapsed;
+
       var currentUvIndex=currentUV();
       var tgtSideMins = safeMin(currentUvIndex);
       var totalTgtSec = tgtSideMins * 60 || 1800;
-      
-      big.textContent=fmtClock(totalSec);
+
+      big.textContent=fmtClock(currentSideSec);
       big.className="n t";
-      
-      var left = Math.ceil((totalTgtSec - totalSec) / 60);
+
+      var left = Math.ceil((totalTgtSec - currentSideSec) / 60);
       lab.textContent=left>0?(left+" min to flip"):"side limit reached";
-      
-      var dose=Math.round(totalSec/60/Math.max(burnMin(currentUvIndex),0.1)*100);
+
+      var dose=Math.round(currentSideSec/60/Math.max(burnMin(currentUvIndex),0.1)*100);
       tap.textContent=dose+"% to redness";
-      
-      var frac=Math.min(totalSec/totalTgtSec,1);
+
+      var frac=Math.min(currentSideSec/totalTgtSec,1);
       ring.setAttribute("stroke-dashoffset",(RING*frac).toFixed(1));
       if(frac >= 1) ring.setAttribute("stroke","#d9534f");
       document.querySelector(".dial .glow").style.setProperty("--dialglow",frac>0.5?1:0);
       dialContainer.setAttribute("aria-valuenow", Math.floor(frac * 100));
-      
-      if(!timer.warned2min && !timer.alerted && totalSec<totalTgtSec && (totalTgtSec-totalSec)<=120){
+
+      if(!timer.warned2min && !timer.alerted && currentSideSec<totalTgtSec && (totalTgtSec-currentSideSec)<=120){
         timer.warned2min=true;
         try{if(navigator.vibrate)navigator.vibrate([100]);}catch(e){}
         toast("2 min left on "+timer.currentSide);
         fireNotify("2 minutes left","Your "+timer.currentSide+" side is almost done — get ready to flip.");
       }
-      if(!timer.alerted && totalSec>=totalTgtSec){
+      if(!timer.alerted && currentSideSec>=totalTgtSec){
         timer.alerted=true;
         burnAlert();
       }
@@ -1097,7 +1110,10 @@
       timer.paused=false;
       timer.start=Date.now();
       timer.accumulatedSec=0;
-      timer.completedSidesSec=0;
+      // apply pre-fill: seed sideTimes with any minutes the user pre-set
+      timer.sideTimes={};
+      activeSides().forEach(function(s){if((preFill[s]||0)>0)timer.sideTimes[s]=preFill[s]*60;});
+      timer.completedSidesSec=timerSumSides();
       timer.currentSide=activeSides()[0];
       timer.sidesDone=[];
       timer.alerted=false;
@@ -1127,11 +1143,14 @@
   }
 
   function flipSides(){
-    var sideElapsed = timer.running ? (Date.now() - timer.start) / 1000 : 0;
-    timer.completedSidesSec += timer.accumulatedSec + sideElapsed;
+    var runningElapsed = timer.running ? (Date.now() - timer.start) / 1000 : 0;
+    // commit current side's time into sideTimes
+    timer.sideTimes[timer.currentSide] = currentSideCommitted() + timer.accumulatedSec + runningElapsed;
+    timer.completedSidesSec = timerSumSides();
     if(timer.sidesDone.indexOf(timer.currentSide)<0) timer.sidesDone.push(timer.currentSide);
     var sides=activeSides(),idx=sides.indexOf(timer.currentSide);
     timer.currentSide = sides[(idx+1)%sides.length];
+    // accumulatedSec resets — previous time on new side is preserved in sideTimes[newSide]
     timer.accumulatedSec = 0;
     timer.start = Date.now();
     timer.alerted = false;
@@ -1141,24 +1160,33 @@
   }
 
   function sessionSides(){var done=timer.sidesDone.slice();if(timer.currentSide&&done.indexOf(timer.currentSide)<0)done.push(timer.currentSide);return done;}
+  function buildFinalSideTimes(){
+    var runningElapsed = timer.running ? (Date.now() - timer.start) / 1000 : 0;
+    var fst = Object.assign({}, timer.sideTimes);
+    fst[timer.currentSide] = currentSideCommitted() + timer.accumulatedSec + runningElapsed;
+    return fst;
+  }
   function triggerFinishConfirmation(){
-    var elapsed = timer.running ? (Date.now() - timer.start) / 1000 : 0;
-    var totalMins = Math.max(1, Math.round((timer.completedSidesSec + timer.accumulatedSec + elapsed) / 60));
-    var sides=sessionSides();
+    var fst = buildFinalSideTimes();
+    var totalSec = Object.keys(fst).reduce(function(a,k){return a+fst[k];},0);
+    var totalMins = Math.max(1, Math.round(totalSec / 60));
+    var sideDetail = Object.keys(fst).map(function(s){return s+" "+Math.round(fst[s]/60)+"m";}).join(" · ");
     setConfirmBurn(0);
-    $("confirmSessionDetails").innerHTML = "You've been out for <b>" + totalMins + " min</b> across " + sides.join(", ") + ". Save this session?";
+    $("confirmSessionDetails").innerHTML = "<b>"+totalMins+" min</b> total — "+sideDetail+". Save this session?";
     openSheet($("confirmFinishSheet"));
   }
 
   function saveFinalizedSession(){
     closeSheets();
-    var elapsed = timer.running ? (Date.now() - timer.start) / 1000 : 0;
-    var totalSec = timer.completedSidesSec + timer.accumulatedSec + elapsed;
+    var fst = buildFinalSideTimes();
+    var totalSec = Object.keys(fst).reduce(function(a,k){return a+fst[k];},0);
     timer.running=false;
     timer.paused=false;
     stopReliableTimer();
     clearTimer();
     var mins=Math.max(1,Math.round(totalSec/60));
+    var sideMinutes={};
+    Object.keys(fst).forEach(function(s){var m=Math.round(fst[s]/60);if(m>0)sideMinutes[s]=m;});
     var cu=Math.round(currentUV()*10)/10;
     var prod=activeProd();
     var sides=sessionSides(),burned=confirmBurn===1,when=Date.now();
@@ -1168,15 +1196,19 @@
       uv:cu,
       spf:calculateEffectiveSPF(),
       sides:sides,
+      sideMinutes:sideMinutes,
       burned:burned,
       note:prodLabel(prod)+" · "+sides.join("+")+(burned?" · 🔴 burned":"")
     });
     if(burned)applyBurn(when);
     timer.accumulatedSec=0;
     timer.completedSidesSec=0;
+    timer.sideTimes={};
     timer.currentSide=activeSides()[0];
     timer.sidesDone=[];
+    preFill={};
     setupActionButtonUI();
+    renderPreFill();
     toast(burned?"Logged — recovery mode on":("Logged "+mins+" min · "+vitDIU(cu,mins).toLocaleString()+" IU vit D"));
     renderToday();
   }
@@ -1185,36 +1217,89 @@
     var mainBtn = $("timerBtn");
     var pauseZone = $("pauseControls");
     var resumeBtn = $("resumeBtn");
+    var resetBtn = $("resetBtn");
+    var pfArea = $("preFillArea");
 
     if(!timer.running && !timer.paused){
       if(recoveryActive()){mainBtn.textContent = "🔒 Locked — recovering";mainBtn.className = "btn btn-ghost";mainBtn.disabled = true;}
       else{mainBtn.textContent = "Start session";mainBtn.className = "btn btn-go";mainBtn.disabled = false;}
       pauseZone.style.display = "none";
+      resetBtn.style.display = "none";
+      if(pfArea)pfArea.style.display = "";
     } else if(timer.running){
       mainBtn.disabled = false;
       mainBtn.textContent = "Pause session";
       mainBtn.className = "btn btn-stop";
-      resumeBtn.style.display = "none";            // running: Flip + Finish, no Resume
+      resumeBtn.style.display = "none";
       pauseZone.style.gridTemplateColumns = "1fr 1fr";
       pauseZone.style.display = "grid";
+      resetBtn.style.display = "";
+      if(pfArea)pfArea.style.display = "none";
     } else if(timer.paused){
       mainBtn.disabled = false;
       mainBtn.textContent = "Session paused";
       mainBtn.className = "btn btn-ghost";
-      resumeBtn.style.display = "";                 // paused: Resume + Flip + Finish
+      resumeBtn.style.display = "";
       pauseZone.style.gridTemplateColumns = "repeat(3,1fr)";
       pauseZone.style.display = "grid";
+      resetBtn.style.display = "";
+      if(pfArea)pfArea.style.display = "none";
     }
   }
 
   // Soft in-app reminder only (no alarm) — the live timer is a glance reference, not something to rely on in the background. Use a phone Clock timer for the real alert.
   function burnAlert(){try{if(navigator.vibrate)navigator.vibrate([200,80,200]);}catch(e){}toast("⚠ "+timer.currentSide+" side hit its safe limit — flip or wrap up.");fireNotify("Side limit reached","Your "+timer.currentSide+" side hit its safe limit. Flip sides or wrap up to avoid burning.");}
-  
+
+  function resetTimer(){
+    timer.running=false;
+    timer.paused=false;
+    stopReliableTimer();
+    clearTimer();
+    timer.accumulatedSec=0;
+    timer.completedSidesSec=0;
+    timer.sideTimes={};
+    timer.currentSide=activeSides()[0];
+    timer.sidesDone=[];
+    timer.alerted=false;
+    timer.warned2min=false;
+    preFill={};
+    setupActionButtonUI();
+    renderDial();
+    renderPreFill();
+    toast("Timer reset");
+  }
+
+  function renderPreFill(){
+    var host=$("preFillArea");
+    if(!host)return;
+    if(timer.running||timer.paused){host.style.display="none";return;}
+    var sides=activeSides();
+    var html="<div class='pf-row'>";
+    sides.forEach(function(s){
+      var v=preFill[s]||0;
+      html+="<div class='pf-item'><span class='pf-label'>"+s+"</span><div class='pf-ctrl'><button class='pf-btn' data-side='"+s+"' data-d='-5'>−</button><span class='pf-val'>"+v+"m</span><button class='pf-btn' data-side='"+s+"' data-d='5'>+</button></div></div>";
+    });
+    html+="</div>";
+    if(sides.some(function(s){return (preFill[s]||0)>0;})){
+      html+="<div class='pf-hint'>Starting with prior time</div>";
+    }
+    host.innerHTML=html;
+    host.style.display="";
+    host.onclick=function(e){
+      var btn=e.target.closest(".pf-btn");
+      if(!btn)return;
+      var side=btn.dataset.side,d=parseInt(btn.dataset.d,10);
+      preFill[side]=Math.max(0,(preFill[side]||0)+d);
+      renderPreFill();
+    };
+  }
+
   $("timerBtn").onclick=function(){haptic(12);handleMainControlClick();};
   $("dial").onclick=function(){haptic(12);handleMainControlClick();};
   $("resumeBtn").onclick=function(){haptic(12);resumeSession();};
   $("flipBtn").onclick=function(){haptic([15,40,15]);flipSides();};
   $("finishBtn").onclick=function(){haptic(20);triggerFinishConfirmation();};
+  $("resetBtn").onclick=function(){haptic(20);resetTimer();};
   $("confirmCancelBtn").onclick=closeSheets;
   $("confirmSaveBtn").onclick=saveFinalizedSession;
 
@@ -1242,7 +1327,10 @@
   }
   function renderLog(){var list=$("logList"),n=state.sessions.length,mins=0;state.sessions.forEach(function(s){mins+=s.min;});$("sTotal").textContent=n;$("sMins").textContent=mins;$("sStreak").textContent=streak();drawTanChart();renderWeek();renderTanForecast();
     if(n===0){list.innerHTML="<div class='empty'><div class='ico'>☀️</div><p>No sessions yet.</p><p>Start the timer or tap + to log one.</p></div>";return;}
-    list.innerHTML="";state.sessions.forEach(function(s){var d=new Date(s.when),date=d.toLocaleDateString([],{weekday:"short",month:"short",day:"numeric"}),time=d.toLocaleTimeString([],{hour:"numeric",minute:"2-digit",hour12:true});var el=document.createElement("div");el.className="card log-item";el.innerHTML="<div class='log-uv' style='background:"+uvColor(s.uv)+"'>"+(s.uv!=null?s.uv:"–")+"</div><div class='log-body'><div class='d'>"+date+" · "+time+"</div><div class='m'>"+(s.note||"Tanning session")+"</div></div><div class='log-min'>"+s.min+"m</div><button class='del' aria-label='Delete'>×</button>";el.querySelector(".del").onclick=function(ev){ev.stopPropagation();delSession(s.id);};el.style.cursor="pointer";el.setAttribute("role","button");el.setAttribute("aria-label","Edit session");el.onclick=function(){haptic(8);openEdit(s);};list.appendChild(el);});}
+    list.innerHTML="";state.sessions.forEach(function(s){var d=new Date(s.when),date=d.toLocaleDateString([],{weekday:"short",month:"short",day:"numeric"}),time=d.toLocaleTimeString([],{hour:"numeric",minute:"2-digit",hour12:true});
+      var sideStr="";
+      if(s.sideMinutes&&Object.keys(s.sideMinutes).length>1){sideStr="<div class='log-sides'>"+Object.keys(s.sideMinutes).map(function(k){return k+": "+s.sideMinutes[k]+"m";}).join(" · ")+"</div>";}
+      var el=document.createElement("div");el.className="card log-item";el.innerHTML="<div class='log-uv' style='background:"+uvColor(s.uv)+"'>"+(s.uv!=null?s.uv:"–")+"</div><div class='log-body'><div class='d'>"+date+" · "+time+"</div><div class='m'>"+(s.note||"Tanning session")+"</div>"+sideStr+"</div><div class='log-min'>"+s.min+"m</div><button class='del' aria-label='Delete'>×</button>";el.querySelector(".del").onclick=function(ev){ev.stopPropagation();delSession(s.id);};el.style.cursor="pointer";el.setAttribute("role","button");el.setAttribute("aria-label","Edit session");el.onclick=function(){haptic(8);openEdit(s);};list.appendChild(el);});}
   function drawTanChart(){var svg=$("tanchart");svg.innerHTML="";var ns="http://www.w3.org/2000/svg",cw=320,ch=100,pad=6,now=Date.now(),days=30,cap=skin().cap,tc=themeColors();var pts=[];for(var i=days;i>=0;i--)pts.push({x:(days-i)/days,y:tanAt(now-i*864e5)});animateCount($("chartPct"),tanAt(now));var t0=TONE[state.skin][0],t1=TONE[state.skin][1];var defs=document.createElementNS(ns,'defs');defs.innerHTML="<linearGradient id='tg' x1='0' y1='0' x2='1' y2='0'><stop offset='0' stop-color='"+t0+"'/><stop offset='1' stop-color='"+t1+"'/></linearGradient><linearGradient id='tgf' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='"+t1+"' stop-opacity='.35'/><stop offset='1' stop-color='"+t1+"' stop-opacity='0'/></linearGradient>";svg.appendChild(defs);function X(x){return pad+x*(cw-2*pad);}function Y(y){return (ch-pad)-(y/Math.max(cap,1))*(ch-2*pad);}var line="";pts.forEach(function(p,i){line+=(i===0?"M":"L")+X(p.x).toFixed(1)+" "+Y(p.y).toFixed(1)+" ";});var ar=document.createElementNS(ns,'path');ar.setAttribute('d',line+"L"+X(1)+" "+(ch-pad)+" L"+X(0)+" "+(ch-pad)+" Z");ar.setAttribute('fill','url(#tgf)');svg.appendChild(ar);var ln=document.createElementNS(ns,'path');ln.setAttribute('d',line);ln.setAttribute('fill','none');ln.setAttribute('stroke','url(#tg)');ln.setAttribute('stroke-width','2.5');ln.setAttribute('stroke-linecap','round');svg.appendChild(ln);var lp=pts[pts.length-1],c=document.createElementNS(ns,'circle');c.setAttribute('cx',X(lp.x));c.setAttribute('cy',Y(lp.y));c.setAttribute('r','4');c.setAttribute('fill',t1);svg.appendChild(c);}
 
   // ---- products ----
@@ -1470,7 +1558,7 @@
 
   applyTheme();try{matchMedia("(prefers-color-scheme:dark)").addEventListener("change",function(){if(state.theme==="auto"){applyTheme();renderToday();drawTanChart();}});}catch(e){}
   initSettingsUI();renderGoalSeg();renderAll();clock();
-  (function(){var st=Store.read("tanmax.timer",null);if(st&&(st.running||st.paused)){var extra=st.running?(Date.now()-st.start)/1000:0;timer.paused=true;timer.running=false;timer.accumulatedSec=(st.accumulatedSec||0)+extra;timer.completedSidesSec=st.completedSidesSec||0;timer.currentSide=st.currentSide||activeSides()[0];timer.sidesDone=st.sidesDone||[];timer.alerted=st.alerted||false;timer.warned2min=st.warned2min||false;setupActionButtonUI();renderDial();toast("Session paused — tap Resume to continue");}})();
+  (function(){var st=Store.read("tanmax.timer",null);if(st&&(st.running||st.paused)){var extra=st.running?(Date.now()-st.start)/1000:0;timer.paused=true;timer.running=false;timer.accumulatedSec=(st.accumulatedSec||0)+extra;timer.completedSidesSec=st.completedSidesSec||0;timer.sideTimes=st.sideTimes||{};timer.currentSide=st.currentSide||activeSides()[0];timer.sidesDone=st.sidesDone||[];timer.alerted=st.alerted||false;timer.warned2min=st.warned2min||false;setupActionButtonUI();renderDial();toast("Session paused — tap Resume to continue");}else{renderPreFill();}})();
   if(state.live)setStatus("warn","Saved UV ("+liveAge()+")");else setStatus("warn","Tap to enable live UV");
   if(!state.onboarded){startOnb(false);}else{refreshUV();}
   syncClockToSystem();
