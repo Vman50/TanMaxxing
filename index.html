@@ -274,11 +274,18 @@
   .onb-nav .back{flex:none;width:54px;border:1px solid var(--card-line);background:var(--card);color:var(--text);border-radius:18px;font-size:20px;cursor:pointer;}
   .onb-nav .next{flex:1;border:none;background:var(--accent-grad);color:#fff;font-family:'Fraunces',serif;font-weight:600;font-size:17px;padding:16px;border-radius:18px;cursor:pointer;}
   /* Today mode selector */
-  .modeseg{display:flex;gap:6px;background:var(--input);border:1px solid var(--input-line);border-radius:16px;padding:5px;margin-bottom:16px;}
-  .modeseg button{flex:1;border:none;background:transparent;color:var(--muted2);font:inherit;font-weight:600;font-size:13px;padding:9px 4px;border-radius:12px;cursor:pointer;transition:.15s;display:flex;flex-direction:column;align-items:center;gap:2px;}
-  .modeseg button .mm{font-size:14px;line-height:1;}
-  .modeseg button[aria-pressed=true]{background:var(--card);color:var(--text);box-shadow:0 1px 6px rgba(0,0,0,.12);}
+  .modeseg{padding:2px 0 10px;margin-bottom:8px;}
+  .mode-slider-wrap{padding:4px 2px 2px;}
+  .mode-slider-wrap input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:4px;outline:none;cursor:pointer;background:linear-gradient(to right,var(--accent) var(--pct,50%),var(--ring-track) var(--pct,50%));}
+  .mode-slider-wrap input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--accent);cursor:pointer;border:3px solid var(--bg);box-shadow:0 1px 4px rgba(0,0,0,.2);}
+  .mode-slider-wrap input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--accent);cursor:pointer;border:3px solid var(--bg);}
+  .mode-slider-labels{display:flex;justify-content:space-between;margin-top:8px;}
+  .mode-slider-labels span{font-size:11px;color:var(--muted2);text-align:center;flex:1;line-height:1.3;transition:color .15s;}
+  .mode-slider-labels span.on{color:var(--accent);font-weight:700;}
   .modeseg-settings{display:flex;flex-direction:column;gap:8px;}
+  .aside-grid{display:grid;grid-template-columns:56px 1fr 28px;gap:6px 8px;align-items:center;}
+  .aside-lbl{font-size:13px;color:var(--sub);}
+  .aside-unit{font-size:13px;color:var(--muted2);}
 
   .toast{position:fixed;left:50%;bottom:calc(120px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);z-index:90;background:var(--heading);color:var(--bg);font-size:13px;font-weight:600;padding:11px 18px;border-radius:99px;opacity:0;pointer-events:none;transition:.25s;max-width:90%;text-align:center;}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
@@ -610,7 +617,7 @@
 <div class="sheet" id="addSheet">
   <div class="grab"></div><h2 id="addTitle">Log a session</h2><p class="sub" id="addSub">Add a tan you've already done.</p>
   <div class="field"><label>When</label><input type="datetime-local" id="aWhen" /></div>
-  <div class="field"><label>Minutes (Total)</label><input type="number" id="aMin" min="1" max="600" inputmode="numeric" enterkeyhint="next" placeholder="e.g. 25" /></div>
+  <div class="field" id="aSidesField"><label>Time per side (min)</label><div id="aSidesArea" class="aside-grid"></div></div>
   <div class="field"><label>Peak UV</label><input type="number" id="aUV" min="0" max="14" inputmode="decimal" enterkeyhint="next" placeholder="e.g. 6" /></div>
   <div class="field"><label>Did your skin burn?</label><div class="seg" id="aBurnSeg"><button type="button" data-burn="0" aria-pressed="true">No burn</button><button type="button" data-burn="1" aria-pressed="false">🔴 Got burned</button></div></div>
   <div class="field"><label>Note (optional)</label><textarea id="aNote" placeholder="Front + back, coconut oil, slight pink…"></textarea></div>
@@ -1317,11 +1324,28 @@
   }
   function setAddBurn(v){addBurn=v;document.querySelectorAll("#aBurnSeg button").forEach(function(b){b.setAttribute("aria-pressed",parseInt(b.dataset.burn,10)===v?"true":"false");});}
   function setConfirmBurn(v){confirmBurn=v;document.querySelectorAll("#cBurnSeg button").forEach(function(b){b.setAttribute("aria-pressed",parseInt(b.dataset.burn,10)===v?"true":"false");});}
+  function renderAddSides(existing){
+    var host=$("aSidesArea");if(!host)return;
+    var sides=activeSides();
+    var html="";
+    sides.forEach(function(s){
+      var v="";
+      if(existing){
+        if(existing.sideMinutes&&(existing.sideMinutes[s]||0)>0){v=existing.sideMinutes[s];}
+        else if(!existing.sideMinutes&&existing.min){v=Math.round(existing.min/sides.length)||"";}
+        else if(existing._plan>0){v=existing._plan;}
+      }
+      html+="<span class='aside-lbl'>"+s+"</span><input type='number' id='aside_"+s+"' min='0' max='300' inputmode='numeric' enterkeyhint='next' placeholder='0' value='"+v+"'><span class='aside-unit'>min</span>";
+    });
+    host.innerHTML=html;
+  }
   function openEdit(s){
     editingId=s.id;
     $("addTitle").textContent="Edit session";$("addSub").textContent="Update or fix this logged session.";$("addSave").textContent="Update";
     var d=new Date(s.when);d.setMinutes(d.getMinutes()-d.getTimezoneOffset());
-    $("aWhen").value=d.toISOString().slice(0,16);$("aMin").value=s.min;$("aUV").value=(s.uv==null?"":s.uv);$("aNote").value=s.note||"";
+    $("aWhen").value=d.toISOString().slice(0,16);
+    renderAddSides(s);
+    $("aUV").value=(s.uv==null?"":s.uv);$("aNote").value=s.note||"";
     setAddBurn(s.burned?1:0);
     openSheet($("addSheet"));
   }
@@ -1458,24 +1482,28 @@
   $("refreshBtn").onclick=function(e){e.stopPropagation();state.live=null;refreshUV();};
   $("statusPill").onclick=function(){if(!state.loc)refreshUV();};
   $("uvSlider").addEventListener("input",function(e){state.manualUV=parseInt(e.target.value,10);Store.write("tanmax.manualUV",state.manualUV);$("uvNum").textContent=state.manualUV;firstDraw=true;renderToday();});
-  $("quickAdd").onclick=function(){editingId=null;$("addTitle").textContent="Log a session";$("addSub").textContent="Add a tan you've already done.";$("addSave").textContent="Save";setAddBurn(0);var now=new Date();now.setMinutes(now.getMinutes()-now.getTimezoneOffset());$("aWhen").value=now.toISOString().slice(0,16);var pSides=activeSides().length,planMin=safeMin(currentUV())*pSides;$("aMin").value=planMin>0?planMin:"";$("aUV").value=Math.round(currentUV());$("aNote").value="";openSheet($("addSheet"));};
+  $("quickAdd").onclick=function(){editingId=null;$("addTitle").textContent="Log a session";$("addSub").textContent="Add a tan you've already done.";$("addSave").textContent="Save";setAddBurn(0);var now=new Date();now.setMinutes(now.getMinutes()-now.getTimezoneOffset());$("aWhen").value=now.toISOString().slice(0,16);var plan=safeMin(currentUV());renderAddSides(plan>0?{_plan:plan}:null);$("aUV").value=Math.round(currentUV());$("aNote").value="";openSheet($("addSheet"));};
   $("addCancel").onclick=function(){editingId=null;closeSheets();};
   document.querySelectorAll("#aBurnSeg button").forEach(function(b){b.onclick=function(){setAddBurn(parseInt(b.dataset.burn,10));};});
   document.querySelectorAll("#cBurnSeg button").forEach(function(b){b.onclick=function(){setConfirmBurn(parseInt(b.dataset.burn,10));};});
   $("addSave").onclick=function(){
-    var min=parseInt($("aMin").value,10);if(!min||min<1){$("aMin").focus();return;}
+    var sides=activeSides(),sideMinutes={};
+    sides.forEach(function(s){var inp=$("aside_"+s);var v=parseInt(inp&&inp.value,10);if(v>0)sideMinutes[s]=v;});
+    var min=Object.keys(sideMinutes).reduce(function(a,k){return a+sideMinutes[k];},0);
+    if(min<1){var first=$("aside_"+sides[0]);if(first)first.focus();return;}
     var wv=$("aWhen").value,when=wv?new Date(wv).getTime():Date.now();
     var uv=$("aUV").value;uv=uv===""?null:parseFloat(uv);
     var note=$("aNote").value.trim(),burned=addBurn===1;
+    var sessionSidesList=Object.keys(sideMinutes);
     if(editingId){
       var s=state.sessions.find(function(x){return x.id===editingId;});
-      if(s){s.when=when;s.min=min;s.uv=uv;s.note=note;s.burned=burned;}
+      if(s){s.when=when;s.min=min;s.uv=uv;s.note=note;s.burned=burned;s.sides=sessionSidesList;s.sideMinutes=sideMinutes;}
       state.sessions.sort(function(a,b){return b.when-a.when;});
       Store.write("tanmax.sessions",state.sessions);editingId=null;renderLog();renderTan();closeSheets();
       if(burned)applyBurn(when);
       renderToday();toast("Session updated");
     }else{
-      addSession({when:when,min:min,uv:uv,note:note,burned:burned});
+      addSession({when:when,min:min,uv:uv,note:note,burned:burned,sides:sessionSidesList,sideMinutes:sideMinutes});
       if(burned)applyBurn(when);
       closeSheets();document.querySelector('.tab[data-tab="log"]').click();
       renderToday();toast(burned?"Logged — recovery mode on":"Session logged");
@@ -1488,7 +1516,17 @@
 
   // ---- tan mode selectors ----
   function renderModeSeg(){
-    var seg=$("modeSeg");if(seg){seg.innerHTML="";MODES.forEach(function(m){var b=document.createElement("button");b.type="button";b.setAttribute("aria-pressed",state.mode===m.id?"true":"false");b.innerHTML="<span class='mm'>"+m.icon+"</span>"+m.name;b.onclick=function(){setMode(m.id);};seg.appendChild(b);});}
+    var seg=$("modeSeg");
+    if(seg){
+      var idx=Math.max(0,MODES.findIndex(function(m){return m.id===state.mode;}));
+      var pct=Math.round(idx/(MODES.length-1)*100)+"%";
+      seg.innerHTML="<div class='mode-slider-wrap'><input type='range' id='modeSlider' min='0' max='"+(MODES.length-1)+"' step='1' value='"+idx+"' style='--pct:"+pct+"'></div><div class='mode-slider-labels'>"+MODES.map(function(m,i){return "<span"+(i===idx?" class='on'":"")+">"+m.icon+"<br>"+m.name+"</span>";}).join("")+"</div>";
+      $("modeSlider").addEventListener("input",function(){
+        var i=parseInt(this.value,10);
+        this.style.setProperty("--pct",Math.round(i/(MODES.length-1)*100)+"%");
+        setMode(MODES[i].id);
+      });
+    }
     var s2=$("modeSegSettings");if(s2){s2.innerHTML="";MODES.forEach(function(m){var c=document.createElement("button");c.type="button";c.className="mode-card";c.setAttribute("aria-pressed",state.mode===m.id?"true":"false");c.innerHTML="<span class='mi'>"+m.icon+"</span><span class='mb'><span class='mn'>"+m.name+"</span><span class='md'>"+m.desc+"</span><span class='mt'>"+m.trade+"</span></span>";c.onclick=function(){setMode(m.id);};s2.appendChild(c);});}
   }
   function setMode(id){haptic(8);state.mode=id;Store.write("tanmax.mode",id);renderModeSeg();renderToday();if(id==="max")toast("🔥 Max Tan — watch the burn line");}
