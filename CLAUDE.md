@@ -20,7 +20,9 @@ sunburn. The entire app — HTML, CSS, and JavaScript — lives in **`index.html
 - **Mobile-first / PWA.** Designed for a phone-width frame (`.app` max-width 460px),
   uses `env(safe-area-inset-*)`, Apple web-app meta tags, and a data-URI touch icon.
 - **State** is a single in-memory `state` object persisted to `localStorage` under keys
-  prefixed `tanmaxxing-data-` (see the `ls()` / `store()` helpers).
+  prefixed `bask.` (e.g. `bask.sessions`, `bask.skin`, `bask.loc`) via the `Store.read()` /
+  `Store.write()` helpers, which fall back to an in-memory `mem` object if `localStorage`
+  is unavailable. The OpenUV key is base64-encoded (`btoa`/`atob`) under `bask.openuvKey`.
 - **Theming** via `html[data-theme="light|dark"]` and CSS custom properties (`--bg`,
   `--accent`, etc.). Keep new colors as tokens, not hard-coded values.
 - **Two screens** — `#screen-today` and `#screen-log` — toggled by adding/removing the
@@ -47,6 +49,9 @@ No API keys are committed to the repo. Never hard-code a key in `index.html`.
 - UI is built imperatively by `render*` / `build*` functions; after changing state call
   the relevant `render*` (e.g. `renderAll()`, `renderToday()`, `renderTan()`).
 - Keep it dependency-free and single-file unless there's a strong reason to split.
+- **Keep this file up to date.** Whenever a change alters something documented here —
+  architecture, state keys, screens/sheets, external services, conventions, or testing —
+  update `CLAUDE.md` in the same change so it never drifts from `index.html`.
 
 ## Testing
 

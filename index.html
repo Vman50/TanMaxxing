@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
@@ -14,7 +14,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
   /* ---------- THEME TOKENS ---------- */
-  html[data-theme="light"]{
+  html{
     --bg:#efe3d4;
     --bg-grad:linear-gradient(180deg,#f3e8da 0%,#ecdcc9 55%,#e7d0b8 100%);
     --frame-glow:radial-gradient(120% 50% at 80% -5%,rgba(230,177,95,.4),transparent 55%),radial-gradient(90% 40% at 10% 8%,rgba(223,157,118,.3),transparent 55%);
@@ -22,13 +22,12 @@
     --card:rgba(255,255,255,.62); --card-line:rgba(255,255,255,.85); --card-shadow:0 6px 22px rgba(94,60,33,.16);
     --accent:#b3702f; --accent-grad:linear-gradient(120deg,#b3702f,#df9d76);
     --curve-a:#df9d76; --curve-b:#b3702f; --curve-c:#e6b15f; --curve-fill:rgba(179,112,47,.26); --night:rgba(120,80,40,.14);
-    --ring-track:rgba(120,80,40,.12); --ring-grad:#ringL;
+    --ring-track:rgba(120,80,40,.12);
     --pill:rgba(179,112,47,.16); --pill-text:#b3702f;
     --chip:rgba(255,255,255,.55); --chip-line:rgba(255,255,255,.8); --chip-on:#3b2a1e;
     --gem-glow:0 22px 46px rgba(124,70,36,.4);
     --nav:rgba(243,232,218,.8); --sheet:#f3e8da; --input:rgba(255,255,255,.6); --input-line:rgba(120,80,40,.18);
     --good:#4f9d6b; --warn:#cf7a3a; --danger:#d9534f;
-    --themecolor:#efe3d4;
   }
   *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent;}
   html,body{height:100%;}
@@ -287,7 +286,7 @@
 
     <div class="trio reveal d1">
       <div class="card s"><div class="v" id="safeMin">—<u>m</u></div><div class="k">Per Side</div></div>
-      <div class="card s"><div class="v" id="totalSessionMin">—<u>m</u></div><div class="k">Total Session</div></div>
+      <div class="card s"><div class="v" id="vitDStat">—<u>IU</u></div><div class="k">Est. Vit D</div></div>
       <div class="card s"><div class="v" id="burnMin">—<u>m</u></div><div class="k">Burns at</div></div>
     </div>
 
@@ -300,7 +299,6 @@
           <circle id="ring" cx="103" cy="103" r="90" fill="none" stroke="url(#ringL)" stroke-width="13" stroke-linecap="round" stroke-dasharray="565.5" stroke-dashoffset="0"/>
           <defs>
             <linearGradient id="ringL" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#df9d76"/><stop offset="1" stop-color="#b3702f"/></linearGradient>
-            <linearGradient id="ringD" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbbf24"/><stop offset="1" stop-color="#f97316"/></linearGradient>
           </defs>
         </svg>
         <div class="c">
@@ -519,7 +517,7 @@
   function $(id){return document.getElementById(id);}
   function skin(){return SKIN.find(function(s){return s.id===state.skin;})||SKIN[2];}
   function activeProd(){return state.products.find(function(p){return p.id===state.activeProduct;})||state.products[0];}
-  function calculateEffectiveSPF(){var s=activeProd().spf||0;return s<=1?1:Math.max(1, Math.sqrt(s));}
+  function calculateEffectiveSPF(){var s=activeProd().spf||0;return s<=1?1:Math.max(1,s*0.5);}
   function burnMin(uv){if(uv<=0.2)return Infinity;return skin().med/(1.5*uv)*calculateEffectiveSPF();}
   
   function safeMin(uv){var burnTimeMinutes=burnMin(uv);if(!isFinite(burnTimeMinutes))return 0;return Math.max(0,Math.round(Math.min((burnTimeMinutes*curMode().factor)/2,90)));}
@@ -622,7 +620,8 @@
     
     var singleSide = safeMin(cu);
     $("safeMin").innerHTML=singleSide+"<u>m</u>";
-    $("totalSessionMin").innerHTML=(singleSide * 2)+"<u>m</u>";
+    var vd=vitDIU(cu,singleSide*2);
+    $("vitDStat").innerHTML=(vd>=1000?(vd/1000).toFixed(1)+"<u>k IU</u>":vd+"<u>IU</u>");
     
     var b=burnMin(cu);$("burnMin").innerHTML=(isFinite(b)?Math.round(b):"∞")+"<u>m</u>";
     var sw=sunWindow();$("sunTimes").innerHTML="<span>☀ "+fmtH(sw.sr)+"</span><span>golden "+fmtH(Math.max(sw.sr,sw.ss-1.5))+"</span><span>"+fmtH(sw.ss)+" ☾</span>";
@@ -635,7 +634,9 @@
   }
   
   // ---- tracking system state & engine update ----
-  var timer={running:false, paused:false, start:0, accumulatedSec:0, currentSide: "A", alerted:false};
+  var timer={running:false,paused:false,start:0,accumulatedSec:0,completedSidesSec:0,currentSide:"A",alerted:false,warned2min:false};
+  function saveTimer(){Store.write("bask.timer",{running:timer.running,paused:timer.paused,start:timer.start,accumulatedSec:timer.accumulatedSec,completedSidesSec:timer.completedSidesSec,currentSide:timer.currentSide,alerted:timer.alerted,warned2min:timer.warned2min});}
+  function clearTimer(){Store.write("bask.timer",null);}
 
   function renderDial(){
     var big=$("dialBig"),lab=$("dialLab"),tap=$("dialTap"),ring=$("ring"), sideInd=$("dialSide");
@@ -673,6 +674,11 @@
       document.querySelector(".dial .glow").style.setProperty("--dialglow",frac>0.5?1:0);
       dialContainer.setAttribute("aria-valuenow", Math.floor(frac * 100));
       
+      if(!timer.warned2min && !timer.alerted && totalSec<totalTgtSec && (totalTgtSec-totalSec)<=120){
+        timer.warned2min=true;
+        try{if(navigator.vibrate)navigator.vibrate([100]);}catch(e){}
+        toast("2 min left on Side "+timer.currentSide);
+      }
       if(!timer.alerted && totalSec>=totalTgtSec){
         timer.alerted=true;
         burnAlert();
@@ -707,33 +713,28 @@
     if(state.goal>0){gw.style.display="block";$("goalFill").style.width=Math.min(100,Math.round(p/state.goal*100))+"%";if(p>=state.goal&&p>=2){note.textContent="🎉 Goal reached — "+Math.round(p)+"% glow.";}else if(p>=2){note.textContent+=" Goal "+state.goal+"%.";}}
   }
 
-  // ---- updated side tracking + confirmations controls engine ----
-  let wakeLock = null;
-  let timerWorker = null;
+  var wakeLock = null;
+  var timerWorker = null;
 
-  async function keepScreenAwake() {
-    try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); }
-    catch (err) { console.warn("Wake Lock failed:", err); }
+  function keepScreenAwake() {
+    if (!('wakeLock' in navigator)) return;
+    navigator.wakeLock.request('screen').then(function(wl){wakeLock=wl;}).catch(function(err){console.warn("Wake Lock failed:",err);});
   }
 
   function startReliableTimer() {
     keepScreenAwake();
     if (!timerWorker) {
-      const workerCode = `
-        let interval;
-        self.onmessage = function(e) {
-          if (e.data === 'start') {
-            if (interval) clearInterval(interval);
-            interval = setInterval(() => self.postMessage('tick'), 1000);
-          } else if (e.data === 'stop') {
-            clearInterval(interval);
-          }
-        };
-      `;
-      const blob = new Blob([workerCode], { type: 'application/javascript' });
-      timerWorker = new Worker(URL.createObjectURL(blob));
+      var workerCode = "var iv;self.onmessage=function(e){if(e.data==='start'){if(iv)clearInterval(iv);iv=setInterval(function(){self.postMessage('tick');},1000);}else if(e.data==='stop'){clearInterval(iv);}};";
+      var workerBlob = new Blob([workerCode], {type:'application/javascript'});
+      var workerUrl = URL.createObjectURL(workerBlob);
+      timerWorker = new Worker(workerUrl);
+      URL.revokeObjectURL(workerUrl);
+      var tick = 0;
       timerWorker.onmessage = function() {
-        if (timer.running) renderDial();
+        if (timer.running) {
+          renderDial();
+          if (++tick % 10 === 0) saveTimer();
+        }
       };
     }
     timerWorker.postMessage('start');
@@ -741,25 +742,27 @@
 
   function stopReliableTimer() {
     if (timerWorker) timerWorker.postMessage('stop');
-    if (wakeLock) wakeLock.release().then(() => wakeLock = null);
+    if (wakeLock) wakeLock.release().then(function(){wakeLock=null;});
   }
   
   function handleMainControlClick(){
     if(!timer.running && !timer.paused){
-      // Start Session
       timer.running=true;
       timer.paused=false;
       timer.start=Date.now();
       timer.accumulatedSec=0;
+      timer.completedSidesSec=0;
       timer.currentSide="A";
       timer.alerted=false;
+      timer.warned2min=false;
+      saveTimer();
       setupActionButtonUI();
       startReliableTimer();
     } else if(timer.running){
-      // Intermediary Pausing trigger
       timer.running=false;
       timer.paused=true;
       timer.accumulatedSec += (Date.now() - timer.start) / 1000;
+      saveTimer();
       stopReliableTimer();
       setupActionButtonUI();
       renderDial();
@@ -770,55 +773,49 @@
     timer.running=true;
     timer.paused=false;
     timer.start=Date.now();
+    saveTimer();
     setupActionButtonUI();
     startReliableTimer();
   }
 
   function flipSides(){
-    // Save current side segment progress cleanly to temporary buffer if necessary, reset target factor
-    var sideFinished = timer.currentSide;
+    var sideElapsed = timer.running ? (Date.now() - timer.start) / 1000 : 0;
+    timer.completedSidesSec += timer.accumulatedSec + sideElapsed;
     timer.currentSide = (timer.currentSide === "A") ? "B" : "A";
-    timer.accumulatedSec = 0; // Fresh tracking window layout for Side B
+    timer.accumulatedSec = 0;
     timer.start = Date.now();
     timer.alerted = false;
-    toast("Flipped over to Side " + timer.currentSide);
-    
-    // Automatically resume activity on new side structure
+    timer.warned2min = false;
+    toast("Flipped to Side " + timer.currentSide);
     resumeSession();
   }
 
   function triggerFinishConfirmation(){
-    // Calculate accurate accumulated stats before triggering modal interface layout profiles
-    var calculatedCurrentSec = timer.accumulatedSec;
-    if(timer.running) {
-      calculatedCurrentSec += (Date.now() - timer.start) / 1000;
-    }
-    var totalMins = Math.max(1, Math.round(calculatedCurrentSec / 60));
-    
-    $("confirmSessionDetails").innerHTML = "You have been tracking for a total calculation of <b>" + totalMins + " minutes</b> on your profile layers. Save this workout?";
+    var elapsed = timer.running ? (Date.now() - timer.start) / 1000 : 0;
+    var totalMins = Math.max(1, Math.round((timer.completedSidesSec + timer.accumulatedSec + elapsed) / 60));
+    $("confirmSessionDetails").innerHTML = "You've been out for <b>" + totalMins + " min</b> across both sides. Save this session?";
     openSheet($("confirmFinishSheet"));
   }
 
   function saveFinalizedSession(){
     closeSheets();
+    var elapsed = timer.running ? (Date.now() - timer.start) / 1000 : 0;
+    var totalSec = timer.completedSidesSec + timer.accumulatedSec + elapsed;
     timer.running=false;
     timer.paused=false;
     stopReliableTimer();
-    
-    var calculatedSec = timer.accumulatedSec;
-    var mins=Math.max(1,Math.round(calculatedSec/60));
+    clearTimer();
+    var mins=Math.max(1,Math.round(totalSec/60));
     var cu=Math.round(currentUV()*10)/10;
     var prod=activeProd();
-    
     addSession({
       when:Date.now(),
       min:mins,
       uv:cu,
-      note:(prod.id==="bare"?"Bare skin":prod.name)+(prod.spf?(" · SPF "+prod.spf):"") + " (Two-Sided Tracked)"
+      note:(prod.id==="bare"?"Bare skin":prod.name)+(prod.spf?(" · SPF "+prod.spf):"")+" (Two-Sided)"
     });
-    
-    // reset configurations structural flags completely
     timer.accumulatedSec=0;
+    timer.completedSidesSec=0;
     timer.currentSide="A";
     setupActionButtonUI();
     toast("Logged "+mins+" min · "+vitDIU(cu,mins).toLocaleString()+" IU vit D");
@@ -846,7 +843,6 @@
 
   function burnAlert(){try{if(navigator.vibrate)navigator.vibrate([200,80,200]);}catch(e){}try{var ac=new (window.AudioContext||window.webkitAudioContext)();var o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);o.frequency.value=660;g.gain.setValueAtTime(.0001,ac.currentTime);g.gain.exponentialRampToValueAtTime(.25,ac.currentTime+.02);g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+.6);o.start();o.stop(ac.currentTime+.62);}catch(e){}toast("⚠ Side safe limit achieved — consider flipping sides or wrapping up.");}
   
-  // Bind Tracking Engine Actions
   $("timerBtn").onclick=handleMainControlClick;
   $("dial").onclick=handleMainControlClick;
   $("resumeBtn").onclick=resumeSession;
@@ -981,6 +977,7 @@
   }
 
   initSettingsUI();renderGoalSeg();renderAll();clock();
+  (function(){var st=Store.read("bask.timer",null);if(st&&(st.running||st.paused)){var extra=st.running?(Date.now()-st.start)/1000:0;timer.paused=true;timer.running=false;timer.accumulatedSec=(st.accumulatedSec||0)+extra;timer.completedSidesSec=st.completedSidesSec||0;timer.currentSide=st.currentSide||"A";timer.alerted=st.alerted||false;timer.warned2min=st.warned2min||false;setupActionButtonUI();renderDial();toast("Session paused — tap Resume to continue");}})();
   if(state.live)setStatus("warn","Saved UV ("+liveAge()+")");else setStatus("warn","Tap to enable live UV");
   if(!state.onboarded){startOnb(false);}else{refreshUV();}
   syncClockToSystem();

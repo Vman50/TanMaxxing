@@ -20,8 +20,7 @@ required. Just open it in a browser.
 - **SPF & products** — log sunscreen/products and the app factors effective SPF into
   safe-exposure estimates.
 - **Session log** — history of past sessions on the Log screen.
-- **Light & dark themes**, installable as a PWA on mobile, with offline-friendly local
-  storage.
+- Installable as a PWA on mobile, with offline-friendly local storage.
 
 ## Getting started
 
