@@ -586,6 +586,7 @@
   <div class="field"><label>UV data source</label><div class="seg" id="sourceSeg"><button data-src="openmeteo" aria-pressed="true">Open-Meteo<br><span style="font-size:11px;color:var(--muted);">free · no key</span></button><button data-src="openuv" aria-pressed="false">OpenUV<br><span style="font-size:11px;color:var(--muted);">needs key</span></button></div></div>
   <div class="field" id="keyField" style="display:none;"><label>OpenUV API key</label><input type="password" id="openuvKey" placeholder="x-access-token from openuv.io" /><div class="hint">Free key, 50 lookups/day. Stored only on this device.</div></div>
   <div class="field"><label>Your data</label><div class="row2"><button class="btn btn-ghost" id="exportBtn">Export</button><button class="btn btn-ghost" id="importBtn">Import</button></div><input type="file" id="importFile" accept="application/json" style="display:none;" /></div>
+  <div class="field"><label>App</label><button class="btn btn-ghost" id="forceUpdateBtn">↺ Check for update</button></div>
   <button class="btn btn-go" id="openSciBtn" style="margin-bottom:10px;">How TanMaxxing calculates</button>
   <button class="btn btn-ghost" id="closeSettings">Done</button>
   <p class="disclaimer">Estimates only, not medical advice. UV exposure carries skin-damage and skin-cancer risk; these numbers help avoid burning, not make tanning safe.</p>
@@ -1402,6 +1403,19 @@
   function updateLocLabels(){var name=(state.loc&&state.loc.place)?state.loc.place:(state.loc?"Your location":"Set location");$("locName").textContent=name;$("locSetting").textContent=state.loc?(name+" ("+state.loc.lat.toFixed(2)+", "+state.loc.lng.toFixed(2)+")"):"Not set yet.";}
 
   // ---- export / import ----
+  $("forceUpdateBtn").onclick=function(){
+    haptic(12);
+    var btn=$("forceUpdateBtn");
+    btn.textContent="Checking…";btn.disabled=true;
+    function wipeAndReload(){
+      caches.keys().then(function(keys){return Promise.all(keys.map(function(k){return caches.delete(k);}));}).then(function(){window.location.reload();}).catch(function(){window.location.reload();});
+    }
+    if("serviceWorker" in navigator){
+      navigator.serviceWorker.getRegistration().then(function(reg){
+        if(reg){reg.update().then(wipeAndReload).catch(wipeAndReload);}else{wipeAndReload();}
+      }).catch(wipeAndReload);
+    }else{wipeAndReload();}
+  };
   $("exportBtn").onclick=function(){var data={app:"TanMaxxing",version:1,exported:new Date().toISOString(),skin:state.skin,goal:state.goal,products:state.products,sessions:state.sessions};var blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="tanmaxxing-data-"+new Date().toISOString().slice(0,10)+".json";a.click();toast("Exported your data");};
   $("importBtn").onclick=function(){$("importFile").click();};
   $("importFile").onchange=function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(d.sessions)state.sessions=d.sessions;if(d.products)state.products=d.products;if(typeof d.skin==="number")state.skin=d.skin;if(typeof d.goal==="number")state.goal=d.goal;Store.write("tanmax.sessions",state.sessions);Store.write("tanmax.products",state.products);Store.write("tanmax.skin",state.skin);Store.write("tanmax.goal",state.goal);renderAll();renderGoalSeg();toast("Imported "+(d.sessions?d.sessions.length:0)+" sessions");}catch(err){toast("Couldn't read that file");}};r.readAsText(f);e.target.value="";};
