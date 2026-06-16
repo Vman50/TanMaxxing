@@ -1536,7 +1536,9 @@
   (function(){
     var scr=$("screen-today"),ind=$("ptr"),startY=0,pulling=false,dist=0,TH=70;
     if(!scr||!ind)return;
-    scr.addEventListener("touchstart",function(e){if(scr.scrollTop<=0&&!sheetOpen&&!ind.classList.contains("spin")){startY=e.touches[0].clientY;pulling=true;dist=0;}else pulling=false;},{passive:true});
+    // True top = both the screen's own scroller AND the document (whichever actually scrolls) are at 0.
+    function atTop(){var de=document.scrollingElement||document.documentElement;return scr.scrollTop<=0&&(de?de.scrollTop:0)<=0&&(window.pageYOffset||0)<=0;}
+    scr.addEventListener("touchstart",function(e){if(atTop()&&!sheetOpen&&!ind.classList.contains("spin")){startY=e.touches[0].clientY;pulling=true;dist=0;}else pulling=false;},{passive:true});
     scr.addEventListener("touchmove",function(e){
       if(!pulling)return;
       dist=e.touches[0].clientY-startY;
