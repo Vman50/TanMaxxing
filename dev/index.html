@@ -217,6 +217,12 @@
   .prod-row .pb{flex:1;min-width:0;} .prod-row .pb .n{font-weight:600;font-size:15px;color:var(--text);} .prod-row .pb .s{font-size:12px;color:var(--muted);}
   .sci p{font-size:13px;color:var(--muted2);line-height:1.6;margin-bottom:11px;} .sci code{background:var(--input);padding:2px 6px;border-radius:6px;color:var(--accent);font-size:12px;} .sci b{color:var(--text);}
   .disclaimer{font-size:11px;color:var(--muted);line-height:1.55;text-align:center;padding:14px 8px 0;}
+  .burn-slid-wrap{padding:4px 0 2px;}
+  .burn-slid-wrap input[type=range]{touch-action:none;-webkit-appearance:none;appearance:none;width:100%;height:7px;border-radius:99px;outline:none;background:linear-gradient(to right,var(--good),#ffce4a 30%,#ff9d3c 55%,#ff5d73 75%,var(--danger));}
+  .burn-slid-wrap input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--bg);box-shadow:0 2px 8px rgba(0,0,0,.3);cursor:pointer;}
+  .burn-slid-wrap input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid var(--bg);cursor:pointer;}
+  .burn-lbl-row{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:5px;}
+  .burn-status{font-size:13px;font-weight:600;margin-top:9px;text-align:center;padding:8px 12px;border-radius:12px;background:var(--input);}
 
   /* onboarding overlay */
   .onb{position:fixed;inset:0;z-index:80;background:var(--frame-glow),var(--bg-grad);display:none;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 8px) 24px calc(24px + env(safe-area-inset-bottom,0px));overflow-y:auto;max-width:460px;margin:0 auto;}
@@ -577,7 +583,7 @@
   <div class="grab"></div>
   <h2>Finish Session?</h2>
   <p class="sub" id="confirmSessionDetails">Are you sure you want to end and save your current session logs?</p>
-  <div class="field"><label>Did your skin burn?</label><div class="seg" id="cBurnSeg"><button type="button" data-burn="0" aria-pressed="true">No burn</button><button type="button" data-burn="1" aria-pressed="false">🔴 Got burned</button></div></div>
+  <div class="field"><label>Skin reaction</label><div class="burn-slid-wrap"><input type="range" id="cBurnSlider" min="0" max="4" step="1" value="0"><div class="burn-lbl-row"><span>None</span><span>Pink</span><span>Mild</span><span>Moderate</span><span>Severe</span></div><div class="burn-status" id="cBurnStatus" style="color:var(--good);">✓ No burn</div></div></div>
   <div class="row2">
     <button class="btn btn-ghost" id="confirmCancelBtn">No, Keep Tracking</button>
     <button class="btn btn-go" id="confirmSaveBtn" style="background:var(--accent-grad);">Yes, Save Logs</button>
@@ -638,7 +644,8 @@
   <div class="field"><label>When</label><input type="datetime-local" id="aWhen" /></div>
   <div class="field" id="aSidesField"><label>Time per side (min)</label><div id="aSidesArea" class="aside-grid"></div></div>
   <div class="field"><label>Peak UV</label><input type="number" id="aUV" min="0" max="14" inputmode="decimal" enterkeyhint="next" placeholder="e.g. 6" /></div>
-  <div class="field"><label>Did your skin burn?</label><div class="seg" id="aBurnSeg"><button type="button" data-burn="0" aria-pressed="true">No burn</button><button type="button" data-burn="1" aria-pressed="false">🔴 Got burned</button></div></div>
+  <div class="field"><label>Product used</label><div class="chips" id="aProductChips" style="flex-wrap:wrap;"></div></div>
+  <div class="field"><label>Skin reaction</label><div class="burn-slid-wrap"><input type="range" id="aBurnSlider" min="0" max="4" step="1" value="0"><div class="burn-lbl-row"><span>None</span><span>Pink</span><span>Mild</span><span>Moderate</span><span>Severe</span></div><div class="burn-status" id="aBurnStatus" style="color:var(--good);">✓ No burn</div></div></div>
   <div class="field"><label>Note (optional)</label><textarea id="aNote" placeholder="Front + back, coconut oil, slight pink…"></textarea></div>
   <div class="row2"><button class="btn btn-ghost" id="addCancel">Cancel</button><button class="btn btn-go" id="addSave">Save</button></div><div style="height:8px"></div>
 </div>
@@ -1233,7 +1240,7 @@
     var totalSec = Object.keys(fst).reduce(function(a,k){return a+fst[k];},0);
     var totalMins = Math.max(1, Math.round(totalSec / 60));
     var sideDetail = Object.keys(fst).map(function(s){return s+" "+Math.round(fst[s]/60)+"m";}).join(" · ");
-    setConfirmBurn(0);
+    setConfirmBurnLevel(0);
     $("confirmSessionDetails").innerHTML = "<b>"+totalMins+" min</b> total — "+sideDetail+". Save this session?";
     openSheet($("confirmFinishSheet"));
   }
@@ -1251,7 +1258,8 @@
     Object.keys(fst).forEach(function(s){var m=Math.round(fst[s]/60);if(m>0)sideMinutes[s]=m;});
     var cu=Math.round(currentUV()*10)/10;
     var prod=activeProd();
-    var sides=sessionSides(),burned=confirmBurn===1,when=Date.now();
+    var sides=sessionSides(),burned=confirmBurnLevel>=2,when=Date.now();
+    var burnNote=confirmBurnLevel>0?(" · "+["","🌸 pink","🟠 mild burn","🔴 burn","🔥 severe burn"][confirmBurnLevel]):"";
     addSession({
       when:when,
       min:mins,
@@ -1260,7 +1268,9 @@
       sides:sides,
       sideMinutes:sideMinutes,
       burned:burned,
-      note:prodLabel(prod)+" · "+sides.join("+")+(burned?" · 🔴 burned":"")
+      burnLevel:confirmBurnLevel,
+      productId:activeProd().id,
+      note:prodLabel(prod)+" · "+sides.join("+")+burnNote
     });
     if(burned)applyBurn(when);
     timer.accumulatedSec=0;
@@ -1366,7 +1376,13 @@
   $("confirmSaveBtn").onclick=saveFinalizedSession;
 
   // ---- sessions ----
-  var editingId=null,addBurn=0,confirmBurn=0,undoT;
+  var editingId=null,addBurnLevel=0,addProductId="bare",confirmBurnLevel=0,undoT;
+  var BURN_LABELS=["✓ No burn","🌸 Slight pink","🟠 Mild burn","🔴 Moderate burn","🔥 Severe burn"];
+  var BURN_COLORS=["var(--good)","#e0934a","#ff9d3c","#ff5d73","var(--danger)"];
+  function setAddBurnLevel(v){addBurnLevel=v;var sl=$("aBurnSlider");if(sl)sl.value=v;var st=$("aBurnStatus");if(st){st.textContent=BURN_LABELS[v];st.style.color=BURN_COLORS[v];}}
+  function setConfirmBurnLevel(v){confirmBurnLevel=v;var sl=$("cBurnSlider");if(sl)sl.value=v;var st=$("cBurnStatus");if(st){st.textContent=BURN_LABELS[v];st.style.color=BURN_COLORS[v];}}
+  function effSpfForProduct(pid){var p=state.products.find(function(x){return x.id===pid;})||state.products[0];var s=p.spf||0;return s<=1?1:Math.max(1,Math.sqrt(s));}
+  function renderAddProductChips(){var host=$("aProductChips");if(!host)return;host.innerHTML="";state.products.forEach(function(p){var b=document.createElement("button");b.type="button";b.className="chip";b.setAttribute("aria-pressed",addProductId===p.id?"true":"false");b.innerHTML=(p.kind==="oil"?"🟠 ":"🟢 ")+(p.id==="bare"?"Bare skin":(p.kind==="oil"?"Tanning Oil":"Sunscreen"))+(p.spf?"<span class='t'>SPF "+p.spf+"</span>":"<span class='t'>no SPF</span>");b.onclick=function(){addProductId=p.id;renderAddProductChips();};host.appendChild(b);});}
   function applyBurn(when){state.recoveryUntil=when+BURN_LOCKOUT_DAYS*864e5;Store.write("tanmax.recoveryUntil",state.recoveryUntil);}
   function addSession(s){s.id=Date.now()+"-"+Math.random().toString(36).slice(2,6);state.sessions.unshift(s);Store.write("tanmax.sessions",state.sessions);renderLog();renderTan();}
   function showUndo(msg,fn){var t=$("toast");t.innerHTML="";var sp=document.createElement("span");sp.textContent=msg;var b=document.createElement("button");b.className="ub";b.textContent="Undo";b.onclick=function(){fn();t.classList.remove("show");t.innerHTML="";clearTimeout(undoT);};t.appendChild(sp);t.appendChild(b);t.classList.add("show");clearTimeout(undoT);clearTimeout(toastT);undoT=setTimeout(function(){t.classList.remove("show");t.innerHTML="";},5000);}
@@ -1377,8 +1393,6 @@
     state.sessions.splice(idx,1);Store.write("tanmax.sessions",state.sessions);renderLog();renderTan();
     showUndo("Session deleted",function(){state.sessions.splice(idx,0,removed);Store.write("tanmax.sessions",state.sessions);renderLog();renderTan();});
   }
-  function setAddBurn(v){addBurn=v;document.querySelectorAll("#aBurnSeg button").forEach(function(b){b.setAttribute("aria-pressed",parseInt(b.dataset.burn,10)===v?"true":"false");});}
-  function setConfirmBurn(v){confirmBurn=v;document.querySelectorAll("#cBurnSeg button").forEach(function(b){b.setAttribute("aria-pressed",parseInt(b.dataset.burn,10)===v?"true":"false");});}
   function renderAddSides(existing){
     var host=$("aSidesArea");if(!host)return;
     var sides=activeSides();
@@ -1401,7 +1415,8 @@
     $("aWhen").value=d.toISOString().slice(0,16);
     renderAddSides(s);
     $("aUV").value=(s.uv==null?"":s.uv);$("aNote").value=s.note||"";
-    setAddBurn(s.burned?1:0);
+    addProductId=s.productId||state.activeProduct;renderAddProductChips();
+    setAddBurnLevel(s.burnLevel!=null?s.burnLevel:(s.burned?2:0));
     openSheet($("addSheet"));
   }
   function renderLog(){var list=$("logList"),n=state.sessions.length,mins=0;state.sessions.forEach(function(s){mins+=s.min;});$("sTotal").textContent=n;$("sMins").textContent=mins;$("sStreak").textContent=streak();drawTanChart();renderWeek();renderTanForecast();
@@ -1552,10 +1567,10 @@
   $("refreshBtn").onclick=function(e){e.stopPropagation();state.live=null;refreshUV();};
   $("statusPill").onclick=function(){if(!state.loc)refreshUV();};
   $("uvSlider").addEventListener("input",function(e){state.manualUV=parseInt(e.target.value,10);Store.write("tanmax.manualUV",state.manualUV);$("uvNum").textContent=state.manualUV;firstDraw=true;renderToday();});
-  $("quickAdd").onclick=function(){editingId=null;$("addTitle").textContent="Log a session";$("addSub").textContent="Add a tan you've already done.";$("addSave").textContent="Save";setAddBurn(0);var now=new Date();now.setMinutes(now.getMinutes()-now.getTimezoneOffset());$("aWhen").value=now.toISOString().slice(0,16);var plan=safeMin(currentUV());renderAddSides(plan>0?{_plan:plan}:null);$("aUV").value=Math.round(currentUV());$("aNote").value="";openSheet($("addSheet"));};
+  $("quickAdd").onclick=function(){editingId=null;$("addTitle").textContent="Log a session";$("addSub").textContent="Add a tan you've already done.";$("addSave").textContent="Save";addProductId=state.activeProduct;renderAddProductChips();setAddBurnLevel(0);var now=new Date();now.setMinutes(now.getMinutes()-now.getTimezoneOffset());$("aWhen").value=now.toISOString().slice(0,16);var plan=safeMin(currentUV());renderAddSides(plan>0?{_plan:plan}:null);$("aUV").value=Math.round(currentUV());$("aNote").value="";openSheet($("addSheet"));};
   $("addCancel").onclick=function(){editingId=null;closeSheets();};
-  document.querySelectorAll("#aBurnSeg button").forEach(function(b){b.onclick=function(){setAddBurn(parseInt(b.dataset.burn,10));};});
-  document.querySelectorAll("#cBurnSeg button").forEach(function(b){b.onclick=function(){setConfirmBurn(parseInt(b.dataset.burn,10));};});
+  $("aBurnSlider").addEventListener("input",function(){setAddBurnLevel(parseInt(this.value,10));});
+  $("cBurnSlider").addEventListener("input",function(){setConfirmBurnLevel(parseInt(this.value,10));});
   $("addSave").onclick=function(){
     var sides=activeSides(),sideMinutes={};
     sides.forEach(function(s){var inp=$("aside_"+s);var v=parseInt(inp&&inp.value,10);if(v>0)sideMinutes[s]=v;});
@@ -1563,17 +1578,18 @@
     if(min<1){var first=$("aside_"+sides[0]);if(first)first.focus();return;}
     var wv=$("aWhen").value,when=wv?new Date(wv).getTime():Date.now();
     var uv=$("aUV").value;uv=uv===""?null:parseFloat(uv);
-    var note=$("aNote").value.trim(),burned=addBurn===1;
+    var note=$("aNote").value.trim(),burned=addBurnLevel>=2;
     var sessionSidesList=Object.keys(sideMinutes);
+    var logSpf=effSpfForProduct(addProductId);
     if(editingId){
       var s=state.sessions.find(function(x){return x.id===editingId;});
-      if(s){s.when=when;s.min=min;s.uv=uv;s.note=note;s.burned=burned;s.sides=sessionSidesList;s.sideMinutes=sideMinutes;}
+      if(s){s.when=when;s.min=min;s.uv=uv;s.note=note;s.burned=burned;s.burnLevel=addBurnLevel;s.productId=addProductId;s.spf=logSpf;s.sides=sessionSidesList;s.sideMinutes=sideMinutes;}
       state.sessions.sort(function(a,b){return b.when-a.when;});
       Store.write("tanmax.sessions",state.sessions);editingId=null;renderLog();renderTan();closeSheets();
       if(burned)applyBurn(when);
       renderToday();toast("Session updated");
     }else{
-      addSession({when:when,min:min,uv:uv,note:note,burned:burned,sides:sessionSidesList,sideMinutes:sideMinutes});
+      addSession({when:when,min:min,uv:uv,note:note,burned:burned,burnLevel:addBurnLevel,productId:addProductId,spf:logSpf,sides:sessionSidesList,sideMinutes:sideMinutes});
       if(burned)applyBurn(when);
       closeSheets();document.querySelector('.tab[data-tab="log"]').click();
       renderToday();toast(burned?"Logged — recovery mode on":"Session logged");
