@@ -805,6 +805,7 @@
   function sunWindow(){if(state.live&&state.live.sunrise!=null&&state.live.sunset!=null)return{sr:state.live.sunrise,ss:state.live.sunset};if(state.loc){var tz=-new Date().getTimezoneOffset()/60;return{sr:sunTime(state.loc.lat,state.loc.lng,new Date(),tz,true),ss:sunTime(state.loc.lat,state.loc.lng,new Date(),tz,false)};}return{sr:6.5,ss:20};}
   // Skin-type sweet spot: lighter skin tans (and burns) at lower UV, darker skin needs more.
   function sweetSpot(){var t=state.skin;if(t<=1)return{lo:2,hi:4};if(t<=2)return{lo:2,hi:5};if(t<=3)return{lo:3,hi:6};if(t<=4)return{lo:4,hi:7};if(t<=5)return{lo:5,hi:9};return{lo:6,hi:11};}
+  function uvTooLow(uv){return uv < sweetSpot().lo;}
   function bestWindow(){var data=curveData(),ss=sweetSpot(),m=envMult();var lo=null,hi=null;data.forEach(function(p){if(p.uv*m>=ss.lo){if(lo===null)lo=p.h;hi=p.h;}});if(lo===null)return null;return{lo:lo,hi:hi};}
   // Window where effective UV sits inside the sweet spot band, plus a status for the nudge.
   function tanZone(dayData){var data=dayData||curveData(),ss=sweetSpot(),m=envMult();var lo=null,hi=null;data.forEach(function(p){var u=p.uv*m;if(u>=ss.lo&&u<=ss.hi+1.5){if(lo===null)lo=p.h;hi=p.h;}});if(lo===null)return null;return{lo:lo,hi:hi};}
@@ -885,9 +886,10 @@
     $("uvNowBig").innerHTML=cu.toFixed(1)+"<i id='uvSub'> now · peak "+(pk?pk.toFixed(1):"—")+"</i>";
     
     var singleSide = safeMin(cu);
-    $("safeMin").innerHTML=singleSide+"<u>m</u>";
+    var tooLow = uvTooLow(cu);
+    $("safeMin").innerHTML=(tooLow?"∞":singleSide)+"<u>m</u>";
     var vd=vitDIU(cu,singleSide*activeSides().length);
-    $("vitDStat").innerHTML=(vd>=1000?(vd/1000).toFixed(1)+"<u>k IU</u>":vd+"<u>IU</u>");
+    $("vitDStat").innerHTML=(tooLow?"—<u>IU</u>":(vd>=1000?(vd/1000).toFixed(1)+"<u>k IU</u>":vd+"<u>IU</u>"));
     
     var b=burnMin(cu);$("burnMin").innerHTML=(isFinite(b)?Math.round(b):"∞")+"<u>m</u>";
     var sw=sunWindow();$("sunTimes").innerHTML="<span>☀ "+fmtH(sw.sr)+"</span><span>peak "+fmtH(Math.max(sw.sr,sw.ss-1.5))+"</span><span>"+fmtH(sw.ss)+" ☾</span>";
@@ -957,15 +959,21 @@
       }
     }else{
       sideInd.style.display = "none";
-      var s = safeMin(currentUV());
-      big.textContent=s>0?s:"–";
-      big.className="n";
-      lab.textContent="min suggested";
-      var nSides=activeSides().length;
-      tap.textContent=s>0?("≈ "+(s*nSides)+"m total suggestion"):"tap to start";
+      var cu2=currentUV();
+      if(uvTooLow(cu2)){
+        big.textContent="∞";big.className="n";
+        lab.textContent="min suggested";
+        tap.textContent="UV too low — won't tan effectively";
+      }else{
+        var s=safeMin(cu2);
+        big.textContent=s>0?s:"–";big.className="n";
+        lab.textContent="min suggested";
+        var nSides=activeSides().length;
+        tap.textContent=s>0?("≈ "+(s*nSides)+"m total suggestion"):"tap to start";
+      }
       ring.setAttribute("stroke-dashoffset","0");
       document.querySelector(".dial .glow").style.setProperty("--dialglow",0);
-      dialContainer.setAttribute("aria-valuenow", "0");
+      dialContainer.setAttribute("aria-valuenow","0");
     }
   }
 
