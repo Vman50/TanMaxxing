@@ -116,7 +116,9 @@ node -e "new Function($(sed -n '/<script>/,/<\/script>/p' index.html | sed '1d;$
 ```
 
 **Git workflow:** Always push to the `dev` branch first. Only push to `main` after a full
-codebase review and explicit approval from Vince.
+codebase review and explicit approval from Vince. **Always commit and push to `dev` when
+finishing a change**, then **end every reply by stating whether you pushed or not** (e.g.
+"Pushed to `dev`" or "Not pushed — changes are local").
 
 ## Conventions
 
