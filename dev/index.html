@@ -1108,7 +1108,7 @@
   }
 
   // ---- changelog ----
-  var APP_VER = "0.4";
+  var APP_VER = IS_DEV ? "0.4.0" : "0.4";
   var CHANGELOG = [
     {ver:"0.4", items:["Redesigned intro screen with clear option boxes","Added What's New changelog","Fixed mode slider sticking on mobile","Fixed data loss bug — settings now persist reliably across sessions"]},
     {ver:"0.3", items:["Continuous mode slider from No Burn 🛡️ to Max Tan 🔥","Pull-to-refresh UV data on Today screen","Scroll position fixes throughout"]},
@@ -1470,20 +1470,14 @@
   function refreshUV(){setStatus("load","Locating…");firstDraw=true;var locP=state.loc?Promise.resolve(state.loc):getLocation().then(function(c){state.loc=c;Store.write("tanmax.loc",c);reverseGeocode(c.lat,c.lng).then(function(name){if(name){state.loc.place=name;Store.write("tanmax.loc",state.loc);updateLocLabels();}});return c;});locP.then(function(c){setStatus("load","Fetching UV…");return (state.source==="openuv"?fetchOpenUV:fetchOpenMeteo)(c.lat,c.lng);}).then(function(live){state.live=live;Store.write("tanmax.live",live);updateLocLabels();setStatus("live","Live · "+liveAge());renderToday();}).catch(function(err){if(state.live)setStatus("warn","Saved UV ("+liveAge()+") · tap ↻");else setStatus("err","Tap to enable live UV");renderToday();});}
   function updateLocLabels(){var name=(state.loc&&state.loc.place)?state.loc.place:(state.loc?"Your location":"Set location");$("locName").textContent=name;$("locSetting").textContent=state.loc?(name+" ("+state.loc.lat.toFixed(2)+", "+state.loc.lng.toFixed(2)+")"):"Not set yet.";}
 
+  // ---- force update (shared by settings button + refresh long-press) ----
+  function forceUpdate(){
+    var btn=$("forceUpdateBtn");if(btn){btn.textContent="Checking…";btn.disabled=true;}
+    function wipeAndReload(){caches.keys().then(function(keys){return Promise.all(keys.map(function(k){return caches.delete(k);}));}).then(function(){window.location.reload();}).catch(function(){window.location.reload();});}
+    if("serviceWorker" in navigator){navigator.serviceWorker.getRegistration().then(function(reg){if(reg){reg.update().then(wipeAndReload).catch(wipeAndReload);}else{wipeAndReload();}}).catch(wipeAndReload);}else{wipeAndReload();}
+  }
   // ---- export / import ----
-  $("forceUpdateBtn").onclick=function(){
-    haptic(12);
-    var btn=$("forceUpdateBtn");
-    btn.textContent="Checking…";btn.disabled=true;
-    function wipeAndReload(){
-      caches.keys().then(function(keys){return Promise.all(keys.map(function(k){return caches.delete(k);}));}).then(function(){window.location.reload();}).catch(function(){window.location.reload();});
-    }
-    if("serviceWorker" in navigator){
-      navigator.serviceWorker.getRegistration().then(function(reg){
-        if(reg){reg.update().then(wipeAndReload).catch(wipeAndReload);}else{wipeAndReload();}
-      }).catch(wipeAndReload);
-    }else{wipeAndReload();}
-  };
+  $("forceUpdateBtn").onclick=function(){haptic(12);forceUpdate();};
   $("exportBtn").onclick=function(){var data={app:"TanMaxxing",version:1,exported:new Date().toISOString(),skin:state.skin,goal:state.goal,products:state.products,sessions:state.sessions};var blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="tanmaxxing-data-"+new Date().toISOString().slice(0,10)+".json";a.click();toast("Exported your data");};
   $("importBtn").onclick=function(){$("importFile").click();};
   $("importFile").onchange=function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(d.sessions)state.sessions=d.sessions;if(d.products)state.products=d.products;if(typeof d.skin==="number")state.skin=d.skin;if(typeof d.goal==="number")state.goal=d.goal;Store.write("tanmax.sessions",state.sessions);Store.write("tanmax.products",state.products);Store.write("tanmax.skin",state.skin);Store.write("tanmax.goal",state.goal);renderAll();renderGoalSeg();toast("Imported "+(d.sessions?d.sessions.length:0)+" sessions");}catch(err){toast("Couldn't read that file");}};r.readAsText(f);e.target.value="";};
@@ -1564,7 +1558,10 @@
   $("useLocation").onclick=function(){state.loc=null;state.live=null;Store.write("tanmax.loc",null);refreshUV();};
   $("locManualBtn").onclick=function(){var q=$("locManualInput").value;if(!q.trim()){$("locManualInput").focus();return;}setManualLocation(q,function(){$("locManualInput").value="";});};
   $("locManualInput").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();$("locManualBtn").click();}});
-  $("refreshBtn").onclick=function(e){e.stopPropagation();state.live=null;refreshUV();};
+  var _rfHoldT=null,_rfHoldFired=false;
+  $("refreshBtn").addEventListener("pointerdown",function(){_rfHoldFired=false;_rfHoldT=setTimeout(function(){_rfHoldFired=true;haptic([15,40,15]);toast("Checking for update…");forceUpdate();},700);});
+  (function(){function cancel(){clearTimeout(_rfHoldT);_rfHoldT=null;}$("refreshBtn").addEventListener("pointerup",cancel);$("refreshBtn").addEventListener("pointerleave",cancel);$("refreshBtn").addEventListener("pointercancel",cancel);})();
+  $("refreshBtn").onclick=function(e){e.stopPropagation();if(_rfHoldFired){_rfHoldFired=false;return;}state.live=null;refreshUV();};
   $("statusPill").onclick=function(){if(!state.loc)refreshUV();};
   $("uvSlider").addEventListener("input",function(e){state.manualUV=parseInt(e.target.value,10);Store.write("tanmax.manualUV",state.manualUV);$("uvNum").textContent=state.manualUV;firstDraw=true;renderToday();});
   $("quickAdd").onclick=function(){editingId=null;$("addTitle").textContent="Log a session";$("addSub").textContent="Add a tan you've already done.";$("addSave").textContent="Save";addProductId=state.activeProduct;renderAddProductChips();setAddBurnLevel(0);var now=new Date();now.setMinutes(now.getMinutes()-now.getTimezoneOffset());$("aWhen").value=now.toISOString().slice(0,16);var plan=safeMin(currentUV());renderAddSides(plan>0?{_plan:plan}:null);$("aUV").value=Math.round(currentUV());$("aNote").value="";openSheet($("addSheet"));};
